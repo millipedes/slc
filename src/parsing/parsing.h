@@ -24,6 +24,8 @@ typedef enum {
   BIN_MOD,
 } expression_type;
 
+const char * expression_type_to_string(expression_type type);
+
 typedef struct EXPRESSION_T {
   union {
     int    int_value;
@@ -31,13 +33,13 @@ typedef struct EXPRESSION_T {
     char * string_value;
   } value;
   struct EXPRESSION_T * child;
-  uint64_t qty_children;
+  uint32_t qty_children;
   expression_type type;
 } expression;
 
 const char * parse_whitespace(const char * input);
 
-const char * or_p(const char * input, void * data, uint64_t num_args, ...);
+const char * or_p(const char * input, void * data, uint32_t num_args, ...);
 
 const char * parse_variable_name(const char * input, void * data);
 const char * parse_number(const char * input, void * data);
@@ -67,15 +69,6 @@ const char * parse_expression(const char * input, void * data);
 bool is_double_delineator(char c);
 bool is_whitespace(char c);
 void debug_expression(expression the_expression, int indent);
-
-typedef struct LAMBDA_T {
-  expression arg;
-  union {
-    expression expr;
-    struct LAMBDA_T * func;
-  } function;
-} lambda;
-
-const char * parse_lambda_expression(const char * input, void * data);
+void free_expression(expression the_expression);
 
 #endif

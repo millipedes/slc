@@ -1,15 +1,31 @@
 #include "parsing.h"
 
+const char * expression_type_to_string(expression_type type) {
+  switch(type) {
+    case INT:        return "Int";
+    case DOUBLE:     return "Double";
+    case VAR:        return "Var";
+    case STRING:     return "String";
+    case UN_MINUS:   return "Un Minus";
+    case BIN_PLUS:   return "Bin Plus";
+    case BIN_MINUS:  return "Bin Minus";
+    case BIN_MULT:   return "Bin Mult";
+    case BIN_DIVIDE: return "Bin Divide";
+    case BIN_MOD:    return "Bin Mod";
+  }
+  return NULL;
+}
+
 const char * parse_whitespace(const char * input) {
-  uint64_t inc = 0;
+  uint32_t inc = 0;
   while(is_whitespace(*(input + inc))) inc++;
   return input + inc;
 }
 
-const char * or_p(const char * input, void * data, uint64_t num_args, ...) {
+const char * or_p(const char * input, void * data, uint32_t num_args, ...) {
   va_list args;
   va_start(args, num_args);
-  for(uint64_t i = 0; i < num_args; i++) {
+  for(uint32_t i = 0; i < num_args; i++) {
     const char * remainder = va_arg(args,
         const char * (*)(const char *, void *))(input, data);
     if(remainder != NULL) {
@@ -36,7 +52,7 @@ const char * parse_variable_name(const char * input, void * data) {
 
 const char * parse_number(const char * input, void * data) {
   expression * the_expression = (expression *)data;
-  uint64_t inc = 0;
+  uint32_t inc = 0;
   bool is_double = false;
 
   // decimal
@@ -67,7 +83,7 @@ const char * parse_number(const char * input, void * data) {
 
 const char * parse_string(const char * input, void * data) {
   expression * the_expression = (expression *)data;
-  uint64_t inc = 1;
+  uint32_t inc = 1;
   if(input[0] != '\"') {
     return NULL;
   }
@@ -76,7 +92,7 @@ const char * parse_string(const char * input, void * data) {
     inc++;
   }
   inc++;
-  the_expression->value.string_value = (char *)calloc(inc, sizeof(char));
+  the_expression->value.string_value = (char *)calloc(inc + 1, sizeof(char));
   strncpy(the_expression->value.string_value, input, inc);
   the_expression->value.string_value[inc] = '\0';
   the_expression->type = STRING;
@@ -169,7 +185,20 @@ void debug_expression(expression the_expression, int indent) {
     case BIN_DIVIDE: printf("/\n");                                     break;
     case BIN_MOD:    printf("%\n");                                     break;
   }
-  for(uint64_t i = 0; i < the_expression.qty_children; i++) {
+  for(uint32_t i = 0; i < the_expression.qty_children; i++) {
     debug_expression(the_expression.child[i], indent + 1);
+  }
+}
+
+void free_expression(expression the_expression) {
+  if((the_expression.type == STRING || the_expression.type == VAR)
+      && the_expression.value.string_value) {
+    free(the_expression.value.string_value);
+  }
+  for(uint32_t i = 0; i < the_expression.qty_children; i++) {
+    free_expression(the_expression.child[i]);
+  }
+  if(the_expression.child) {
+    free(the_expression.child);
   }
 }
