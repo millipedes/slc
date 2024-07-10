@@ -235,3 +235,15 @@ TEST(evaluation, evaluation_test_6) {
   free_expression(the_expression);
   free_expression(result);
 }
+
+TEST(evaluation, evaluation_test_7) {
+  const char * the_input = "2 ^ 2 ^ 3";
+  expression the_expression = {0};
+  const char * remainder = parse_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  int value_one = 256;
+  test_expression(result, INT, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}

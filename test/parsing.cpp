@@ -256,3 +256,34 @@ TEST(parsing, expression_test_8) {
   test_expression(the_expression.child[1].child[0], INT, &value_two);
   free_expression(the_expression);
 }
+
+TEST(parsing, expression_test_9) {
+  const char * the_input = "1 ^ 2";
+  expression the_expression = {0};
+  const char * remainder = parse_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, BIN_POW, NULL);
+  test_expression(the_expression.child[0], INT, &value_one);
+  test_expression(the_expression.child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_10) {
+  const char * the_input = "(1 + 2) ^ -(1 + 2)";
+  expression the_expression = {0};
+  const char * remainder = parse_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, BIN_POW, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  test_expression(the_expression.child[1], UN_MINUS, NULL);
+  test_expression(the_expression.child[1].child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[1].child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[1].child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}

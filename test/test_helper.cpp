@@ -21,6 +21,7 @@ void test_expression(expression the_expression, expression_type type, void * val
     case BIN_MULT:
     case BIN_DIVIDE:
     case BIN_MOD:
+    case BIN_POW:
       ASSERT_EQ(the_expression.qty_children, 2);
       break;
   }

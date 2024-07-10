@@ -17,9 +17,11 @@ const char * expression_type_to_string(expression_type type) {
 }
 
 const char * parse_whitespace(const char * input) {
-  uint32_t inc = 0;
-  while(is_whitespace(*(input + inc))) inc++;
-  return input + inc;
+  if(input) {
+    uint32_t inc = 0;
+    while(is_whitespace(*(input + inc))) inc++;
+    return input + inc;
+  } else return NULL;
 }
 
 const char * or_p(const char * input, void * data, uint32_t num_args, ...) {
@@ -100,9 +102,11 @@ const char * parse_string(const char * input, void * data) {
 }
 
 const char * parse_character(const char * input, void * data) {
-  if(input[0] == *(char *)data)
-    return input + 1;
-  return NULL;
+  if(input) {
+    if(input[0] == *(char *)data) {
+      return input + 1;
+    } else return NULL;
+  } else return NULL;
 }
 
 const char * parse_word(const char * input, void * data) {
@@ -125,11 +129,16 @@ const char * parse_factor(const char * input, void * data) {
     return remainder;
   } else if((remainder = parse_character(parse_whitespace(input), (void *)"(")) != NULL) {
     remainder = parse_expression(parse_whitespace(remainder), data);
-    return parse_character(parse_whitespace(remainder), (void *)")");
+    remainder = parse_character(parse_whitespace(remainder), (void *)")");
   } else {
-    return or_p(parse_whitespace(input), data,
-        3, parse_number, parse_string, parse_variable_name);
+    remainder = or_p(parse_whitespace(input), data, 3, parse_number, parse_string, parse_variable_name);
   }
+  const char * maybe_factor;
+  if((maybe_factor = parse_character(parse_whitespace(remainder), (void *)"^")) != NULL) {
+      ADJUST_BINARY_TREE(parse_term, maybe_factor, BIN_POW);
+      return NULL;
+  }
+  return remainder;
 }
 
 const char * parse_term(const char * input, void * data) {

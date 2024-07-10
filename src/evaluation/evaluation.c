@@ -38,6 +38,11 @@ expression evaluate_expression(expression the_expression) {
           evaluate_expression(the_expression.child[0]),
           evaluate_expression(the_expression.child[1]));
       return result;
+    case BIN_POW:
+      result = expression_pow(
+          evaluate_expression(the_expression.child[0]),
+          evaluate_expression(the_expression.child[1]));
+      return result;
   }
   return result;
 }
@@ -176,6 +181,30 @@ expression expression_modulus(expression left, expression right) {
       return result;
     default:
       fprintf(stderr, "[EXPRESSION_MODULUS]: operation modulus not supported "
+          "for type: `%s`\n", expression_type_to_string(left.type));
+      exit(1);
+  }
+}
+
+expression expression_pow(expression left, expression right) {
+  if(left.type != right.type) {
+      fprintf(stderr, "[EXPRESSION_POW]: type do not match: `%s`, `%s`",
+          expression_type_to_string(left.type),
+          expression_type_to_string(right.type));
+      exit(1);
+  }
+  expression result = {0};
+  switch(left.type) {
+    case INT:
+      result.value.int_value = int_pow(left, right);
+      result.type = INT;
+      return result;
+    case DOUBLE:
+      result.value.double_value = double_pow(left, right);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_POW]: operation power not supported "
           "for type: `%s`\n", expression_type_to_string(left.type));
       exit(1);
   }

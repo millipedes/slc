@@ -22,6 +22,7 @@ typedef enum {
   BIN_MULT,
   BIN_DIVIDE,
   BIN_MOD,
+  BIN_POW,
 } expression_type;
 
 const char * expression_type_to_string(expression_type type);

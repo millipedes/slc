@@ -12,5 +12,6 @@ expression expression_subtraction(expression left, expression right);
 expression expression_multiplication(expression left, expression right);
 expression expression_division(expression left, expression right);
 expression expression_modulus(expression left, expression right);
+expression expression_pow(expression left, expression right);
 
 #endif

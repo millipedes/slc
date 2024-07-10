@@ -23,3 +23,7 @@ int int_division(expression left, expression right) {
 int int_modulus(expression left, expression right) {
   return left.value.int_value % right.value.int_value;
 }
+
+int int_pow(expression left, expression right) {
+  return pow(left.value.int_value, right.value.int_value);
+}
