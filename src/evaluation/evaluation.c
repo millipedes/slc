@@ -394,6 +394,7 @@ shape evaluate_shape(shape_parsed the_shape) {
       result.value.rect = evaluate_rectangle(the_shape);
       break;
     case LINE:
+      result.value.the_line = evaluate_line(the_shape);
       break;
   }
   return result;

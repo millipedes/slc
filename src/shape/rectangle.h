@@ -33,7 +33,6 @@ typedef struct RECTANGLE_T {
 
 rectangle evaluate_rectangle(shape_parsed the_shape);
 canvas draw_rectangle(canvas the_canvas, rectangle the_rect);
-bool validate_rectangle(rectangle truth, rectangle test);
 
 extern expression evaluate_expression(expression the_expression);
 

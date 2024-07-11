@@ -344,13 +344,46 @@ TEST(evaluation, evaluate_expression_test_15) {
   free_expression(result);
 }
 
+void validate_rectangle(rectangle truth, rectangle test) {
+  ASSERT_EQ(truth.center.x, test.center.x);
+  ASSERT_EQ(truth.center.y, test.center.y);
+  ASSERT_EQ(truth.color.r, test.color.r);
+  ASSERT_EQ(truth.color.g, test.color.g);
+  ASSERT_EQ(truth.color.b, test.color.b);
+  ASSERT_EQ(truth.height, test.height);
+  ASSERT_EQ(truth.width, test.width);
+  ASSERT_EQ(truth.thickness, test.thickness);
+}
+
+void validate_line(line truth, line test) {
+  ASSERT_EQ(truth.to.x, test.to.x);
+  ASSERT_EQ(truth.to.y, test.to.y);
+  ASSERT_EQ(truth.from.x, test.from.x);
+  ASSERT_EQ(truth.from.y, test.from.y);
+  ASSERT_EQ(truth.color.r, test.color.r);
+  ASSERT_EQ(truth.color.g, test.color.g );
+  ASSERT_EQ(truth.color.b, test.color.b);
+  ASSERT_EQ(truth.thickness, test.thickness);
+}
+
 TEST(evaluation, evaluate_shape_test_0) {
-  const char * the_input = "rectangle(thickness 1 + 2, center_x 2.0, center_y 1.0, width 1, height 2)";
+  const char * the_input = "rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1)";
   shape_parsed the_shape = {0};
   const char * remainder = parse_shape(the_input, &the_shape);
   ASSERT_EQ(remainder[0], '\0');
   shape result = evaluate_shape(the_shape);
-  bool validated = validate_rectangle((rectangle){(coord_2d){2.0, 1.0}, (pixel){0, 0, 0}, 2, 1, 3}, result.value.rect);
-  ASSERT_TRUE(validated);
+  validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
+      (pixel){1, 35, 66}, 2, 1, 3}, result.value.rect);
+  free_shape_parsed(the_shape);
+}
+
+TEST(evaluation, evaluate_shape_test_1) {
+  const char * the_input = "line(thickness 1 + 2, pixel_r 1, to_x 2.0, from_x 2.0, to_y 2.0, from_y 2.0 pixel_b 66, pixel_g 35)";
+  shape_parsed the_shape = {0};
+  const char * remainder = parse_shape(the_input, &the_shape);
+  ASSERT_EQ(remainder[0], '\0');
+  shape result = evaluate_shape(the_shape);
+  validate_line((line){(coord_2d){2.0, 2.0},
+      (coord_2d){2.0, 2.0}, (pixel){1, 35, 66}, 3}, result.value.the_line);
   free_shape_parsed(the_shape);
 }

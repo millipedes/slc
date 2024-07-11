@@ -55,6 +55,10 @@ rectangle evaluate_rectangle(shape_parsed the_shape) {
     } else if(!strncmp(tmp_name.value.string_value, "thickness", sizeof("thickness") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_RECTANGLE]: thickness requires a int\n");
       thickness = tmp_value.value.int_value;
+    } else {
+      fprintf(stderr, "[EVALUATE_RECTANGLE]: unrecognized directive `%s`\n",
+          tmp_name.value.string_value);
+      exit(1);
     }
 
     tmp_name = (expression){0};
@@ -93,15 +97,4 @@ canvas draw_rectangle(canvas the_canvas, rectangle the_rect) {
       (coord_2d){x1, y2}, (coord_2d){x1, y1}, the_rect.color, the_rect.thickness});
 
   return the_canvas;
-}
-
-bool validate_rectangle(rectangle truth, rectangle test) {
-  return truth.center.x == test.center.x
-    && truth.center.y == test.center.y
-    && truth.color.r == test.color.r
-    && truth.color.g == test.color.g
-    && truth.color.b == test.color.b
-    && truth.height == test.height
-    && truth.width == test.width
-    && truth.thickness == test.thickness;
 }

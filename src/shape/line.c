@@ -9,6 +9,68 @@
  */
 #include "line.h"
 
+line evaluate_line(shape_parsed the_shape) {
+  double to_x = DEFAULT_LINE_TO_X;
+  double to_y = DEFAULT_LINE_TO_Y;
+
+  double from_x = DEFAULT_LINE_FROM_X;
+  double from_y = DEFAULT_LINE_FROM_Y;
+
+  uint8_t pixel_r = DEFAULT_LINE_PIXEL_R;
+  uint8_t pixel_g = DEFAULT_LINE_PIXEL_G;
+  uint8_t pixel_b = DEFAULT_LINE_PIXEL_B;
+
+  int thickness = DEFAULT_LINE_THICKNESS;
+
+  expression tmp_name = {0};
+  expression tmp_value = {0};
+
+  for(uint32_t i = 0; i < the_shape.qty_values; i++) {
+    tmp_name = the_shape.values[i];
+    i++;
+    tmp_value = evaluate_expression(the_shape.values[i]);
+    validate_type(tmp_name, VAR, "[EVALUATE_LINE]: name was not specified before value\n");
+
+    if(!strncmp(tmp_name.value.string_value, "to_x", sizeof("to_x") - 1)) {
+      validate_type(tmp_value, DOUBLE, "[EVALUATE_LINE]: to_x requires a double\n");
+      to_x = tmp_value.value.double_value;
+    } else if(!strncmp(tmp_name.value.string_value, "to_y", sizeof("to_y") - 1)) {
+      validate_type(tmp_value, DOUBLE, "[EVALUATE_LINE]: to_y requires a double\n");
+      to_y = tmp_value.value.double_value;
+    } else if(!strncmp(tmp_name.value.string_value, "from_x", sizeof("from_x") - 1)) {
+      validate_type(tmp_value, DOUBLE, "[EVALUATE_LINE]: from_x requires a double\n");
+      from_x = tmp_value.value.double_value;
+    } else if(!strncmp(tmp_name.value.string_value, "from_y", sizeof("from_y") - 1)) {
+      validate_type(tmp_value, DOUBLE, "[EVALUATE_LINE]: from_y requires a double\n");
+      from_y = tmp_value.value.double_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_r", sizeof("pixel_r") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_LINE]: pixel_r requires an int\n");
+      pixel_r = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_g", sizeof("pixel_g") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_LINE]: pixel_g requires an int\n");
+      pixel_g = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_LINE]: pixel_b requires an int\n");
+      pixel_b = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "thickness", sizeof("thickness") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_LINE]: thickness requires a int\n");
+      thickness = tmp_value.value.int_value;
+    } else {
+      fprintf(stderr, "[EVALUATE_LINE]: unrecognized directive `%s`\n",
+          tmp_name.value.string_value);
+      exit(1);
+    }
+
+    tmp_name = (expression){0};
+    tmp_value = (expression){0};
+  }
+  return (line){
+    (coord_2d){to_x, to_y},
+    (coord_2d){from_x, from_y},
+    (pixel){pixel_r, pixel_g, pixel_b},
+    thickness};
+}
+
 /**
  * This function uses bresenham's line drawing algorithm to write a solid style
  * line to a canvas.
