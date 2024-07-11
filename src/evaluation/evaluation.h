@@ -6,6 +6,8 @@
 #include "integer.h"
 #include "string.h"
 
+#include "../shape/rectangle.h"
+
 expression evaluate_expression(expression the_expression);
 expression expression_unary_minus(expression the_expression);
 expression expression_addition(expression left, expression right);
@@ -20,5 +22,15 @@ expression expression_geq(expression left, expression right);
 expression expression_gt(expression left, expression right);
 expression expression_leq(expression left, expression right);
 expression expression_lt(expression left, expression right);
+
+typedef struct SHAPE_T {
+  union {
+    line the_line;
+    rectangle rect;
+  } value;
+  shape_type type;
+} shape;
+
+shape evaluate_shape(shape_parsed the_shape);
 
 #endif

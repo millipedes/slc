@@ -1,7 +1,7 @@
 #include "evaluation/evaluation.h"
 #include "test_helper.h"
 
-TEST(evaluation, evaluation_test_0) {
+TEST(evaluation, evaluate_expression_test_0) {
   // int
   expression head_int = {0};
   head_int.type = UN_MINUS;
@@ -30,7 +30,7 @@ TEST(evaluation, evaluation_test_0) {
   free_expression(head_double);
 }
 
-TEST(evaluation, evaluation_test_1) {
+TEST(evaluation, evaluate_expression_test_1) {
   // int
   expression head_int = {0};
   head_int.type = BIN_PLUS;
@@ -89,7 +89,7 @@ TEST(evaluation, evaluation_test_1) {
   free_expression(result_string);
 }
 
-TEST(evaluation, evaluation_test_2) {
+TEST(evaluation, evaluate_expression_test_2) {
   // int
   expression head_int = {0};
   head_int.type = BIN_MINUS;
@@ -127,7 +127,7 @@ TEST(evaluation, evaluation_test_2) {
   free_expression(head_double);
 }
 
-TEST(evaluation, evaluation_test_3) {
+TEST(evaluation, evaluate_expression_test_3) {
   // int
   expression head_int = {0};
   head_int.type = BIN_MULT;
@@ -165,7 +165,7 @@ TEST(evaluation, evaluation_test_3) {
   free_expression(head_double);
 }
 
-TEST(evaluation, evaluation_test_4) {
+TEST(evaluation, evaluate_expression_test_4) {
   // int
   expression head_int = {0};
   head_int.type = BIN_DIVIDE;
@@ -203,7 +203,7 @@ TEST(evaluation, evaluation_test_4) {
   free_expression(head_double);
 }
 
-TEST(evaluation, evaluation_test_5) {
+TEST(evaluation, evaluate_expression_test_5) {
   // int
   expression head_int = {0};
   head_int.type = BIN_MOD;
@@ -224,7 +224,7 @@ TEST(evaluation, evaluation_test_5) {
   free_expression(head_int);
 }
 
-TEST(evaluation, evaluation_test_6) {
+TEST(evaluation, evaluate_expression_test_6) {
   const char * the_input = "(((1 - - 2 * 3)))";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -236,7 +236,7 @@ TEST(evaluation, evaluation_test_6) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_7) {
+TEST(evaluation, evaluate_expression_test_7) {
   const char * the_input = "2 ^ 2 ^ 3";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -248,7 +248,7 @@ TEST(evaluation, evaluation_test_7) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_8) {
+TEST(evaluation, evaluate_expression_test_8) {
   const char * the_input = "(1.0 + 2.0) ^ -(1.0 + 2.0)";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -260,7 +260,7 @@ TEST(evaluation, evaluation_test_8) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_9) {
+TEST(evaluation, evaluate_expression_test_9) {
   const char * the_input = "1.0 == 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -272,7 +272,7 @@ TEST(evaluation, evaluation_test_9) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_10) {
+TEST(evaluation, evaluate_expression_test_10) {
   const char * the_input = "1.0 != 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -284,7 +284,7 @@ TEST(evaluation, evaluation_test_10) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_11) {
+TEST(evaluation, evaluate_expression_test_11) {
   const char * the_input = "1.0 >= 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -296,7 +296,7 @@ TEST(evaluation, evaluation_test_11) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_12) {
+TEST(evaluation, evaluate_expression_test_12) {
   const char * the_input = "1.0 > 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -308,7 +308,7 @@ TEST(evaluation, evaluation_test_12) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_13) {
+TEST(evaluation, evaluate_expression_test_13) {
   const char * the_input = "1.0 <= 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -320,7 +320,7 @@ TEST(evaluation, evaluation_test_13) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_14) {
+TEST(evaluation, evaluate_expression_test_14) {
   const char * the_input = "1.0 < 2.0";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -332,7 +332,7 @@ TEST(evaluation, evaluation_test_14) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluation_test_15) {
+TEST(evaluation, evaluate_expression_test_15) {
   const char * the_input = "false == true";
   expression the_expression = {0};
   const char * remainder = parse_boolean_expression(the_input, &the_expression);
@@ -342,4 +342,15 @@ TEST(evaluation, evaluation_test_15) {
   test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_0) {
+  const char * the_input = "rectangle(thickness 1 + 2, center_x 2.0, center_y 1.0, width 1, height 2)";
+  shape_parsed the_shape = {0};
+  const char * remainder = parse_shape(the_input, &the_shape);
+  ASSERT_EQ(remainder[0], '\0');
+  shape result = evaluate_shape(the_shape);
+  bool validated = validate_rectangle((rectangle){(coord_2d){2.0, 1.0}, (pixel){0, 0, 0}, 2, 1, 3}, result.value.rect);
+  ASSERT_TRUE(validated);
+  free_shape_parsed(the_shape);
 }

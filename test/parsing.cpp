@@ -383,3 +383,25 @@ TEST(parsing, expression_test_18) {
   bool value_one = false;
   test_expression(the_expression, BOOL, &value_one);
 }
+
+TEST(parsing, shape_test_0) {
+  const char * the_input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
+  shape_parsed the_shape = {0};
+  const char * remainder = parse_shape(the_input, &the_shape);
+  ASSERT_EQ(the_shape.type, RECTANGLE);
+  test_expression(the_shape.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape.values[1], BIN_PLUS, NULL);
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_shape.values[1].child[0], INT, &value_one);
+  test_expression(the_shape.values[1].child[1], INT, &value_two);
+  test_expression(the_shape.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape.values[3], INT, &value_two);
+  test_expression(the_shape.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape.values[5], INT, &value_one);
+  test_expression(the_shape.values[6], VAR, (void *)"width");
+  test_expression(the_shape.values[7], INT, &value_one);
+  test_expression(the_shape.values[8], VAR, (void *)"height");
+  test_expression(the_shape.values[9], INT, &value_two);
+  free_shape_parsed(the_shape);
+}

@@ -10,6 +10,8 @@ set(SRC_FILES
   ${SRC_DIR}/evaluation/evaluation.c
   ${SRC_DIR}/evaluation/integer.c
   ${SRC_DIR}/evaluation/string.c
+  ${SRC_DIR}/shape/line.c
+  ${SRC_DIR}/shape/rectangle.c
   ${SRC_DIR}/parsing/parsing.c
 )
 

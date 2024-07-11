@@ -80,6 +80,22 @@ const char * parse_boolean_expression(const char * input, void * data);
 bool is_double_delineator(char c);
 bool is_whitespace(char c);
 void debug_expression(expression the_expression, int indent);
+void validate_type(expression the_expression, expression_type type, const char * err);
 void free_expression(expression the_expression);
+
+typedef enum {
+  LINE,
+  RECTANGLE,
+} shape_type;
+
+typedef struct SHAPE_PARSED_T {
+  expression * values;
+  uint32_t qty_values;
+  shape_type type;
+} shape_parsed;
+
+const char * parse_shape(const char * input, void * data);
+shape_parsed * add_expression(shape_parsed * the_shape, expression the_expression);
+void free_shape_parsed(shape_parsed the_shape);
 
 #endif

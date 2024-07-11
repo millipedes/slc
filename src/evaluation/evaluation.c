@@ -8,7 +8,7 @@ expression evaluate_expression(expression the_expression) {
     case BOOL:
       return the_expression;
     case VAR:
-      fprintf(stderr, "[EVALUATE_EXPRESSION]: variables not yet supported");
+      fprintf(stderr, "[EVALUATE_EXPRESSION]: variables not yet supported\n");
       exit(1);
     case UN_MINUS:
       return expression_unary_minus(evaluate_expression(the_expression.child[0]));
@@ -384,4 +384,17 @@ expression expression_lt(expression left, expression right) {
           "for type: `%s`\n", expression_type_to_string(left.type));
       exit(1);
   }
+}
+
+shape evaluate_shape(shape_parsed the_shape) {
+  shape result = {0};
+  result.type = the_shape.type;
+  switch(the_shape.type) {
+    case RECTANGLE:
+      result.value.rect = evaluate_rectangle(the_shape);
+      break;
+    case LINE:
+      break;
+  }
+  return result;
 }

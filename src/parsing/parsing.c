@@ -48,7 +48,7 @@ const char * or_p(const char * input, void * data, uint32_t num_args, ...) {
 
 const char * parse_variable_name(const char * input, void * data) {
   expression * the_expression = (expression *)data;
-  uint64_t inc = 0;
+  uint32_t inc = 0;
   while(isalpha(*(input + inc)) || *(input + inc) == '_') inc++;
   if(inc > 0) {
     the_expression->value.string_value = (char *)calloc(inc + 1, sizeof(char));
@@ -254,6 +254,13 @@ void debug_expression(expression the_expression, int indent) {
   }
 }
 
+void validate_type(expression the_expression, expression_type type, const char * err) {
+  if(the_expression.type != type) {
+    fprintf(stderr, err);
+    exit(1);
+  }
+}
+
 void free_expression(expression the_expression) {
   if((the_expression.type == STRING || the_expression.type == VAR)
       && the_expression.value.string_value) {
@@ -264,5 +271,60 @@ void free_expression(expression the_expression) {
   }
   if(the_expression.child) {
     free(the_expression.child);
+  }
+}
+
+const char * parse_shape(const char * input, void * data) {
+  expression name = {0};
+  expression tmp_value = {0};
+  const char * remainder = parse_expression(parse_whitespace(input), &name);
+  const char * delimiter;
+  shape_parsed * the_shape = (shape_parsed *)data;
+
+  validate_type(name, VAR, "[PARSE_SHAPE]: attempted to parse shape\n");
+  if(!strncmp(name.value.string_value, "line", sizeof("line") - 1)) {
+    the_shape->type = LINE;
+  } else if(!strncmp(name.value.string_value, "rectangle", sizeof("rectangle") - 1)) {
+    the_shape->type = RECTANGLE;
+  } else {
+    fprintf(stderr, "[PARSE_SHAPE]: unrecognized shape `%s`\n", name.value.string_value);
+    exit(1);
+  }
+  free_expression(name);
+
+  if((remainder = parse_character(parse_whitespace(remainder), (void *)"(")) != NULL) {
+    while((delimiter = parse_character(parse_whitespace(remainder), (void *)")")) == NULL) {
+      remainder = parse_expression(parse_whitespace(remainder), &tmp_value);
+      the_shape = add_expression(the_shape, tmp_value);
+      tmp_value = (expression){0};
+      remainder = parse_expression(parse_whitespace(remainder), &tmp_value);
+      the_shape = add_expression(the_shape, tmp_value);
+      if((delimiter = parse_character(parse_whitespace(remainder), (void *)",")) != NULL) {
+        remainder = delimiter;
+      }
+      tmp_value = (expression){0};
+    }
+    return delimiter;
+  } else return NULL;
+}
+
+shape_parsed * add_expression(shape_parsed * the_shape, expression the_expression) {
+  the_shape->qty_values++;
+  if(the_shape->values) {
+    the_shape->values = (expression *)realloc(the_shape->values,
+        the_shape->qty_values * sizeof(struct EXPRESSION_T));
+  } else {
+    the_shape->values = (expression *)calloc(1, sizeof(struct EXPRESSION_T));
+  }
+  the_shape->values[the_shape->qty_values - 1] = the_expression;
+  return the_shape;
+}
+
+void free_shape_parsed(shape_parsed the_shape) {
+  for(uint32_t i = 0; i < the_shape.qty_values; i++) {
+    free_expression(the_shape.values[i]);
+  }
+  if(the_shape.values) {
+    free(the_shape.values);
   }
 }
