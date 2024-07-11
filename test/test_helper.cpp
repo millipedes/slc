@@ -13,6 +13,9 @@ void test_expression(expression the_expression, expression_type type, void * val
     case STRING:
       ASSERT_TRUE(!strncmp((char *)value, the_expression.value.string_value, MAX_STR));
       break;
+    case BOOL:
+      ASSERT_EQ(the_expression.value.bool_value, *(bool *)value);
+      break;
     case UN_MINUS:
       ASSERT_EQ(the_expression.qty_children, 1);
       break;
@@ -22,6 +25,12 @@ void test_expression(expression the_expression, expression_type type, void * val
     case BIN_DIVIDE:
     case BIN_MOD:
     case BIN_POW:
+    case BIN_EQ:
+    case BIN_NEQ:
+    case BIN_GEQ:
+    case BIN_GT:
+    case BIN_LEQ:
+    case BIN_LT:
       ASSERT_EQ(the_expression.qty_children, 2);
       break;
   }

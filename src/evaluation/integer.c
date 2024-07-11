@@ -27,3 +27,27 @@ int int_modulus(expression left, expression right) {
 int int_pow(expression left, expression right) {
   return pow(left.value.int_value, right.value.int_value);
 }
+
+bool int_eq(expression left, expression right) {
+  return left.value.int_value == right.value.int_value;
+}
+
+bool int_neq(expression left, expression right) {
+  return left.value.int_value != right.value.int_value;
+}
+
+bool int_geq(expression left, expression right) {
+  return left.value.int_value >= right.value.int_value;
+}
+
+bool int_gt(expression left, expression right) {
+  return left.value.int_value > right.value.int_value;
+}
+
+bool int_leq(expression left, expression right) {
+  return left.value.int_value <= right.value.int_value;
+}
+
+bool int_lt(expression left, expression right) {
+  return left.value.int_value < right.value.int_value;
+}

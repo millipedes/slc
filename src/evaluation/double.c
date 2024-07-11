@@ -23,3 +23,27 @@ double double_division(expression left, expression right) {
 double double_pow(expression left, expression right) {
   return pow(left.value.double_value, right.value.double_value);
 }
+
+bool double_eq(expression left, expression right) {
+  return left.value.double_value == right.value.double_value;
+}
+
+bool double_neq(expression left, expression right) {
+  return left.value.double_value != right.value.double_value;
+}
+
+bool double_geq(expression left, expression right) {
+  return left.value.double_value >= right.value.double_value;
+}
+
+bool double_gt(expression left, expression right) {
+  return left.value.double_value > right.value.double_value;
+}
+
+bool double_leq(expression left, expression right) {
+  return left.value.double_value <= right.value.double_value;
+}
+
+bool double_lt(expression left, expression right) {
+  return left.value.double_value < right.value.double_value;
+}

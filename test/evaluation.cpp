@@ -227,7 +227,7 @@ TEST(evaluation, evaluation_test_5) {
 TEST(evaluation, evaluation_test_6) {
   const char * the_input = "(((1 - - 2 * 3)))";
   expression the_expression = {0};
-  const char * remainder = parse_expression(the_input, &the_expression);
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   int value_one = 7;
@@ -239,11 +239,107 @@ TEST(evaluation, evaluation_test_6) {
 TEST(evaluation, evaluation_test_7) {
   const char * the_input = "2 ^ 2 ^ 3";
   expression the_expression = {0};
-  const char * remainder = parse_expression(the_input, &the_expression);
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   int value_one = 256;
   test_expression(result, INT, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_8) {
+  const char * the_input = "(1.0 + 2.0) ^ -(1.0 + 2.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = pow(3.0, -3.0);
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_9) {
+  const char * the_input = "1.0 == 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_10) {
+  const char * the_input = "1.0 != 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_11) {
+  const char * the_input = "1.0 >= 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_12) {
+  const char * the_input = "1.0 > 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_13) {
+  const char * the_input = "1.0 <= 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_14) {
+  const char * the_input = "1.0 < 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluation_test_15) {
+  const char * the_input = "false == true";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
 }

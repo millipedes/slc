@@ -5,6 +5,7 @@ set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(TEST_DIR "${CMAKE_SOURCE_DIR}/test")
 set(SRC_FILES
   ${SRC_DIR}/canvas/canvas.c
+  ${SRC_DIR}/evaluation/bool.c
   ${SRC_DIR}/evaluation/double.c
   ${SRC_DIR}/evaluation/evaluation.c
   ${SRC_DIR}/evaluation/integer.c

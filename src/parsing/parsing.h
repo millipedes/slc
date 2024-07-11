@@ -16,6 +16,7 @@ typedef enum {
   DOUBLE,
   VAR,
   STRING,
+  BOOL,
   UN_MINUS,
   BIN_PLUS,
   BIN_MINUS,
@@ -23,6 +24,12 @@ typedef enum {
   BIN_DIVIDE,
   BIN_MOD,
   BIN_POW,
+  BIN_EQ,
+  BIN_NEQ,
+  BIN_GEQ,
+  BIN_GT,
+  BIN_LEQ,
+  BIN_LT,
 } expression_type;
 
 const char * expression_type_to_string(expression_type type);
@@ -32,6 +39,7 @@ typedef struct EXPRESSION_T {
     int    int_value;
     double double_value;
     char * string_value;
+    bool   bool_value;
   } value;
   struct EXPRESSION_T * child;
   uint32_t qty_children;
@@ -47,6 +55,7 @@ const char * parse_number(const char * input, void * data);
 const char * parse_string(const char * input, void * data);
 const char * parse_character(const char * input, void * data);
 const char * parse_word(const char * input, void * data);
+const char * parse_bool(const char * input, void * data);
 
 #define ADJUST_BINARY_TREE(right_p, str, parent_type)                    \
   expression parent = {0};                                               \
@@ -66,6 +75,7 @@ const char * parse_word(const char * input, void * data);
 const char * parse_factor(const char * input, void * data);
 const char * parse_term(const char * input, void * data);
 const char * parse_expression(const char * input, void * data);
+const char * parse_boolean_expression(const char * input, void * data);
 
 bool is_double_delineator(char c);
 bool is_whitespace(char c);

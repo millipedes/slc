@@ -6,12 +6,19 @@ const char * expression_type_to_string(expression_type type) {
     case DOUBLE:     return "Double";
     case VAR:        return "Var";
     case STRING:     return "String";
+    case BOOL:       return "Bool";
     case UN_MINUS:   return "Un Minus";
     case BIN_PLUS:   return "Bin Plus";
     case BIN_MINUS:  return "Bin Minus";
     case BIN_MULT:   return "Bin Mult";
     case BIN_DIVIDE: return "Bin Divide";
     case BIN_MOD:    return "Bin Mod";
+    case BIN_EQ:     return "Bin Eq";
+    case BIN_NEQ:    return "Bin Neq";
+    case BIN_GEQ:    return "Bin Geq";
+    case BIN_GT:     return "Bin Gt";
+    case BIN_LEQ:    return "Bin Leq";
+    case BIN_LT:     return "Bin Lt";
   }
   return NULL;
 }
@@ -110,35 +117,57 @@ const char * parse_character(const char * input, void * data) {
 }
 
 const char * parse_word(const char * input, void * data) {
-  size_t len = strnlen((char *)data, MAX_STR);
-  if(!strncmp(input, (char *)data, len))
-    return input + len;
-  return NULL;
+  if(input) {
+    size_t len = strnlen((char *)data, MAX_STR);
+    if(!strncmp(input, (char *)data, len)) {
+      return input + len;
+    } else return NULL;
+  } else return NULL;
+}
+
+const char * parse_bool(const char * input, void * data) {
+  const char * true_str = "true";
+  const size_t true_len = 4;
+  const char * false_str = "false";
+  const size_t false_len = 5;
+  expression * the_expression = (expression *)data;
+  if(input) {
+    if(!strncmp(input, true_str, true_len)) {
+      the_expression->value.bool_value = true;
+      the_expression->type = BOOL;
+      return input + true_len;
+    } else if(!strncmp(input, false_str, false_len)) {
+      the_expression->value.bool_value = false;
+      the_expression->type = BOOL;
+      return input + false_len;
+    } else return NULL;
+  } else return NULL;
 }
 
 const char * parse_factor(const char * input, void * data) {
-  const char * remainder;
-  if((remainder = parse_character(parse_whitespace(input), (void *)"-")) != NULL) {
+  const char * factor;
+  if((factor = parse_character(parse_whitespace(input), (void *)"-")) != NULL) {
     expression * parent = (expression *)data;
     expression child = {0};
-    remainder = parse_factor(parse_whitespace(remainder), &child);
+    factor = parse_factor(parse_whitespace(factor), &child);
     parent->type = UN_MINUS;
     parent->qty_children = 1;
     parent->child = (expression *)calloc(1, sizeof(struct EXPRESSION_T));
     parent->child[0] = child;
-    return remainder;
-  } else if((remainder = parse_character(parse_whitespace(input), (void *)"(")) != NULL) {
-    remainder = parse_expression(parse_whitespace(remainder), data);
-    remainder = parse_character(parse_whitespace(remainder), (void *)")");
+    return factor;
+  } else if((factor = parse_character(parse_whitespace(input), (void *)"(")) != NULL) {
+    factor = parse_expression(parse_whitespace(factor), data);
+    factor = parse_character(parse_whitespace(factor), (void *)")");
   } else {
-    remainder = or_p(parse_whitespace(input), data, 3, parse_number, parse_string, parse_variable_name);
+    factor = or_p(parse_whitespace(input), data, 4, parse_number, parse_bool,
+        parse_string, parse_variable_name);
   }
   const char * maybe_factor;
-  if((maybe_factor = parse_character(parse_whitespace(remainder), (void *)"^")) != NULL) {
+  if((maybe_factor = parse_character(parse_whitespace(factor), (void *)"^")) != NULL) {
       ADJUST_BINARY_TREE(parse_term, maybe_factor, BIN_POW);
       return NULL;
   }
-  return remainder;
+  return factor;
 }
 
 const char * parse_term(const char * input, void * data) {
@@ -169,6 +198,32 @@ const char * parse_expression(const char * input, void * data) {
       ADJUST_BINARY_TREE(parse_expression, maybe_expression, BIN_MINUS);
       return parse_character(parse_whitespace(term), (void *)"-");
     } else return term;
+  } return NULL;
+}
+
+const char * parse_boolean_expression(const char * input, void * data) {
+  const char * expr = parse_expression(parse_whitespace(input), data);
+  const char * maybe_boolean_expr;
+  if(expr) {
+    if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)"==")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_EQ);
+      return parse_word(parse_whitespace(expr), (void *)"==");
+    } else if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)"!=")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_NEQ);
+      return parse_word(parse_whitespace(expr), (void *)"!=");
+    } else if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)">=")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_GEQ);
+      return parse_word(parse_whitespace(expr), (void *)">=");
+    } else if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)">")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_GT);
+      return parse_word(parse_whitespace(expr), (void *)">");
+    } else if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)"<=")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_LEQ);
+      return parse_word(parse_whitespace(expr), (void *)"<=");
+    } else if((maybe_boolean_expr = parse_word(parse_whitespace(expr), (void *)"<")) != NULL) {
+      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_LT);
+      return parse_word(parse_whitespace(expr), (void *)"<");
+    } else return expr;
   } return NULL;
 }
 
