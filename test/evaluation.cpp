@@ -398,4 +398,6 @@ TEST(evaluation, symbol_table_test_0) {
   ASSERT_EQ(the_value.value.the_shape.type, RECTANGLE);
   validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
       (pixel){1, 35, 66}, 2, 1, 3}, the_value.value.the_shape.value.the_rectangle);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
 }
