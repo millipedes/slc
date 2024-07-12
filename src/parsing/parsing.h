@@ -84,6 +84,7 @@ void validate_type(expression the_expression, expression_type type, const char *
 void free_expression(expression the_expression);
 
 typedef enum {
+  ELLIPSE,
   LINE,
   RECTANGLE,
 } shape_type;

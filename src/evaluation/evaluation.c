@@ -390,11 +390,14 @@ shape evaluate_shape(shape_parsed the_shape) {
   shape result = {0};
   result.type = the_shape.type;
   switch(the_shape.type) {
-    case RECTANGLE:
-      result.value.rect = evaluate_rectangle(the_shape);
+    case ELLIPSE:
+      result.value.the_ellipse = evaluate_ellipse(the_shape);
       break;
     case LINE:
       result.value.the_line = evaluate_line(the_shape);
+      break;
+    case RECTANGLE:
+      result.value.the_rectangle = evaluate_rectangle(the_shape);
       break;
   }
   return result;

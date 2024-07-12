@@ -70,7 +70,8 @@ const char * parse_number(const char * input, void * data) {
   if(*(input + inc) == '.') {
     is_double = true;
     inc++;
-  } else if(*(input + inc) == 'e' || *(input + inc) == 'E') {
+  } else if((*(input + inc) == 'e' || *(input + inc) == 'E')
+      && (*(input + inc + 1) == '-' || isdigit(*input + inc + 1))) {
     is_double = true;
     inc++;
     if(*(input + inc) == '-') inc++;
@@ -242,12 +243,20 @@ void debug_expression(expression the_expression, int indent) {
     case DOUBLE:     printf("%f\n", the_expression.value.double_value); break;
     case VAR:        printf("%s\n", the_expression.value.string_value); break;
     case STRING:     printf("%s\n", the_expression.value.string_value); break;
+    case BOOL:       printf("%s\n", the_expression.value.bool_value ? "true" : "false"); break;
     case UN_MINUS:   printf("-\n");                                     break;
     case BIN_PLUS:   printf("+\n");                                     break;
     case BIN_MINUS:  printf("-\n");                                     break;
     case BIN_MULT:   printf("*\n");                                     break;
     case BIN_DIVIDE: printf("/\n");                                     break;
     case BIN_MOD:    printf("%\n");                                     break;
+    case BIN_POW:    printf("^\n");                                     break;
+    case BIN_EQ:     printf("==\n");                                    break;
+    case BIN_NEQ:    printf("!=\n");                                    break;
+    case BIN_GEQ:    printf(">=\n");                                    break;
+    case BIN_GT:     printf(">\n");                                     break;
+    case BIN_LEQ:    printf("<=\n");                                    break;
+    case BIN_LT:     printf("<\n");                                     break;
   }
   for(uint32_t i = 0; i < the_expression.qty_children; i++) {
     debug_expression(the_expression.child[i], indent + 1);
@@ -286,6 +295,8 @@ const char * parse_shape(const char * input, void * data) {
     the_shape->type = LINE;
   } else if(!strncmp(name.value.string_value, "rectangle", sizeof("rectangle") - 1)) {
     the_shape->type = RECTANGLE;
+  } else if(!strncmp(name.value.string_value, "ellipse", sizeof("ellipse") - 1)) {
+    the_shape->type = ELLIPSE;
   } else {
     fprintf(stderr, "[PARSE_SHAPE]: unrecognized shape `%s`\n", name.value.string_value);
     exit(1);

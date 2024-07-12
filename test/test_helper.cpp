@@ -35,3 +35,36 @@ void test_expression(expression the_expression, expression_type type, void * val
       break;
   }
 }
+
+void validate_ellipse(ellipse truth, ellipse test) {
+  ASSERT_EQ(truth.center.x, test.center.x);
+  ASSERT_EQ(truth.center.y, test.center.y);
+  ASSERT_EQ(truth.color.r, test.color.r);
+  ASSERT_EQ(truth.color.b, test.color.b);
+  ASSERT_EQ(truth.color.g, test.color.g);
+  ASSERT_EQ(truth.major_axis, test.major_axis);
+  ASSERT_EQ(truth.minor_axis, test.minor_axis);
+  ASSERT_EQ(truth.thickness, test.thickness);
+}
+
+void validate_line(line truth, line test) {
+  ASSERT_EQ(truth.to.x, test.to.x);
+  ASSERT_EQ(truth.to.y, test.to.y);
+  ASSERT_EQ(truth.from.x, test.from.x);
+  ASSERT_EQ(truth.from.y, test.from.y);
+  ASSERT_EQ(truth.color.r, test.color.r);
+  ASSERT_EQ(truth.color.g, test.color.g );
+  ASSERT_EQ(truth.color.b, test.color.b);
+  ASSERT_EQ(truth.thickness, test.thickness);
+}
+
+void validate_rectangle(rectangle truth, rectangle test) {
+  ASSERT_EQ(truth.center.x, test.center.x);
+  ASSERT_EQ(truth.center.y, test.center.y);
+  ASSERT_EQ(truth.color.r, test.color.r);
+  ASSERT_EQ(truth.color.g, test.color.g);
+  ASSERT_EQ(truth.color.b, test.color.b);
+  ASSERT_EQ(truth.height, test.height);
+  ASSERT_EQ(truth.width, test.width);
+  ASSERT_EQ(truth.thickness, test.thickness);
+}

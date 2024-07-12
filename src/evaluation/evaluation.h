@@ -6,6 +6,7 @@
 #include "integer.h"
 #include "string.h"
 
+#include "../shape/ellipse.h"
 #include "../shape/rectangle.h"
 
 expression evaluate_expression(expression the_expression);
@@ -25,8 +26,9 @@ expression expression_lt(expression left, expression right);
 
 typedef struct SHAPE_T {
   union {
+    ellipse the_ellipse;
     line the_line;
-    rectangle rect;
+    rectangle the_rectangle;
   } value;
   shape_type type;
 } shape;
