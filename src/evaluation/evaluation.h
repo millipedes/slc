@@ -9,6 +9,23 @@
 #include "../shape/ellipse.h"
 #include "../shape/rectangle.h"
 
+typedef struct SHAPE_T {
+  union {
+    ellipse the_ellipse;
+    line the_line;
+    rectangle the_rectangle;
+  } value;
+  shape_type type;
+} shape;
+
+typedef struct SLC_VALUE_T {
+  union {
+    shape the_shape;
+    expression the_expression;
+  } value;
+  slc_value_type type;
+} slc_value;
+
 expression evaluate_expression(expression the_expression);
 expression expression_unary_minus(expression the_expression);
 expression expression_addition(expression left, expression right);
@@ -24,15 +41,6 @@ expression expression_gt(expression left, expression right);
 expression expression_leq(expression left, expression right);
 expression expression_lt(expression left, expression right);
 
-typedef struct SHAPE_T {
-  union {
-    ellipse the_ellipse;
-    line the_line;
-    rectangle the_rectangle;
-  } value;
-  shape_type type;
-} shape;
-
-shape evaluate_shape(shape_parsed the_shape);
+shape evaluate_shape(parsed_shape the_shape);
 
 #endif

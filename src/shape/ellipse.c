@@ -8,7 +8,7 @@
  */
 #include "ellipse.h"
 
-ellipse evaluate_ellipse(shape_parsed the_shape) {
+ellipse evaluate_ellipse(parsed_shape the_shape) {
   double center_x = DEFAULT_ELLIPSE_CENTER_X;
   double center_y = DEFAULT_ELLIPSE_CENTER_Y;
 

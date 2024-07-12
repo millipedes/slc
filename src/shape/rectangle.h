@@ -31,7 +31,7 @@ typedef struct RECTANGLE_T {
   int thickness;
 } rectangle;
 
-rectangle evaluate_rectangle(shape_parsed the_shape);
+rectangle evaluate_rectangle(parsed_shape the_shape);
 canvas draw_rectangle(canvas the_canvas, rectangle the_rect);
 
 extern expression evaluate_expression(expression the_expression);

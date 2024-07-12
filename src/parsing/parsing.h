@@ -46,7 +46,7 @@ typedef struct EXPRESSION_T {
   expression_type type;
 } expression;
 
-const char * parse_whitespace(const char * input);
+const char * parse_ws(const char * input);
 
 const char * or_p(const char * input, void * data, uint32_t num_args, ...);
 
@@ -61,7 +61,7 @@ const char * parse_bool(const char * input, void * data);
   expression parent = {0};                                               \
   expression * left = (expression *)data;                                \
   expression right = {0};                                                \
-  str = right_p(parse_whitespace(str), &right);                          \
+  str = right_p(parse_ws(str), &right);                                  \
   if(str) {                                                              \
     parent.type = parent_type;                                           \
     parent.qty_children = 2;                                             \
@@ -89,14 +89,39 @@ typedef enum {
   RECTANGLE,
 } shape_type;
 
-typedef struct SHAPE_PARSED_T {
+typedef struct PARSED_SHAPE_T {
   expression * values;
   uint32_t qty_values;
   shape_type type;
-} shape_parsed;
+} parsed_shape;
 
 const char * parse_shape(const char * input, void * data);
-shape_parsed * add_expression(shape_parsed * the_shape, expression the_expression);
-void free_shape_parsed(shape_parsed the_shape);
+parsed_shape * add_expression(parsed_shape * the_shape, expression the_expression);
+void free_parsed_shape(parsed_shape the_shape);
+
+typedef enum {
+  EXPR,
+  SHAPE,
+} slc_value_type;
+
+typedef enum {
+  ASSIGNMENT,
+} lline_type;
+
+typedef union {
+  expression the_expr;
+  parsed_shape the_shape;
+} lline_union;
+
+typedef struct PARSED_LINE_T {
+  lline_union * value;
+  slc_value_type * value_type;
+  lline_type type;
+  uint32_t qty_values;
+} parsed_lline;
+
+const char * parse_assignment(const char * input, void * data);
+parsed_lline add_to_lline(parsed_lline the_lline, slc_value_type type, void * addition);
+void free_parsed_lline(parsed_lline the_lline);
 
 #endif

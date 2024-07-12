@@ -32,7 +32,7 @@ typedef struct LINE_T {
   int thickness;
 } line;
 
-line evaluate_line(shape_parsed the_shape);
+line evaluate_line(parsed_shape the_shape);
 canvas bresenham_line_draw(canvas the_canvas, line the_line);
 
 extern expression evaluate_expression(expression the_expression);

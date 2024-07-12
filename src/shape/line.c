@@ -9,7 +9,7 @@
  */
 #include "line.h"
 
-line evaluate_line(shape_parsed the_shape) {
+line evaluate_line(parsed_shape the_shape) {
   double to_x = DEFAULT_LINE_TO_X;
   double to_y = DEFAULT_LINE_TO_Y;
 

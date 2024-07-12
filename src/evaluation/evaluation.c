@@ -386,7 +386,7 @@ expression expression_lt(expression left, expression right) {
   }
 }
 
-shape evaluate_shape(shape_parsed the_shape) {
+shape evaluate_shape(parsed_shape the_shape) {
   shape result = {0};
   result.type = the_shape.type;
   switch(the_shape.type) {

@@ -9,7 +9,7 @@
  */
 #include "rectangle.h"
 
-rectangle evaluate_rectangle(shape_parsed the_shape) {
+rectangle evaluate_rectangle(parsed_shape the_shape) {
   double center_x = DEFAULT_RECTANGLE_CENTER_X;
   double center_y = DEFAULT_RECTANGLE_CENTER_Y;
 

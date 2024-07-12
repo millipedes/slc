@@ -33,7 +33,7 @@ typedef struct ELLIPSE_T {
   int thickness;
 } ellipse;
 
-ellipse evaluate_ellipse(shape_parsed the_shape);
+ellipse evaluate_ellipse(parsed_shape the_shape);
 canvas draw_ellipse(canvas the_canvas, ellipse the_ellipse);
 canvas draw_ellipse_points(canvas the_canvas, ellipse the_ellipse, int center_x,
     int center_y, int x, int y);
