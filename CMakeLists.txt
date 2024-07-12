@@ -9,7 +9,9 @@ set(SRC_FILES
   ${SRC_DIR}/evaluation/double.c
   ${SRC_DIR}/evaluation/evaluation.c
   ${SRC_DIR}/evaluation/integer.c
+  ${SRC_DIR}/evaluation/linked_list.c
   ${SRC_DIR}/evaluation/string.c
+  ${SRC_DIR}/evaluation/symbol_table.c
   ${SRC_DIR}/shape/ellipse.c
   ${SRC_DIR}/shape/line.c
   ${SRC_DIR}/shape/rectangle.c

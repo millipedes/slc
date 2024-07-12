@@ -386,3 +386,16 @@ TEST(evaluation, evaluate_shape_test_3) {
       (pixel){0, 0, 0}, 15, 15, 10}, result.value.the_ellipse);
   free_parsed_shape(the_shape);
 }
+
+TEST(evaluation, symbol_table_test_0) {
+  const char * the_input = "some_value = rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1);";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_assignment(the_input, &the_lline);
+  symbol_table st = {0};
+  evaluate_lline(the_lline, &st);
+  slc_value the_value = find_symbol(st, "some_value");
+  ASSERT_EQ(the_value.type, SHAPE);
+  ASSERT_EQ(the_value.value.the_shape.type, RECTANGLE);
+  validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
+      (pixel){1, 35, 66}, 2, 1, 3}, the_value.value.the_shape.value.the_rectangle);
+}

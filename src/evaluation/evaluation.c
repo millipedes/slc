@@ -402,3 +402,31 @@ shape evaluate_shape(parsed_shape the_shape) {
   }
   return result;
 }
+
+slc_value evaluate_lline_union(lline_union value, slc_value_type type) {
+  slc_value result = {0};
+  switch(type) {
+    case SHAPE:
+      result.type = SHAPE;
+      result.value.the_shape = evaluate_shape(value.the_shape);
+      break;
+    case EXPR:
+      result.type = EXPR;
+      result.value.the_expr = evaluate_expression(value.the_expr);
+      break;
+    default:
+      fprintf(stderr, "[EVALUATE_LLINE_UNION]: Unknown slc_value_type\n");
+      exit(1);
+  }
+  return result;
+}
+
+void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
+  switch(the_lline.type) {
+    case ASSIGNMENT:
+      *st = add_slc_value_to_table(*st,
+          the_lline.value[0].the_expr.value.string_value,
+          evaluate_lline_union(the_lline.value[1], the_lline.value_type[1]));
+      break;
+  }
+}

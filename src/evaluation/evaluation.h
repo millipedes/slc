@@ -3,28 +3,10 @@
 
 #include "bool.h"
 #include "double.h"
+#include "evaluation_types.h"
 #include "integer.h"
 #include "string.h"
-
-#include "../shape/ellipse.h"
-#include "../shape/rectangle.h"
-
-typedef struct SHAPE_T {
-  union {
-    ellipse the_ellipse;
-    line the_line;
-    rectangle the_rectangle;
-  } value;
-  shape_type type;
-} shape;
-
-typedef struct SLC_VALUE_T {
-  union {
-    shape the_shape;
-    expression the_expression;
-  } value;
-  slc_value_type type;
-} slc_value;
+#include "symbol_table.h"
 
 expression evaluate_expression(expression the_expression);
 expression expression_unary_minus(expression the_expression);
@@ -42,5 +24,8 @@ expression expression_leq(expression left, expression right);
 expression expression_lt(expression left, expression right);
 
 shape evaluate_shape(parsed_shape the_shape);
+
+slc_value evaluate_lline_union(lline_union value, slc_value_type type);
+void evaluate_lline(parsed_lline the_lline, symbol_table * st);
 
 #endif
