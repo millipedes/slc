@@ -8,6 +8,14 @@ const char * expression_type_to_string(expression_type type) {
     case STRING:     return "String";
     case BOOL:       return "Bool";
     case UN_MINUS:   return "Un Minus";
+    case SIN:        return "Sin";
+    case COS:        return "Cos";
+    case TAN:        return "Tan";
+    case ARCSIN:     return "Arcsin";
+    case ARCCOS:     return "Arccos";
+    case ARCTAN:     return "Arctan";
+    case LOG:        return "Log";
+    case LN:         return "Ln";
     case BIN_PLUS:   return "Bin Plus";
     case BIN_MINUS:  return "Bin Minus";
     case BIN_MULT:   return "Bin Mult";
