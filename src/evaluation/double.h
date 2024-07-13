@@ -16,5 +16,13 @@ bool double_geq(expression left, expression right);
 bool double_gt(expression left, expression right);
 bool double_leq(expression left, expression right);
 bool double_lt(expression left, expression right);
+double double_sin(expression the_expression);
+double double_cos(expression the_expression);
+double double_tan(expression the_expression);
+double double_arcsin(expression the_expression);
+double double_arccos(expression the_expression);
+double double_arctan(expression the_expression);
+double double_log(expression the_expression);
+double double_ln(expression the_expression);
 
 #endif

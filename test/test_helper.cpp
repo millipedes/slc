@@ -7,7 +7,7 @@ void test_expression(expression the_expression, expression_type type, void * val
       ASSERT_EQ(the_expression.value.int_value, *(int *)value);
       break;
     case DOUBLE:
-      ASSERT_EQ(the_expression.value.double_value, *(double *)value);
+      EXPECT_NEAR(the_expression.value.double_value, *(double *)value, 0.001);
       break;
     case VAR:
     case STRING:
@@ -17,6 +17,14 @@ void test_expression(expression the_expression, expression_type type, void * val
       ASSERT_EQ(the_expression.value.bool_value, *(bool *)value);
       break;
     case UN_MINUS:
+    case SIN:
+    case COS:
+    case TAN:
+    case ARCSIN:
+    case ARCCOS:
+    case ARCTAN:
+    case LOG:
+    case LN:
       ASSERT_EQ(the_expression.qty_children, 1);
       break;
     case BIN_PLUS:

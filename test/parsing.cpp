@@ -384,6 +384,118 @@ TEST(parsing, expression_test_18) {
   test_expression(the_expression, BOOL, &value_one);
 }
 
+TEST(parsing, expression_test_19) {
+  const char * the_input = "sin((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, SIN, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_20) {
+  const char * the_input = "cos((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, COS, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_21) {
+  const char * the_input = "tan((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, TAN, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_22) {
+  const char * the_input = "arcsin((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, ARCSIN, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_23) {
+  const char * the_input = "arccos((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, ARCCOS, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_24) {
+  const char * the_input = "arctan((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, ARCTAN, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_25) {
+  const char * the_input = "log((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, LOG, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_26) {
+  const char * the_input = "ln((1 + 2))";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, LN, NULL);
+  test_expression(the_expression.child[0], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[1], INT, &value_two);
+  free_expression(the_expression);
+}
+
 TEST(parsing, shape_test_0) {
   const char * the_input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
   parsed_shape the_shape = {0};

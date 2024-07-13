@@ -12,6 +12,22 @@ expression evaluate_expression(expression the_expression) {
       exit(1);
     case UN_MINUS:
       return expression_unary_minus(evaluate_expression(the_expression.child[0]));
+    case SIN:
+      return expression_sin(evaluate_expression(the_expression.child[0]));
+    case COS:
+      return expression_cos(evaluate_expression(the_expression.child[0]));
+    case TAN:
+      return expression_tan(evaluate_expression(the_expression.child[0]));
+    case ARCSIN:
+      return expression_arcsin(evaluate_expression(the_expression.child[0]));
+    case ARCCOS:
+      return expression_arccos(evaluate_expression(the_expression.child[0]));
+    case ARCTAN:
+      return expression_arctan(evaluate_expression(the_expression.child[0]));
+    case LOG:
+      return expression_log(evaluate_expression(the_expression.child[0]));
+    case LN:
+      return expression_ln(evaluate_expression(the_expression.child[0]));
     case BIN_PLUS:
       return expression_addition(
           evaluate_expression(the_expression.child[0]),
@@ -85,7 +101,7 @@ expression expression_unary_minus(expression the_expression) {
 
 expression expression_addition(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_ADDITION]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_ADDITION]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -113,7 +129,7 @@ expression expression_addition(expression left, expression right) {
 
 expression expression_subtraction(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_SUBTRACTION]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_SUBTRACTION]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -137,7 +153,7 @@ expression expression_subtraction(expression left, expression right) {
 
 expression expression_multiplication(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_MULTIPLICATION]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_MULTIPLICATION]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -161,7 +177,7 @@ expression expression_multiplication(expression left, expression right) {
 
 expression expression_division(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_DIVISION]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_DIVISION]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -185,7 +201,7 @@ expression expression_division(expression left, expression right) {
 
 expression expression_modulus(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_MODULUS]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_MODULUS]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -205,7 +221,7 @@ expression expression_modulus(expression left, expression right) {
 
 expression expression_pow(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_POW]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_POW]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -229,7 +245,7 @@ expression expression_pow(expression left, expression right) {
 
 expression expression_eq(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_EQ]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_EQ]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -258,7 +274,7 @@ expression expression_eq(expression left, expression right) {
 
 expression expression_neq(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_NEQ]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_NEQ]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -284,7 +300,7 @@ expression expression_neq(expression left, expression right) {
 
 expression expression_geq(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_GEQ]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_GEQ]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -310,7 +326,7 @@ expression expression_geq(expression left, expression right) {
 
 expression expression_gt(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_GT]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_GT]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -336,7 +352,7 @@ expression expression_gt(expression left, expression right) {
 
 expression expression_leq(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_LEQ]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_LEQ]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -362,7 +378,7 @@ expression expression_leq(expression left, expression right) {
 
 expression expression_lt(expression left, expression right) {
   if(left.type != right.type) {
-      fprintf(stderr, "[EXPRESSION_LT]: type do not match: `%s`, `%s`",
+      fprintf(stderr, "[EXPRESSION_LT]: type do not match: `%s`, `%s`\n",
           expression_type_to_string(left.type),
           expression_type_to_string(right.type));
       exit(1);
@@ -382,6 +398,118 @@ expression expression_lt(expression left, expression right) {
     default:
       fprintf(stderr, "[EXPRESSION_LT]: operation less than not supported "
           "for type: `%s`\n", expression_type_to_string(left.type));
+      exit(1);
+  }
+}
+
+expression expression_sin(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_sin(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_SIN]: operation sin not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_cos(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_cos(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_COS]: operation cos not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_tan(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_tan(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_TAN]: operation tan not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_arcsin(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_arcsin(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_ARCSIN]: operation arcsin not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_arccos(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_arccos(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_ARCCOS]: operation arccos not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_arctan(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_arctan(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_ARCTAN]: operation arctan not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_log(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_log(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_LOG]: operation log not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
+      exit(1);
+  }
+}
+
+expression expression_ln(expression the_expression) {
+  expression result = {0};
+  switch(the_expression.type) {
+    case DOUBLE:
+      result.value.double_value = double_ln(the_expression);
+      result.type = DOUBLE;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_UNARY_MINUS]: operation ln not supported "
+          "for type: `%s`\n", expression_type_to_string(the_expression.type));
       exit(1);
   }
 }

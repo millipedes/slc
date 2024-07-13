@@ -343,6 +343,102 @@ TEST(evaluation, evaluate_expression_test_15) {
   free_expression(result);
 }
 
+TEST(evaluation, evaluate_shape_test_16) {
+  const char * the_input = "sin(3.1415926 / 6.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = 0.5;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_17) {
+  const char * the_input = "cos(3.1415926 / 3.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = 0.5;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_18) {
+  const char * the_input = "tan(3.1415926 / 4.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = 1.0;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_19) {
+  const char * the_input = "arcsin(0.5)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = M_PI / 6.0;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_20) {
+  const char * the_input = "arccos(0.5)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = M_PI / 3.0;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_21) {
+  const char * the_input = "arctan(1.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = M_PI / 4.0;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_22) {
+  const char * the_input = "log(2.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = 1.0;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_23) {
+  const char * the_input = "ln(0.5)";
+  expression the_expression = {0};
+  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = -0.6931;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
 TEST(evaluation, evaluate_shape_test_0) {
   const char * the_input = "rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1)";
   parsed_shape the_shape = {0};

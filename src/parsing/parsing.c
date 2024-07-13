@@ -148,14 +148,23 @@ const char * parse_bool(const char * input, void * data) {
 const char * parse_factor(const char * input, void * data) {
   const char * factor;
   if((factor = parse_character(parse_ws(input), (void *)"-")) != NULL) {
-    expression * parent = (expression *)data;
-    expression child = {0};
-    factor = parse_factor(parse_ws(factor), &child);
-    parent->type = UN_MINUS;
-    parent->qty_children = 1;
-    parent->child = (expression *)calloc(1, sizeof(struct EXPRESSION_T));
-    parent->child[0] = child;
-    return factor;
+    ADJUST_UNARY_TREE(parse_factor, factor, UN_MINUS);
+  } else if((factor = parse_word(parse_ws(input), (void *)"sin")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, SIN);
+  } else if((factor = parse_word(parse_ws(input), (void *)"cos")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, COS);
+  } else if((factor = parse_word(parse_ws(input), (void *)"tan")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, TAN);
+  } else if((factor = parse_word(parse_ws(input), (void *)"arcsin")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, ARCSIN);
+  } else if((factor = parse_word(parse_ws(input), (void *)"arccos")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, ARCCOS);
+  } else if((factor = parse_word(parse_ws(input), (void *)"arctan")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, ARCTAN);
+  } else if((factor = parse_word(parse_ws(input), (void *)"log")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, LOG);
+  } else if((factor = parse_word(parse_ws(input), (void *)"ln")) != NULL) {
+    ADJUST_UNARY_TREE(parse_expression, factor, LN);
   } else if((factor = parse_character(parse_ws(input), (void *)"(")) != NULL) {
     factor = parse_expression(parse_ws(factor), data);
     factor = parse_character(parse_ws(factor), (void *)")");
@@ -245,6 +254,14 @@ void debug_expression(expression the_expression, int indent) {
     case STRING:     printf("%s\n", the_expression.value.string_value); break;
     case BOOL:       printf("%s\n", the_expression.value.bool_value ? "true" : "false"); break;
     case UN_MINUS:   printf("-\n");                                     break;
+    case SIN:        printf("sin\n");                                   break;
+    case COS:        printf("cos\n");                                   break;
+    case TAN:        printf("tan\n");                                   break;
+    case ARCSIN:     printf("arcsin\n");                                break;
+    case ARCCOS:     printf("arccos\n");                                break;
+    case ARCTAN:     printf("arctan\n");                                break;
+    case LOG:        printf("log\n");                                   break;
+    case LN:         printf("ln\n");                                    break;
     case BIN_PLUS:   printf("+\n");                                     break;
     case BIN_MINUS:  printf("-\n");                                     break;
     case BIN_MULT:   printf("*\n");                                     break;

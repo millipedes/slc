@@ -20,6 +20,14 @@ typedef enum {
   UN_MINUS,
   BIN_PLUS,
   BIN_MINUS,
+  SIN,
+  COS,
+  TAN,
+  ARCSIN,
+  ARCCOS,
+  ARCTAN,
+  LOG,
+  LN,
   BIN_MULT,
   BIN_DIVIDE,
   BIN_MOD,
@@ -56,6 +64,16 @@ const char * parse_string(const char * input, void * data);
 const char * parse_character(const char * input, void * data);
 const char * parse_word(const char * input, void * data);
 const char * parse_bool(const char * input, void * data);
+
+#define ADJUST_UNARY_TREE(parser, str, parent_type) \
+    expression * parent = (expression *)data; \
+    expression child = {0}; \
+    factor = parser(parse_ws(factor), &child); \
+    parent->type = parent_type; \
+    parent->qty_children = 1; \
+    parent->child = (expression *)calloc(1, sizeof(struct EXPRESSION_T)); \
+    parent->child[0] = child; \
+    return factor;
 
 #define ADJUST_BINARY_TREE(right_p, str, parent_type)                    \
   expression parent = {0};                                               \

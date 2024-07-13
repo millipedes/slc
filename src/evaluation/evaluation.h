@@ -22,6 +22,14 @@ expression expression_geq(expression left, expression right);
 expression expression_gt(expression left, expression right);
 expression expression_leq(expression left, expression right);
 expression expression_lt(expression left, expression right);
+expression expression_sin(expression the_expression);
+expression expression_cos(expression the_expression);
+expression expression_tan(expression the_expression);
+expression expression_arcsin(expression the_expression);
+expression expression_arccos(expression the_expression);
+expression expression_arctan(expression the_expression);
+expression expression_log(expression the_expression);
+expression expression_ln(expression the_expression);
 
 shape evaluate_shape(parsed_shape the_shape);
 
