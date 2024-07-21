@@ -226,7 +226,7 @@ TEST(evaluation, evaluate_expression_test_5) {
 TEST(evaluation, evaluate_expression_test_6) {
   const char * the_input = "(((1 - - 2 * 3)))";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   int value_one = 7;
@@ -238,7 +238,7 @@ TEST(evaluation, evaluate_expression_test_6) {
 TEST(evaluation, evaluate_expression_test_7) {
   const char * the_input = "2 ^ 2 ^ 3";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   int value_one = 256;
@@ -250,7 +250,7 @@ TEST(evaluation, evaluate_expression_test_7) {
 TEST(evaluation, evaluate_expression_test_8) {
   const char * the_input = "(1.0 + 2.0) ^ -(1.0 + 2.0)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = pow(3.0, -3.0);
@@ -262,7 +262,7 @@ TEST(evaluation, evaluate_expression_test_8) {
 TEST(evaluation, evaluate_expression_test_9) {
   const char * the_input = "1.0 == 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = false;
@@ -274,7 +274,7 @@ TEST(evaluation, evaluate_expression_test_9) {
 TEST(evaluation, evaluate_expression_test_10) {
   const char * the_input = "1.0 != 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = true;
@@ -286,7 +286,7 @@ TEST(evaluation, evaluate_expression_test_10) {
 TEST(evaluation, evaluate_expression_test_11) {
   const char * the_input = "1.0 >= 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = false;
@@ -298,7 +298,7 @@ TEST(evaluation, evaluate_expression_test_11) {
 TEST(evaluation, evaluate_expression_test_12) {
   const char * the_input = "1.0 > 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = false;
@@ -310,7 +310,7 @@ TEST(evaluation, evaluate_expression_test_12) {
 TEST(evaluation, evaluate_expression_test_13) {
   const char * the_input = "1.0 <= 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = true;
@@ -322,7 +322,7 @@ TEST(evaluation, evaluate_expression_test_13) {
 TEST(evaluation, evaluate_expression_test_14) {
   const char * the_input = "1.0 < 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = true;
@@ -334,7 +334,7 @@ TEST(evaluation, evaluate_expression_test_14) {
 TEST(evaluation, evaluate_expression_test_15) {
   const char * the_input = "false == true";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   bool value_one = false;
@@ -344,21 +344,21 @@ TEST(evaluation, evaluate_expression_test_15) {
 }
 
 TEST(evaluation, evaluate_shape_test_16) {
-  const char * the_input = "sin(3.1415926 / 6.0)";
+  const char * the_input = "1 < 3 == 2 > 1";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
-  double value_one = 0.5;
-  test_expression(result, DOUBLE, &value_one);
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
 }
 
 TEST(evaluation, evaluate_shape_test_17) {
-  const char * the_input = "cos(3.1415926 / 3.0)";
+  const char * the_input = "sin(3.1415926 / 6.0)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = 0.5;
@@ -368,9 +368,21 @@ TEST(evaluation, evaluate_shape_test_17) {
 }
 
 TEST(evaluation, evaluate_shape_test_18) {
+  const char * the_input = "cos(3.1415926 / 3.0)";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  expression result = evaluate_expression(the_expression);
+  double value_one = 0.5;
+  test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_shape_test_19) {
   const char * the_input = "tan(3.1415926 / 4.0)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = 1.0;
@@ -379,10 +391,10 @@ TEST(evaluation, evaluate_shape_test_18) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluate_shape_test_19) {
+TEST(evaluation, evaluate_shape_test_20) {
   const char * the_input = "arcsin(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = M_PI / 6.0;
@@ -391,10 +403,10 @@ TEST(evaluation, evaluate_shape_test_19) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluate_shape_test_20) {
+TEST(evaluation, evaluate_shape_test_21) {
   const char * the_input = "arccos(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = M_PI / 3.0;
@@ -403,10 +415,10 @@ TEST(evaluation, evaluate_shape_test_20) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluate_shape_test_21) {
+TEST(evaluation, evaluate_shape_test_22) {
   const char * the_input = "arctan(1.0)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = M_PI / 4.0;
@@ -415,10 +427,10 @@ TEST(evaluation, evaluate_shape_test_21) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluate_shape_test_22) {
+TEST(evaluation, evaluate_shape_test_23) {
   const char * the_input = "log(2.0)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = 1.0;
@@ -427,10 +439,10 @@ TEST(evaluation, evaluate_shape_test_22) {
   free_expression(result);
 }
 
-TEST(evaluation, evaluate_shape_test_23) {
+TEST(evaluation, evaluate_shape_test_24) {
   const char * the_input = "ln(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_boolean_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   expression result = evaluate_expression(the_expression);
   double value_one = -0.6931;

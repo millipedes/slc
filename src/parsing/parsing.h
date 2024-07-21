@@ -28,6 +28,8 @@ typedef enum {
   ARCTAN,
   LOG,
   LN,
+  ARRAY,
+  ARRAY_ACCESSOR,
   BIN_MULT,
   BIN_DIVIDE,
   BIN_MOD,
@@ -42,15 +44,20 @@ typedef enum {
 
 const char * expression_type_to_string(expression_type type);
 
+typedef struct SHAPE_T shape;
+
 typedef struct EXPRESSION_T {
   union {
-    int    int_value;
-    double double_value;
-    char * string_value;
-    bool   bool_value;
+    int                   int_value;
+    double                double_value;
+    char *                string_value;
+    bool                  bool_value;
+    struct EXPRESSION_T * array_value;
+    shape *               the_shape;
   } value;
   struct EXPRESSION_T * child;
   uint32_t qty_children;
+  uint32_t array_qty;
   expression_type type;
 } expression;
 
@@ -64,15 +71,16 @@ const char * parse_string(const char * input, void * data);
 const char * parse_character(const char * input, void * data);
 const char * parse_word(const char * input, void * data);
 const char * parse_bool(const char * input, void * data);
+const char * parse_array(const char * input, void * data);
 
-#define ADJUST_UNARY_TREE(parser, str, parent_type) \
-    expression * parent = (expression *)data; \
-    expression child = {0}; \
-    factor = parser(parse_ws(factor), &child); \
-    parent->type = parent_type; \
-    parent->qty_children = 1; \
+#define ADJUST_UNARY_TREE(parser, str, parent_type)                       \
+    expression * parent = (expression *)data;                             \
+    expression child = {0};                                               \
+    factor = parser(parse_ws(factor), &child);                            \
+    parent->type = parent_type;                                           \
+    parent->qty_children = 1;                                             \
     parent->child = (expression *)calloc(1, sizeof(struct EXPRESSION_T)); \
-    parent->child[0] = child; \
+    parent->child[0] = child;                                             \
     return factor;
 
 #define ADJUST_BINARY_TREE(right_p, str, parent_type)                    \
@@ -93,12 +101,14 @@ const char * parse_bool(const char * input, void * data);
 const char * parse_factor(const char * input, void * data);
 const char * parse_term(const char * input, void * data);
 const char * parse_expression(const char * input, void * data);
-const char * parse_boolean_expression(const char * input, void * data);
+const char * parse_relational_expression(const char * input, void * data);
+const char * parse_precedence_1_expression(const char * input, void * data);
 
 bool is_double_delineator(char c);
 bool is_whitespace(char c);
 void debug_expression(expression the_expression, int indent);
 void validate_type(expression the_expression, expression_type type, const char * err);
+expression add_array_element(expression head, expression element);
 void free_expression(expression the_expression);
 
 typedef enum {

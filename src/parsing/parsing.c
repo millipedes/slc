@@ -16,6 +16,7 @@ const char * expression_type_to_string(expression_type type) {
     case ARCTAN:     return "Arctan";
     case LOG:        return "Log";
     case LN:         return "Ln";
+    case ARRAY:      return "Array";
     case BIN_PLUS:   return "Bin Plus";
     case BIN_MINUS:  return "Bin Minus";
     case BIN_MULT:   return "Bin Mult";
@@ -153,6 +154,23 @@ const char * parse_bool(const char * input, void * data) {
   } else return NULL;
 }
 
+const char * parse_array(const char * input, void * data) {
+  expression tmp_value = {0};
+  const char * remainder = parse_character(parse_ws(input), (void *)"[");
+  const char * delimiter;
+  expression * the_expression = (expression *)data;
+  the_expression->type = ARRAY;
+  while((delimiter = parse_character(parse_ws(remainder), (void *)"]")) == NULL) {
+    remainder = parse_expression(parse_ws(remainder), &tmp_value);
+    *the_expression = add_array_element(*the_expression, tmp_value);
+    if((delimiter = parse_character(parse_ws(remainder), (void *)",")) != NULL) {
+      remainder = delimiter;
+    }
+    tmp_value = (expression){0};
+  }
+  return delimiter;
+}
+
 const char * parse_factor(const char * input, void * data) {
   const char * factor;
   if((factor = parse_character(parse_ws(input), (void *)"-")) != NULL) {
@@ -206,6 +224,12 @@ const char * parse_term(const char * input, void * data) {
 }
 
 const char * parse_expression(const char * input, void * data) {
+  if(input[0] == '[') {
+    const char * array_str = parse_array(parse_ws(input), data);
+    if(array_str) {
+      return array_str;
+    }
+  } 
   const char * term = parse_term(parse_ws(input), data);
   const char * maybe_expression;
   if(term) {
@@ -219,28 +243,36 @@ const char * parse_expression(const char * input, void * data) {
   } return NULL;
 }
 
-const char * parse_boolean_expression(const char * input, void * data) {
+const char * parse_relational_expression(const char * input, void * data) {
   const char * expr = parse_expression(parse_ws(input), data);
   const char * maybe_boolean_expr;
   if(expr) {
-    if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"==")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_EQ);
-      return parse_word(parse_ws(expr), (void *)"==");
-    } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"!=")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_NEQ);
-      return parse_word(parse_ws(expr), (void *)"!=");
-    } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)">=")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_GEQ);
+    if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)">=")) != NULL) {
+      ADJUST_BINARY_TREE(parse_relational_expression, maybe_boolean_expr, BIN_GEQ);
       return parse_word(parse_ws(expr), (void *)">=");
     } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)">")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_GT);
+      ADJUST_BINARY_TREE(parse_relational_expression, maybe_boolean_expr, BIN_GT);
       return parse_word(parse_ws(expr), (void *)">");
     } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"<=")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_LEQ);
+      ADJUST_BINARY_TREE(parse_relational_expression, maybe_boolean_expr, BIN_LEQ);
       return parse_word(parse_ws(expr), (void *)"<=");
     } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"<")) != NULL) {
-      ADJUST_BINARY_TREE(parse_expression, maybe_boolean_expr, BIN_LT);
+      ADJUST_BINARY_TREE(parse_relational_expression, maybe_boolean_expr, BIN_LT);
       return parse_word(parse_ws(expr), (void *)"<");
+    } else return expr;
+
+  } return NULL;
+}
+const char * parse_precedence_1_expression(const char * input, void * data) {
+  const char * expr = parse_relational_expression(parse_ws(input), data);
+  const char * maybe_boolean_expr;
+  if(expr) {
+    if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"==")) != NULL) {
+      ADJUST_BINARY_TREE(parse_precedence_1_expression, maybe_boolean_expr, BIN_EQ);
+      return parse_word(parse_ws(expr), (void *)"==");
+    } else if((maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"!=")) != NULL) {
+      ADJUST_BINARY_TREE(parse_precedence_1_expression, maybe_boolean_expr, BIN_NEQ);
+      return parse_word(parse_ws(expr), (void *)"!=");
     } else return expr;
   } return NULL;
 }
@@ -295,10 +327,29 @@ void validate_type(expression the_expression, expression_type type, const char *
   }
 }
 
+expression add_array_element(expression head, expression element) {
+  head.array_qty++;
+  if(head.value.array_value) {
+    head.value.array_value = (expression *)realloc(head.value.array_value,
+        head.array_qty * sizeof(struct EXPRESSION_T));
+  } else {
+    head.value.array_value = (expression *)calloc(1, sizeof(struct EXPRESSION_T));
+  }
+  head.value.array_value[head.array_qty - 1] = element;
+  return head;
+}
+
 void free_expression(expression the_expression) {
   if((the_expression.type == STRING || the_expression.type == VAR)
       && the_expression.value.string_value) {
     free(the_expression.value.string_value);
+  } else if(the_expression.type == ARRAY) {
+    for(uint32_t i = 0; i < the_expression.array_qty; i++) {
+      free_expression(the_expression.value.array_value[i]);
+    }
+    if(the_expression.value.array_value) {
+      free(the_expression.value.array_value);
+    }
   }
   for(uint32_t i = 0; i < the_expression.qty_children; i++) {
     free_expression(the_expression.child[i]);
