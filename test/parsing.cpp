@@ -571,6 +571,8 @@ TEST(parsing, array_test_2) {
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   double value_two = 2.0;
+  ASSERT_EQ(the_array.value_type[0], ARRAY);
+  ASSERT_EQ(the_array.value_type[1], ARRAY);
   parsed_array sub_array_one = the_array.value[0].the_array[0];
   parsed_array sub_array_two = the_array.value[1].the_array[0];
   test_expression(sub_array_one.value[0].the_expr, INT, &value_one);

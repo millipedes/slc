@@ -93,7 +93,7 @@ typedef struct PARSED_ARRAY_T {
   uint32_t qty_values;
 } parsed_array;
 
-parsed_array add_to_array(parsed_array the_array, slc_primitive_type type, void * addition);
+parsed_array add_to_parsed_array(parsed_array the_array, slc_primitive_type type, void * addition);
 void free_parsed_array(parsed_array the_array);
 
 typedef struct PARSED_LINE_T {

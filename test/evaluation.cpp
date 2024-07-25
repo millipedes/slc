@@ -587,6 +587,55 @@ TEST(evaluation, evaluate_shape_test_3) {
   free_parsed_shape(the_shape);
 }
 
+TEST(evaluation, array_test_0) {
+  symbol_table st = {0};
+  const char * input = "[1 < 3 == 2 > 1, -(((1 - - 2)))]";
+  parsed_array the_parsed_array = {0};
+  const char * remainder = parse_array(input, &the_parsed_array);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value the_value = evaluate_array(the_parsed_array, &st);
+  bool value_one = true;
+  int value_two = -3;
+  test_expression(the_value.value.the_array[0].value[0].the_expr, BOOL, &value_one);
+  test_expression(the_value.value.the_array[0].value[1].the_expr, INT, &value_two);
+  free_parsed_array(the_parsed_array);
+  free_slc_value(the_value);
+}
+
+TEST(evaluation, array_test_1) {
+  symbol_table st = {0};
+  const char * input = "[1 < 3 == 2 > 1, -(((1 - - 2))), rectangle(center_x 1.0, center_y 1.0, pixel_r 1, pixel_g 35, pixel_b 66)]";
+  parsed_array the_parsed_array = {0};
+  const char * remainder = parse_array(input, &the_parsed_array);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value the_value = evaluate_array(the_parsed_array, &st);
+  bool value_one = true;
+  int value_two = -3;
+  test_expression(the_value.value.the_array[0].value[0].the_expr, BOOL, &value_one);
+  test_expression(the_value.value.the_array[0].value[1].the_expr, INT, &value_two);
+  validate_rectangle((rectangle){(coord_2d){1.0, 1.0}, (pixel){1, 35, 66}, 15, 15, 10},
+      the_value.value.the_array[0].value[2].the_shape.value.the_rectangle);
+  free_parsed_array(the_parsed_array);
+  free_slc_value(the_value);
+}
+
+TEST(evaluation, array_test_2) {
+  symbol_table st = {0};
+  const char * input = "[[1 < 3 == 2 > 1], [-(((1 - - 2)))]]";
+  parsed_array the_parsed_array = {0};
+  const char * remainder = parse_array(input, &the_parsed_array);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value the_value = evaluate_array(the_parsed_array, &st);
+  bool value_one = true;
+  int value_two = -3;
+  array sub_array_one = the_value.value.the_array[0].value[0].the_array[0];
+  array sub_array_two = the_value.value.the_array[0].value[1].the_array[0];
+  test_expression(sub_array_one.value[0].the_expr, BOOL, &value_one);
+  test_expression(sub_array_two.value[0].the_expr, INT, &value_two);
+  free_parsed_array(the_parsed_array);
+  free_slc_value(the_value);
+}
+
 TEST(evaluation, symbol_table_test_0) {
   symbol_table st = {0};
   const char * the_input = "some_value = rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1);";

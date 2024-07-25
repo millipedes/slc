@@ -110,7 +110,7 @@ void free_parsed_shape(parsed_shape the_shape) {
   }
 }
 
-parsed_array add_to_array(parsed_array the_array, slc_primitive_type type, void * addition) {
+parsed_array add_to_parsed_array(parsed_array the_array, slc_primitive_type type, void * addition) {
   the_array.qty_values++;
   if(the_array.value) {
     the_array.value = (slc_primitive *)realloc(the_array.value,
@@ -130,7 +130,7 @@ parsed_array add_to_array(parsed_array the_array, slc_primitive_type type, void 
       the_array.value[the_array.qty_values - 1].the_shape = *(parsed_shape *)addition;
       break;
     case ARRAY:
-      the_array.value[the_array.qty_values - 1].the_array = (parsed_array *)calloc(1, sizeof(parsed_array));
+      the_array.value[the_array.qty_values - 1].the_array = (parsed_array *)calloc(1, sizeof(struct PARSED_ARRAY_T));
       the_array.value[the_array.qty_values - 1].the_array[0] = *(parsed_array *)addition;
       break;
   }

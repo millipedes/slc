@@ -8,6 +8,7 @@ set(SRC_FILES
   ${SRC_DIR}/evaluation/bool.c
   ${SRC_DIR}/evaluation/double.c
   ${SRC_DIR}/evaluation/evaluation.c
+  ${SRC_DIR}/evaluation/evaluation_types.c
   ${SRC_DIR}/evaluation/integer.c
   ${SRC_DIR}/evaluation/linked_list.c
   ${SRC_DIR}/evaluation/string.c

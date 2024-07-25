@@ -282,14 +282,14 @@ const char * parse_array(const char * input, void * data) {
       const char * maybe_array_remainder;
       if((maybe_array_remainder = parse_word(parse_ws(remainder), (void *)"[")) != NULL) {
         remainder = parse_array(parse_ws(remainder), &maybe_array);
-        *the_array = add_to_array(*the_array, ARRAY, &maybe_array);
+        *the_array = add_to_parsed_array(*the_array, ARRAY, &maybe_array);
       } else if((maybe_shape_remainder
             = parse_shape(parse_ws(remainder), &maybe_shape)) != NULL) {
-        *the_array = add_to_array(*the_array, SHAPE, &maybe_shape);
+        *the_array = add_to_parsed_array(*the_array, SHAPE, &maybe_shape);
         remainder = maybe_shape_remainder;
       } else if((maybe_expr_remainder
-            = parse_expression(parse_ws(remainder), &maybe_expression)) != NULL) {
-        *the_array = add_to_array(*the_array, EXPR, &maybe_expression);
+            = parse_precedence_1_expression(parse_ws(remainder), &maybe_expression)) != NULL) {
+        *the_array = add_to_parsed_array(*the_array, EXPR, &maybe_expression);
         remainder = maybe_expr_remainder;
       }
 

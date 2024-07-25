@@ -560,12 +560,37 @@ slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st) {
   return result;
 }
 
+slc_value evaluate_array(parsed_array the_array, symbol_table * st) {
+  slc_value result = {0};
+  result.value.the_array = (array *)calloc(1, sizeof(struct ARRAY_T));
+  result.type = ARRAY;
+  for(uint32_t i = 0; i < the_array.qty_values; i++) {
+    switch(the_array.value_type[i]) {
+      case EXPR:
+        result.value.the_array[0]
+          = add_to_array(result.value.the_array[0], EXPR, &the_array.value[i].the_expr, st);
+        break;
+      case SHAPE:
+        result.value.the_array[0]
+          = add_to_array(result.value.the_array[0], SHAPE, &the_array.value[i].the_shape, st);
+        break;
+      case ARRAY:
+        result.value.the_array[0]
+          = add_to_array(result.value.the_array[0], ARRAY, the_array.value[i].the_array, st);
+        break;
+    }
+  }
+  return result;
+}
+
 slc_value evaluate_slc_primitive(slc_primitive value, slc_primitive_type type, symbol_table * st) {
   switch(type) {
-    case SHAPE:
-      return evaluate_shape(value.the_shape, st);
     case EXPR:
       return evaluate_expression(value.the_expr, st);
+    case SHAPE:
+      return evaluate_shape(value.the_shape, st);
+    case ARRAY:
+      return evaluate_array(value.the_array[0], st);
     default:
       fprintf(stderr, "[EVALUATE_SLC_PRIMITIVE]: Unknown slc_primitive_type\n");
       exit(1);

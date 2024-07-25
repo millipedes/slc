@@ -33,6 +33,10 @@ expression expression_ln(expression the_expression);
 
 slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st);
 
+slc_value evaluate_array(parsed_array the_array, symbol_table * st);
+
+slc_value evaluate_slc_primitive(slc_primitive value, slc_primitive_type type, symbol_table * st);
+
 slc_value evaluate_lline_union(slc_primitive value, slc_primitive_type type);
 void evaluate_lline(parsed_lline the_lline, symbol_table * st);
 
