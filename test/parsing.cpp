@@ -564,6 +564,22 @@ TEST(parsing, array_test_1) {
   free_parsed_array(the_array);
 }
 
+TEST(parsing, array_test_2) {
+  const char * the_input = "[[1, 2.0], [\"hello\", world]]";
+  parsed_array the_array = {0};
+  const char * remainder = parse_array(the_input, &the_array);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  double value_two = 2.0;
+  parsed_array sub_array_one = the_array.value[0].the_array[0];
+  parsed_array sub_array_two = the_array.value[1].the_array[0];
+  test_expression(sub_array_one.value[0].the_expr, INT, &value_one);
+  test_expression(sub_array_one.value[1].the_expr, DOUBLE, &value_two);
+  test_expression(sub_array_two.value[0].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(sub_array_two.value[1].the_expr, VAR, (void *)"world");
+  free_parsed_array(the_array);
+}
+
 TEST(parsing, assignment_test_0) {
   const char * the_input = "x = rectangle();";
   parsed_lline the_lline = {0};

@@ -129,6 +129,10 @@ parsed_array add_to_array(parsed_array the_array, slc_primitive_type type, void 
     case SHAPE:
       the_array.value[the_array.qty_values - 1].the_shape = *(parsed_shape *)addition;
       break;
+    case ARRAY:
+      the_array.value[the_array.qty_values - 1].the_array = (parsed_array *)calloc(1, sizeof(parsed_array));
+      the_array.value[the_array.qty_values - 1].the_array[0] = *(parsed_array *)addition;
+      break;
   }
   return the_array;
 }
@@ -141,6 +145,11 @@ void free_parsed_array(parsed_array the_array) {
         break;
       case SHAPE:
         free_parsed_shape(the_array.value[i].the_shape);
+        break;
+      case ARRAY:
+        free_parsed_array(the_array.value[i].the_array[0]);
+        if(the_array.value[i].the_array)
+          free(the_array.value[i].the_array);
         break;
     }
   }
