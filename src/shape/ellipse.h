@@ -33,11 +33,13 @@ typedef struct ELLIPSE_T {
   int thickness;
 } ellipse;
 
-ellipse evaluate_ellipse(parsed_shape the_shape);
+struct SYMBOL_TABLE_T;
+typedef struct SYMBOL_TABLE_T symbol_table;
+ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st);
 canvas draw_ellipse(canvas the_canvas, ellipse the_ellipse);
 canvas draw_ellipse_points(canvas the_canvas, ellipse the_ellipse, int center_x,
     int center_y, int x, int y);
 
-extern expression evaluate_expression(expression the_expression);
+extern expression opaque_eval_expr(expression * value, symbol_table * st);
 
 #endif

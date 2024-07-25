@@ -5,5 +5,6 @@
 
 char * string_addition(expression left, expression right);
 bool string_eq(expression left, expression right);
+bool string_neq(expression left, expression right);
 
 #endif

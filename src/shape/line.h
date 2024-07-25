@@ -32,9 +32,11 @@ typedef struct LINE_T {
   int thickness;
 } line;
 
-line evaluate_line(parsed_shape the_shape);
+struct SYMBOL_TABLE_T;
+typedef struct SYMBOL_TABLE_T symbol_table;
+line evaluate_line(parsed_shape the_shape, symbol_table * st);
 canvas bresenham_line_draw(canvas the_canvas, line the_line);
 
-extern expression evaluate_expression(expression the_expression);
+extern expression opaque_eval_expr(expression * value, symbol_table * st);
 
 #endif

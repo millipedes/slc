@@ -8,7 +8,7 @@
  */
 #include "ellipse.h"
 
-ellipse evaluate_ellipse(parsed_shape the_shape) {
+ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
   double center_x = DEFAULT_ELLIPSE_CENTER_X;
   double center_y = DEFAULT_ELLIPSE_CENTER_Y;
 
@@ -27,7 +27,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape) {
   for(uint32_t i = 0; i < the_shape.qty_values; i++) {
     tmp_name = the_shape.values[i];
     i++;
-    tmp_value = evaluate_expression(the_shape.values[i]);
+    tmp_value = opaque_eval_expr(&the_shape.values[i], st);
     validate_type(tmp_name, VAR, "[EVALUATE_ELLIPSE]: name was not specified before value\n");
 
     if(!strncmp(tmp_name.value.string_value, "center_x", sizeof("center_x") - 1)) {

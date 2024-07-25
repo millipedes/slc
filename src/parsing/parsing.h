@@ -1,65 +1,14 @@
 #ifndef PARSING_H
 #define PARSING_H
 
+#include "parsing_ds.h"
+
 #include <ctype.h>
 #include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MAX_STR 1024
 
-typedef enum {
-  INT,
-  DOUBLE,
-  VAR,
-  STRING,
-  BOOL,
-  UN_MINUS,
-  BIN_PLUS,
-  BIN_MINUS,
-  SIN,
-  COS,
-  TAN,
-  ARCSIN,
-  ARCCOS,
-  ARCTAN,
-  LOG,
-  LN,
-  ARRAY,
-  ARRAY_ACCESSOR,
-  BIN_MULT,
-  BIN_DIVIDE,
-  BIN_MOD,
-  BIN_POW,
-  BIN_EQ,
-  BIN_NEQ,
-  BIN_GEQ,
-  BIN_GT,
-  BIN_LEQ,
-  BIN_LT,
-} expression_type;
-
-const char * expression_type_to_string(expression_type type);
-
-typedef struct SHAPE_T shape;
-
-typedef struct EXPRESSION_T {
-  union {
-    int                   int_value;
-    double                double_value;
-    char *                string_value;
-    bool                  bool_value;
-    struct EXPRESSION_T * array_value;
-    shape *               the_shape;
-  } value;
-  struct EXPRESSION_T * child;
-  uint32_t qty_children;
-  uint32_t array_qty;
-  expression_type type;
-} expression;
 
 const char * parse_ws(const char * input);
 
@@ -106,50 +55,9 @@ const char * parse_precedence_1_expression(const char * input, void * data);
 
 bool is_double_delineator(char c);
 bool is_whitespace(char c);
-void debug_expression(expression the_expression, int indent);
-void validate_type(expression the_expression, expression_type type, const char * err);
-expression add_array_element(expression head, expression element);
-void free_expression(expression the_expression);
-
-typedef enum {
-  ELLIPSE,
-  LINE,
-  RECTANGLE,
-} shape_type;
-
-typedef struct PARSED_SHAPE_T {
-  expression * values;
-  uint32_t qty_values;
-  shape_type type;
-} parsed_shape;
 
 const char * parse_shape(const char * input, void * data);
-parsed_shape * add_expression(parsed_shape * the_shape, expression the_expression);
-void free_parsed_shape(parsed_shape the_shape);
-
-typedef enum {
-  EXPR,
-  SHAPE,
-} slc_value_type;
-
-typedef enum {
-  ASSIGNMENT,
-} lline_type;
-
-typedef union {
-  expression the_expr;
-  parsed_shape the_shape;
-} lline_union;
-
-typedef struct PARSED_LINE_T {
-  lline_union * value;
-  slc_value_type * value_type;
-  lline_type type;
-  uint32_t qty_values;
-} parsed_lline;
 
 const char * parse_assignment(const char * input, void * data);
-parsed_lline add_to_lline(parsed_lline the_lline, slc_value_type type, void * addition);
-void free_parsed_lline(parsed_lline the_lline);
 
 #endif

@@ -67,21 +67,6 @@ TEST(parsing, word_test_0) {
   ASSERT_EQ(remainder[0], '\0');
 }
 
-TEST(parsing, array_test_0) {
-  const char * the_input = "[1, 2.0, \"hello\", world]";
-  expression the_expression = {0};
-  const char * remainder = parse_array(the_input, &the_expression);
-  ASSERT_EQ(remainder[0], '\0');
-  test_expression(the_expression, ARRAY, NULL);
-  int value_one = 1;
-  double value_two = 2.0;
-  test_expression(the_expression.value.array_value[0], INT, &value_one);
-  test_expression(the_expression.value.array_value[1], DOUBLE, &value_two);
-  test_expression(the_expression.value.array_value[2], STRING, (void *)"\"hello\"");
-  test_expression(the_expression.value.array_value[3], VAR, (void *)"world");
-  free_expression(the_expression);
-}
-
 TEST(parsing, factor_test_0) {
   const char * the_input = "(((((-1e-2)))))";
   expression the_expression = {0};
@@ -511,21 +496,6 @@ TEST(parsing, expression_test_26) {
   free_expression(the_expression);
 }
 
-TEST(parsing, expression_test_27) {
-  const char * the_input = "[1, 2.0, \"hello\", world]";
-  expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
-  ASSERT_EQ(remainder[0], '\0');
-  test_expression(the_expression, ARRAY, NULL);
-  int value_one = 1;
-  double value_two = 2.0;
-  test_expression(the_expression.value.array_value[0], INT, &value_one);
-  test_expression(the_expression.value.array_value[1], DOUBLE, &value_two);
-  test_expression(the_expression.value.array_value[2], STRING, (void *)"\"hello\"");
-  test_expression(the_expression.value.array_value[3], VAR, (void *)"world");
-  free_expression(the_expression);
-}
-
 TEST(parsing, shape_test_0) {
   const char * the_input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
   parsed_shape the_shape = {0};
@@ -547,6 +517,51 @@ TEST(parsing, shape_test_0) {
   test_expression(the_shape.values[8], VAR, (void *)"height");
   test_expression(the_shape.values[9], INT, &value_two);
   free_parsed_shape(the_shape);
+}
+
+TEST(parsing, array_test_0) {
+  const char * the_input = "[1, 2.0, \"hello\", world]";
+  parsed_array the_array = {0};
+  const char * remainder = parse_array(the_input, &the_array);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  double value_two = 2.0;
+  test_expression(the_array.value[0].the_expr, INT, &value_one);
+  test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
+  test_expression(the_array.value[2].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
+  free_parsed_array(the_array);
+}
+
+TEST(parsing, array_test_1) {
+  const char * the_input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
+  parsed_array the_array = {0};
+  const char * remainder = parse_array(the_input, &the_array);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  double value_two = 2.0;
+  test_expression(the_array.value[0].the_expr, INT, &value_one);
+  test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
+  test_expression(the_array.value[2].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
+  ASSERT_EQ(the_array.value_type[4], SHAPE);
+  parsed_shape the_shape = the_array.value[4].the_shape;
+  ASSERT_EQ(the_shape.type, RECTANGLE);
+  test_expression(the_shape.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape.values[1], BIN_PLUS, NULL);
+  int value_three = 1;
+  int value_four = 2;
+  test_expression(the_shape.values[1].child[0], INT, &value_three);
+  test_expression(the_shape.values[1].child[1], INT, &value_four);
+  test_expression(the_shape.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape.values[3], INT, &value_four);
+  test_expression(the_shape.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape.values[5], INT, &value_three);
+  test_expression(the_shape.values[6], VAR, (void *)"width");
+  test_expression(the_shape.values[7], INT, &value_three);
+  test_expression(the_shape.values[8], VAR, (void *)"height");
+  test_expression(the_shape.values[9], INT, &value_four);
+  free_parsed_array(the_array);
 }
 
 TEST(parsing, assignment_test_0) {

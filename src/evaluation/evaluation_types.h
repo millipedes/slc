@@ -15,11 +15,10 @@ typedef struct SHAPE_T {
 
 typedef struct SLC_VALUE_T {
   union {
-    shape the_shape;
     expression the_expr;
+    shape the_shape;
   } value;
-  slc_value_type type;
+  slc_primitive_type type;
 } slc_value;
-
 
 #endif

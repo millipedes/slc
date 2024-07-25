@@ -8,7 +8,7 @@
 #include "string.h"
 #include "symbol_table.h"
 
-expression evaluate_expression(expression the_expression);
+slc_value evaluate_expression(expression the_expression, symbol_table * st);
 expression expression_unary_minus(expression the_expression);
 expression expression_addition(expression left, expression right);
 expression expression_subtraction(expression left, expression right);
@@ -31,9 +31,9 @@ expression expression_arctan(expression the_expression);
 expression expression_log(expression the_expression);
 expression expression_ln(expression the_expression);
 
-shape evaluate_shape(parsed_shape the_shape);
+slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st);
 
-slc_value evaluate_lline_union(lline_union value, slc_value_type type);
+slc_value evaluate_lline_union(slc_primitive value, slc_primitive_type type);
 void evaluate_lline(parsed_lline the_lline, symbol_table * st);
 
 #endif

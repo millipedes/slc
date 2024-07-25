@@ -9,7 +9,7 @@
  */
 #include "line.h"
 
-line evaluate_line(parsed_shape the_shape) {
+line evaluate_line(parsed_shape the_shape, symbol_table * st) {
   double to_x = DEFAULT_LINE_TO_X;
   double to_y = DEFAULT_LINE_TO_Y;
 
@@ -28,7 +28,7 @@ line evaluate_line(parsed_shape the_shape) {
   for(uint32_t i = 0; i < the_shape.qty_values; i++) {
     tmp_name = the_shape.values[i];
     i++;
-    tmp_value = evaluate_expression(the_shape.values[i]);
+    tmp_value = opaque_eval_expr(&the_shape.values[i], st);
     validate_type(tmp_name, VAR, "[EVALUATE_LINE]: name was not specified before value\n");
 
     if(!strncmp(tmp_name.value.string_value, "to_x", sizeof("to_x") - 1)) {

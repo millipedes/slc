@@ -15,3 +15,7 @@ bool string_eq(expression left, expression right) {
     return false;
   return !strncmp(left.value.string_value, right.value.string_value, left_len);
 }
+
+bool string_neq(expression left, expression right) {
+  return !string_eq(left, right);
+}

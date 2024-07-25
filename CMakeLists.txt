@@ -16,6 +16,7 @@ set(SRC_FILES
   ${SRC_DIR}/shape/line.c
   ${SRC_DIR}/shape/rectangle.c
   ${SRC_DIR}/parsing/parsing.c
+  ${SRC_DIR}/parsing/parsing_ds.c
 )
 
 include_directories(

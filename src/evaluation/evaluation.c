@@ -1,83 +1,106 @@
 #include "evaluation.h"
 
-expression evaluate_expression(expression the_expression) {
+slc_value evaluate_expression(expression the_expression, symbol_table * st) {
+  slc_value result = {0};
+  result.type = EXPR;
   switch(the_expression.type) {
     case INT:
     case DOUBLE:
     case STRING:
     case BOOL:
-      return the_expression;
+      result.value.the_expr = the_expression;
+      break;
     case VAR:
-      fprintf(stderr, "[EVALUATE_EXPRESSION]: variables not yet supported\n");
-      exit(1);
+      return find_symbol(*st, the_expression.value.string_value);
     case UN_MINUS:
-      return expression_unary_minus(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_unary_minus(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case SIN:
-      return expression_sin(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_sin(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case COS:
-      return expression_cos(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_cos(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case TAN:
-      return expression_tan(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_tan(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case ARCSIN:
-      return expression_arcsin(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_arcsin(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case ARCCOS:
-      return expression_arccos(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_arccos(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case ARCTAN:
-      return expression_arctan(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_arctan(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case LOG:
-      return expression_log(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_log(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case LN:
-      return expression_ln(evaluate_expression(the_expression.child[0]));
+      result.value.the_expr = expression_ln(evaluate_expression(the_expression.child[0], st).value.the_expr);
+      break;
     case BIN_PLUS:
-      return expression_addition(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_addition(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_MINUS:
-      return expression_subtraction(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_subtraction(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_MULT:
-      return expression_multiplication(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_multiplication(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_DIVIDE:
-      return expression_division(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_division(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_MOD:
-      return expression_modulus(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_modulus(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_POW:
-      return expression_pow(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_pow(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_EQ:
-      return expression_eq(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_eq(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_NEQ:
-      return expression_neq(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_neq(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_GEQ:
-      return expression_geq(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_geq(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_GT:
-      return expression_gt(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_gt(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_LEQ:
-      return expression_leq(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_leq(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
     case BIN_LT:
-      return expression_lt(
-          evaluate_expression(the_expression.child[0]),
-          evaluate_expression(the_expression.child[1]));
+      result.value.the_expr = expression_lt(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
   }
-  return (expression){0};
+  return result;
 }
 
 expression expression_unary_minus(expression the_expression) {
@@ -287,6 +310,9 @@ expression expression_neq(expression left, expression right) {
       return result;
     case DOUBLE:
       result.value.bool_value = double_neq(left, right);
+      return result;
+    case STRING:
+      result.value.bool_value = string_neq(left, right);
       return result;
     case BOOL:
       result.value.bool_value = bool_neq(left, right);
@@ -514,39 +540,36 @@ expression expression_ln(expression the_expression) {
   }
 }
 
-shape evaluate_shape(parsed_shape the_shape) {
-  shape result = {0};
-  result.type = the_shape.type;
+slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st) {
+  slc_value result = {0};
+  result.type = SHAPE;
   switch(the_shape.type) {
     case ELLIPSE:
-      result.value.the_ellipse = evaluate_ellipse(the_shape);
+      result.value.the_shape.type = ELLIPSE;
+      result.value.the_shape.value.the_ellipse = evaluate_ellipse(the_shape, st);
       break;
     case LINE:
-      result.value.the_line = evaluate_line(the_shape);
+      result.value.the_shape.type = LINE;
+      result.value.the_shape.value.the_line = evaluate_line(the_shape, st);
       break;
     case RECTANGLE:
-      result.value.the_rectangle = evaluate_rectangle(the_shape);
+      result.value.the_shape.type = RECTANGLE;
+      result.value.the_shape.value.the_rectangle = evaluate_rectangle(the_shape, st);
       break;
   }
   return result;
 }
 
-slc_value evaluate_lline_union(lline_union value, slc_value_type type) {
-  slc_value result = {0};
+slc_value evaluate_slc_primitive(slc_primitive value, slc_primitive_type type, symbol_table * st) {
   switch(type) {
     case SHAPE:
-      result.type = SHAPE;
-      result.value.the_shape = evaluate_shape(value.the_shape);
-      break;
+      return evaluate_shape(value.the_shape, st);
     case EXPR:
-      result.type = EXPR;
-      result.value.the_expr = evaluate_expression(value.the_expr);
-      break;
+      return evaluate_expression(value.the_expr, st);
     default:
-      fprintf(stderr, "[EVALUATE_LLINE_UNION]: Unknown slc_value_type\n");
+      fprintf(stderr, "[EVALUATE_SLC_PRIMITIVE]: Unknown slc_primitive_type\n");
       exit(1);
   }
-  return result;
 }
 
 void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
@@ -554,7 +577,11 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
     case ASSIGNMENT:
       *st = add_slc_value_to_table(*st,
           the_lline.value[0].the_expr.value.string_value,
-          evaluate_lline_union(the_lline.value[1], the_lline.value_type[1]));
+          evaluate_slc_primitive(the_lline.value[1], the_lline.value_type[1], st));
       break;
   }
+}
+
+expression opaque_eval_expr(expression * value, symbol_table * st) {
+  return evaluate_expression(*value, st).value.the_expr;
 }
