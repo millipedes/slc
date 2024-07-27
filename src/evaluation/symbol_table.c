@@ -46,7 +46,7 @@ slc_value get_value_from_array(slc_value value, const expression the_expr, symbo
         index.value.int_value, the_expr.value.string_value, value.value.the_array[0].qty_values);
     exit(1);
   }
-  if(i_deep == the_expr.qty_children - 1) {
+  if(i_deep == the_expr.child[0].qty_children - 1) {
     return (slc_value){value.value.the_array[0].value[index.value.int_value],
         value.value.the_array[0].value_type[index.value.int_value]};
   } else {

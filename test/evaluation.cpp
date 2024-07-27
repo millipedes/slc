@@ -711,3 +711,25 @@ TEST(evaluation, symbol_table_test_2) {
   free_slc_value(the_value_two);
   free_symbol_table(st);
 }
+
+TEST(evaluation, symbol_table_test_3) {
+  symbol_table st = {0};
+  const char * setup_input = "x = [[1 < 3 == 2 > 1]];";
+  const char * evaluation_input_one = "x[0][0]";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_assignment(setup_input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  expression accessor_one = {0};
+  const char * evaluation_remainer_one = parse_precedence_1_expression(evaluation_input_one, &accessor_one);
+  ASSERT_EQ(evaluation_remainer_one[0], '\0');
+  bool value_one = true;
+  evaluate_lline(the_lline, &st);
+  test_expression(accessor_one, VAR, (void *)"x");
+  slc_value the_value_one = find_symbol(st, accessor_one);
+  ASSERT_EQ(the_value_one.type, EXPR);
+  test_expression(the_value_one.value.the_expr, BOOL, &value_one);
+  free_expression(accessor_one);
+  free_parsed_lline(the_lline);
+  free_slc_value(the_value_one);
+  free_symbol_table(st);
+}
