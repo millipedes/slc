@@ -9,7 +9,7 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
-#include "../canvas/canvas.h"
+#include "canvas.h"
 #include "coordinate.h"
 #include "../parsing/parsing.h"
 
