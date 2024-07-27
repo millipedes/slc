@@ -69,6 +69,18 @@ void debug_expression(expression the_expression, int indent) {
   }
 }
 
+expression add_expression_child(expression the_expression, expression addition) {
+  the_expression.qty_children++;
+  if(the_expression.child) {
+    the_expression.child = (expression *)realloc(the_expression.child,
+        the_expression.qty_children * sizeof(struct EXPRESSION_T));
+  } else {
+    the_expression.child = (expression *)calloc(1, sizeof(struct EXPRESSION_T));
+  }
+  the_expression.child[the_expression.qty_children - 1] = addition;
+  return the_expression;
+}
+
 void free_expression(expression the_expression) {
   if((the_expression.type == STRING || the_expression.type == VAR)
       && the_expression.value.string_value) {
@@ -178,6 +190,9 @@ parsed_lline add_to_lline(parsed_lline the_lline, slc_primitive_type type, void 
     case SHAPE:
       the_lline.value[the_lline.qty_values - 1].the_shape = *(parsed_shape *)addition;
       break;
+    case ARRAY:
+      the_lline.value[the_lline.qty_values - 1].the_array = (parsed_array *)calloc(1, sizeof(struct PARSED_ARRAY_T));
+      the_lline.value[the_lline.qty_values - 1].the_array[0] = *(parsed_array *)addition;
   }
   return the_lline;
 }
@@ -190,6 +205,11 @@ void free_parsed_lline(parsed_lline the_lline) {
         break;
       case SHAPE:
         free_parsed_shape(the_lline.value[i].the_shape);
+        break;
+      case ARRAY:
+        free_parsed_array(the_lline.value[i].the_array[0]);
+        if(the_lline.value[i].the_array)
+          free(the_lline.value[i].the_array);
         break;
     }
   }

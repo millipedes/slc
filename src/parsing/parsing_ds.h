@@ -50,6 +50,7 @@ typedef struct EXPRESSION_T {
   expression_type type;
 } expression;
 
+expression add_expression_child(expression the_expression, expression addition);
 void debug_expression(expression the_expression, int indent);
 void free_expression(expression the_expression);
 void validate_type(expression the_expression, expression_type type, const char * err);

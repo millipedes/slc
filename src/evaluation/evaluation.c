@@ -11,7 +11,7 @@ slc_value evaluate_expression(expression the_expression, symbol_table * st) {
       result.value.the_expr = the_expression;
       break;
     case VAR:
-      return find_symbol(*st, the_expression.value.string_value);
+      return find_symbol(*st, the_expression);
     case UN_MINUS:
       result.value.the_expr = expression_unary_minus(evaluate_expression(the_expression.child[0], st).value.the_expr);
       break;

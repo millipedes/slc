@@ -496,6 +496,37 @@ TEST(parsing, expression_test_26) {
   free_expression(the_expression);
 }
 
+TEST(parsing, expression_test_27) {
+  const char * the_input = "x[0]";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 0;
+  test_expression(the_expression, VAR, (void *)"x");
+  test_expression(the_expression.child[0], ARRAY_ACCESSOR, NULL);
+  test_expression(the_expression.child[0].child[0], INT, &value_one);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_28) {
+  const char * the_input = "x[9 * 1][1 + 2]";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 9;
+  int value_two = 1;
+  int value_three = 2;
+  test_expression(the_expression, VAR, (void *)"x");
+  test_expression(the_expression.child[0], ARRAY_ACCESSOR, NULL);
+  test_expression(the_expression.child[0].child[0], BIN_MULT, NULL);
+  test_expression(the_expression.child[0].child[0].child[0], INT, &value_one);
+  test_expression(the_expression.child[0].child[0].child[1], INT, &value_two);
+  test_expression(the_expression.child[0].child[1], BIN_PLUS, NULL);
+  test_expression(the_expression.child[0].child[1].child[0], INT, &value_two);
+  test_expression(the_expression.child[0].child[1].child[1], INT, &value_three);
+  free_expression(the_expression);
+}
+
 TEST(parsing, shape_test_0) {
   const char * the_input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
   parsed_shape the_shape = {0};
@@ -588,6 +619,8 @@ TEST(parsing, assignment_test_0) {
   const char * remainder = parse_assignment(the_input, &the_lline);
   ASSERT_EQ(remainder[0], '\0');
   ASSERT_EQ(the_lline.type, ASSIGNMENT);
+  ASSERT_EQ(the_lline.value_type[0], EXPR);
+  ASSERT_EQ(the_lline.value_type[1], SHAPE);
   test_expression(the_lline.value[0].the_expr, VAR, (void *)"x");
   ASSERT_EQ(the_lline.value[1].the_shape.type, RECTANGLE);
   ASSERT_EQ(the_lline.value[1].the_shape.qty_values, 0);
@@ -601,6 +634,8 @@ TEST(parsing, assignment_test_1) {
   const char * remainder = parse_assignment(the_input, &the_lline);
   ASSERT_EQ(remainder[0], '\0');
   ASSERT_EQ(the_lline.type, ASSIGNMENT);
+  ASSERT_EQ(the_lline.value_type[0], EXPR);
+  ASSERT_EQ(the_lline.value_type[1], SHAPE);
   test_expression(the_lline.value[0].the_expr, VAR, (void *)"some_value");
   parsed_shape the_shape = the_lline.value[1].the_shape;
   ASSERT_EQ(the_shape.type, RECTANGLE);
@@ -618,5 +653,34 @@ TEST(parsing, assignment_test_1) {
   test_expression(the_shape.values[7], INT, &value_one);
   test_expression(the_shape.values[8], VAR, (void *)"height");
   test_expression(the_shape.values[9], INT, &value_two);
+  free_parsed_lline(the_lline);
+}
+
+TEST(parsing, assignment_test_2) {
+  const char * the_input = "x = [1 < 3 == 2 > 1, -(((1 - - 2)))];";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_assignment(the_input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  ASSERT_EQ(the_lline.type, ASSIGNMENT);
+  ASSERT_EQ(the_lline.value_type[0], EXPR);
+  ASSERT_EQ(the_lline.value_type[1], ARRAY);
+  test_expression(the_lline.value[0].the_expr, VAR, (void *)"x");
+  expression head_one = the_lline.value[1].the_array[0].value[0].the_expr;
+  int value_one = 1;
+  int value_two = 2;
+  int value_three = 3;
+  test_expression(head_one, BIN_EQ, NULL);
+  test_expression(head_one.child[0], BIN_LT, NULL);
+  test_expression(head_one.child[0].child[0], INT, &value_one);
+  test_expression(head_one.child[0].child[1], INT, &value_three);
+  test_expression(head_one.child[1], BIN_GT, NULL);
+  test_expression(head_one.child[1].child[0], INT, &value_two);
+  test_expression(head_one.child[1].child[1], INT, &value_one);
+  expression head_two = the_lline.value[1].the_array[0].value[1].the_expr;
+  test_expression(head_two, UN_MINUS, NULL);
+  test_expression(head_two.child[0], BIN_MINUS, NULL);
+  test_expression(head_two.child[0].child[0], INT, &value_one);
+  test_expression(head_two.child[0].child[1], UN_MINUS, NULL);
+  test_expression(head_two.child[0].child[1].child[0], INT, &value_two);
   free_parsed_lline(the_lline);
 }

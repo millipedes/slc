@@ -154,6 +154,25 @@ const char * parse_factor(const char * input, void * data) {
       ADJUST_BINARY_TREE(parse_term, maybe_factor, BIN_POW);
       return NULL;
   }
+  const char * maybe_accessors;
+  if((maybe_accessors = parse_character(parse_ws(factor), (void *)"[")) != NULL) {
+    expression * parent = (expression *)data;
+    expression accessor_parent = (expression){{.int_value = 0}, NULL, 0, ARRAY_ACCESSOR};
+    expression accessor_value = {0};
+    maybe_accessors = parse_expression(parse_ws(maybe_accessors), &accessor_value);
+    accessor_parent = add_expression_child(accessor_parent, accessor_value);
+    maybe_accessors = parse_character(parse_ws(maybe_accessors), (void *)"]");
+    factor = maybe_accessors;
+    accessor_value = (expression){0};
+    while((maybe_accessors = parse_character(parse_ws(factor), (void *)"[")) != NULL) {
+      maybe_accessors = parse_expression(parse_ws(maybe_accessors), &accessor_value);
+      accessor_parent = add_expression_child(accessor_parent, accessor_value);
+      maybe_accessors = parse_character(parse_ws(maybe_accessors), (void *)"]");
+      factor = maybe_accessors;
+      accessor_value = (expression){0};
+    }
+    *parent = add_expression_child(*parent, accessor_parent);
+  }
   return factor;
 }
 
@@ -271,6 +290,7 @@ const char * parse_shape(const char * input, void * data) {
 
 const char * parse_array(const char * input, void * data) {
   const char * remainder = parse_character(parse_ws(input), (void *)"[");
+  if(!remainder) return NULL;
   const char * delimiter;
   parsed_array * the_array = (parsed_array *)data;
   while((delimiter = parse_character(parse_ws(remainder), (void *)"]")) == NULL) {
@@ -306,6 +326,18 @@ const char * parse_assignment(const char * input, void * data) {
   const char * remainder = parse_variable_name(parse_ws(input), &maybe_variable);
   if(remainder) {
     if((remainder = parse_character(parse_ws(remainder), (void *)"=")) != NULL) {
+      // Array?
+      parsed_array maybe_array = {0};
+      const char * maybe_array_remainder;
+      if((maybe_array_remainder = parse_array(parse_ws(remainder), &maybe_array)) != NULL) {
+        if((maybe_array_remainder
+              = parse_character(parse_ws(maybe_array_remainder), (void *)";")) != NULL) {
+          the_lline->type = ASSIGNMENT;
+          *the_lline = add_to_lline(*the_lline, EXPR, &maybe_variable);
+          *the_lline = add_to_lline(*the_lline, ARRAY, &maybe_array);
+          return maybe_array_remainder;
+        } else return NULL;
+      }
       // Shape?
       parsed_shape maybe_shape = {0};
       const char * maybe_shape_remainder;

@@ -642,11 +642,16 @@ TEST(evaluation, symbol_table_test_0) {
   parsed_lline the_lline = {0};
   const char * remainder = parse_assignment(the_input, &the_lline);
   evaluate_lline(the_lline, &st);
-  slc_value the_value = find_symbol(st, "some_value");
+  expression symbol = {0};
+  symbol.type = VAR;
+  symbol.value.string_value = (char *)calloc(sizeof("some_value"), sizeof(char));
+  strncpy(symbol.value.string_value, "some_value", sizeof("some_value"));
+  slc_value the_value = find_symbol(st, symbol);
   ASSERT_EQ(the_value.type, SHAPE);
   ASSERT_EQ(the_value.value.the_shape.type, RECTANGLE);
   validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
       (pixel){1, 35, 66}, 2, 1, 3}, the_value.value.the_shape.value.the_rectangle);
+  free_expression(symbol);
   free_parsed_lline(the_lline);
   free_symbol_table(st);
 }
@@ -659,11 +664,50 @@ TEST(evaluation, symbol_table_test_1) {
   parsed_lline the_lline = {0};
   const char * remainder = parse_assignment(the_input, &the_lline);
   evaluate_lline(the_lline, &st);
-  slc_value the_value = find_symbol(st, "some_value");
+  expression symbol = {0};
+  symbol.type = VAR;
+  symbol.value.string_value = (char *)calloc(sizeof("some_value"), sizeof(char));
+  strncpy(symbol.value.string_value, "some_value", sizeof("some_value"));
+  slc_value the_value = find_symbol(st, symbol);
   ASSERT_EQ(the_value.type, SHAPE);
   ASSERT_EQ(the_value.value.the_shape.type, RECTANGLE);
   validate_rectangle((rectangle){(coord_2d){3.0, 1.0},
       (pixel){1, 35, 66}, 2, 1, 5}, the_value.value.the_shape.value.the_rectangle);
+  free_expression(symbol);
   free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, symbol_table_test_2) {
+  symbol_table st = {0};
+  const char * setup_input = "x = [1 < 3 == 2 > 1, -(((1 - - 2)))];";
+  const char * evaluation_input_one = "x[13 - 13]";
+  // I just asked chatdpt for "a complicated expression which evaluated to 1"
+  // lol, but good test
+  const char * evaluation_input_two = "x[((((3 ^ 4 - 2 ^ 6) * (7 - 3) + 5 ^ 2) - (8 ^ 2 - 9)) - 17) / ((6 * 4 - 2 ^ 3) - 5)]";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_assignment(setup_input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  expression accessor_one = {0};
+  const char * evaluation_remainer_one = parse_precedence_1_expression(evaluation_input_one, &accessor_one);
+  ASSERT_EQ(evaluation_remainer_one[0], '\0');
+  expression accessor_two = {0};
+  const char * evaluation_remainer_two = parse_precedence_1_expression(evaluation_input_two, &accessor_two);
+  ASSERT_EQ(evaluation_remainer_two[0], '\0');
+  bool value_one = true;
+  int value_two = -3;
+  evaluate_lline(the_lline, &st);
+  test_expression(accessor_one, VAR, (void *)"x");
+  slc_value the_value_one = find_symbol(st, accessor_one);
+  ASSERT_EQ(the_value_one.type, EXPR);
+  test_expression(the_value_one.value.the_expr, BOOL, &value_one);
+  slc_value the_value_two = find_symbol(st, accessor_two);
+  ASSERT_EQ(the_value_two.type, EXPR);
+  test_expression(the_value_two.value.the_expr, INT, &value_two);
+  free_expression(accessor_one);
+  free_expression(accessor_two);
+  free_parsed_lline(the_lline);
+  free_slc_value(the_value_one);
+  free_slc_value(the_value_two);
   free_symbol_table(st);
 }

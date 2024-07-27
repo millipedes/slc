@@ -41,6 +41,9 @@ void test_expression(expression the_expression, expression_type type, void * val
     case BIN_LT:
       ASSERT_EQ(the_expression.qty_children, 2);
       break;
+    case ARRAY_ACCESSOR:
+      ASSERT_TRUE(the_expression.qty_children > 0);
+      break;
   }
 }
 
