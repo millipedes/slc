@@ -1,8 +1,8 @@
 #ifndef EVALUATION_TYPES_H
 #define EVALUATION_TYPES_H
 
-#include "../shape/ellipse.h"
-#include "../shape/rectangle.h"
+#include "ellipse.h"
+#include "rectangle.h"
 
 typedef struct SHAPE_T {
   union {

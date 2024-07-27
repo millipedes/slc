@@ -7,14 +7,14 @@ set(SRC_FILES
   ${SRC_DIR}/canvas/canvas.c
   ${SRC_DIR}/evaluation/bool.c
   ${SRC_DIR}/evaluation/double.c
+  ${SRC_DIR}/evaluation/ellipse.c
   ${SRC_DIR}/evaluation/evaluation.c
   ${SRC_DIR}/evaluation/evaluation_types.c
   ${SRC_DIR}/evaluation/integer.c
+  ${SRC_DIR}/evaluation/line.c
+  ${SRC_DIR}/evaluation/rectangle.c
   ${SRC_DIR}/evaluation/string.c
   ${SRC_DIR}/evaluation/symbol_table.c
-  ${SRC_DIR}/shape/ellipse.c
-  ${SRC_DIR}/shape/line.c
-  ${SRC_DIR}/shape/rectangle.c
   ${SRC_DIR}/parsing/parsing.c
   ${SRC_DIR}/parsing/parsing_ds.c
 )
