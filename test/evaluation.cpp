@@ -583,7 +583,10 @@ TEST(evaluation, evaluate_shape_test_3) {
   slc_value value_result = evaluate_shape(the_shape, &st);
   shape result = value_result.value.the_shape;
   validate_ellipse((ellipse){(coord_2d){0.0, 0.0},
-      (pixel){0, 0, 0}, 15, 15, 10}, result.value.the_ellipse);
+      (pixel){DEFAULT_ELLIPSE_PIXEL_R, DEFAULT_ELLIPSE_PIXEL_G,
+              DEFAULT_ELLIPSE_PIXEL_B, DEFAULT_ELLIPSE_PIXEL_A},
+      DEFAULT_ELLIPSE_MAJOR_AXIS, DEFAULT_ELLIPSE_MINOR_AXIS, DEFAULT_ELLIPSE_THICKNESS},
+      result.value.the_ellipse);
   free_parsed_shape(the_shape);
 }
 
@@ -613,7 +616,8 @@ TEST(evaluation, array_test_1) {
   int value_two = -3;
   test_expression(the_value.value.the_array[0].value[0].the_expr, BOOL, &value_one);
   test_expression(the_value.value.the_array[0].value[1].the_expr, INT, &value_two);
-  validate_rectangle((rectangle){(coord_2d){1.0, 1.0}, (pixel){1, 35, 66}, 15, 15, 10},
+  validate_rectangle((rectangle){(coord_2d){1.0, 1.0}, (pixel){1, 35, 66, 255},
+      DEFAULT_RECTANGLE_HEIGHT, DEFAULT_RECTANGLE_WIDTH, DEFAULT_RECTANGLE_THICKNESS},
       the_value.value.the_array[0].value[2].the_shape.value.the_rectangle);
   free_parsed_array(the_parsed_array);
   free_slc_value(the_value);
@@ -731,5 +735,49 @@ TEST(evaluation, symbol_table_test_3) {
   free_expression(accessor_one);
   free_parsed_lline(the_lline);
   free_slc_value(the_value_one);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, draw_test_0) {
+  symbol_table st = {0};
+  const char * input = "draw(rectangle());";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, draw_test_1) {
+  symbol_table st = {0};
+  const char * input = "draw(ellipse());";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, draw_test_2) {
+  symbol_table st = {0};
+  const char * input = "draw(line());";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, lline_test_0) {
+  symbol_table st = {0};
+  const char * input = "draw(rectangle());";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
   free_symbol_table(st);
 }

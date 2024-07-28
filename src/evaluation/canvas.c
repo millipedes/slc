@@ -15,7 +15,7 @@
  * @param       width - The width of the canvas.
  * @return the_canvas - The inited canvas.
  */
-canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b) {
+canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
   canvas the_canvas = {0};
   the_canvas.height = height;
   the_canvas.width = width;
@@ -23,7 +23,7 @@ canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b) {
   for(int i = 0; i < height; i++) {
     the_canvas.values[i] = (pixel *)calloc(width, sizeof(struct PIXEL_T *));
     for(int j = 0; j < width; j++)
-      the_canvas.values[i][j] = (pixel){r, g, b};
+      the_canvas.values[i][j] = (pixel){r, g, b, a};
   }
   return the_canvas;
 }
@@ -41,15 +41,16 @@ void write_canvas_png(canvas the_canvas, const char * file_name) {
   png_infop info_ptr = png_create_info_struct(png_ptr);
   png_init_io(png_ptr, fp);
   png_set_IHDR(png_ptr, info_ptr, the_canvas.width, the_canvas.height, 8,
-      PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+      PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
       PNG_FILTER_TYPE_DEFAULT);
   png_write_info(png_ptr, info_ptr);
   for (int i = 0; i < the_canvas.height; i++) {
-    png_bytep row = (png_byte *)calloc(the_canvas.width * 3, sizeof(png_byte));
+    png_bytep row = (png_byte *)calloc(the_canvas.width * 4, sizeof(png_byte));
     for(int j = 0; j < the_canvas.width; j++) {
-      row[3*j + 0] = (png_byte) the_canvas.values[i][j].r;
-      row[3*j + 1] = (png_byte) the_canvas.values[i][j].g;
-      row[3*j + 2] = (png_byte) the_canvas.values[i][j].b;
+      row[4*j + 0] = (png_byte) the_canvas.values[i][j].r;
+      row[4*j + 1] = (png_byte) the_canvas.values[i][j].g;
+      row[4*j + 2] = (png_byte) the_canvas.values[i][j].b;
+      row[4*j + 3] = (png_byte) the_canvas.values[i][j].a;
     }
     png_write_row(png_ptr, row);
     free(row);
@@ -85,7 +86,7 @@ canvas read_canvas_png(const char *file_name) {
   png_read_info(png_ptr, info_ptr);
 
   canvas the_canvas = init_canvas(png_get_image_height(png_ptr, info_ptr),
-      png_get_image_width(png_ptr, info_ptr), MAX_COL, MAX_COL, MAX_COL);
+      png_get_image_width(png_ptr, info_ptr), MAX_COL, MAX_COL, MAX_COL, MAX_COL);
 
   png_byte color_type = png_get_color_type(png_ptr, info_ptr);
   png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
@@ -109,6 +110,7 @@ canvas read_canvas_png(const char *file_name) {
       the_canvas.values[i][j].r = (int)row[3 * j];
       the_canvas.values[i][j].g = (int)row[3 * j + 1];
       the_canvas.values[i][j].b = (int)row[3 * j + 2];
+      the_canvas.values[i][j].a = 255;
     }
 
     free(row);

@@ -7,9 +7,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define MAX_STR 1024
-
-
 const char * parse_ws(const char * input);
 
 const char * or_p(const char * input, void * data, uint32_t num_args, ...);
@@ -59,5 +56,7 @@ bool is_whitespace(char c);
 const char * parse_shape(const char * input, void * data);
 
 const char * parse_assignment(const char * input, void * data);
+const char * parse_draw_statement(const char * input, void * data);
+const char * parse_lline(const char * input, void * data);
 
 #endif

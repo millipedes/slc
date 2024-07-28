@@ -4,8 +4,7 @@
  * @author Matthew C. Lindeman
  * @date   July 02, 2023
  * @bug    None known
- * @todo   Make rectangle use draw_line instead of bresenham_line_draw when
- * styles are more concrete.
+ * @todo   N/a
  */
 #include "rectangle.h"
 
@@ -16,6 +15,7 @@ rectangle evaluate_rectangle(parsed_shape the_shape, symbol_table * st) {
   uint8_t pixel_r = DEFAULT_RECTANGLE_PIXEL_R;
   uint8_t pixel_g = DEFAULT_RECTANGLE_PIXEL_G;
   uint8_t pixel_b = DEFAULT_RECTANGLE_PIXEL_B;
+  uint8_t pixel_a = DEFAULT_RECTANGLE_PIXEL_A;
 
   size_t height = DEFAULT_RECTANGLE_HEIGHT;
   size_t width = DEFAULT_RECTANGLE_WIDTH;
@@ -46,6 +46,9 @@ rectangle evaluate_rectangle(parsed_shape the_shape, symbol_table * st) {
     } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_RECTANGLE]: pixel_b requires an int\n");
       pixel_b = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_a", sizeof("pixel_a") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_RECTANGLE]: pixel_a requires an int\n");
+      pixel_a = (uint8_t)tmp_value.value.int_value;
     } else if(!strncmp(tmp_name.value.string_value, "height", sizeof("height") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_RECTANGLE]: height requires a int\n");
       height = (size_t)tmp_value.value.int_value;
@@ -66,7 +69,7 @@ rectangle evaluate_rectangle(parsed_shape the_shape, symbol_table * st) {
   }
   return (rectangle){
     (coord_2d){center_x, center_y},
-    (pixel){pixel_r, pixel_g, pixel_b},
+    (pixel){pixel_r, pixel_g, pixel_b, pixel_a},
     height,
     width,
     thickness};
@@ -87,13 +90,13 @@ canvas draw_rectangle(canvas the_canvas, rectangle the_rect) {
   double y2 = (double)(the_rect.center.y + half_height);
 
   // Draw the four sides of the rectangle
-  bresenham_line_draw(the_canvas, (line){
+  draw_line(the_canvas, (line){
       (coord_2d){x1, y1}, (coord_2d){x2, y1}, the_rect.color, the_rect.thickness});
-  bresenham_line_draw(the_canvas, (line){
+  draw_line(the_canvas, (line){
       (coord_2d){x2, y1}, (coord_2d){x2, y2}, the_rect.color, the_rect.thickness});
-  bresenham_line_draw(the_canvas, (line){
+  draw_line(the_canvas, (line){
       (coord_2d){x2, y2}, (coord_2d){x1, y2}, the_rect.color, the_rect.thickness});
-  bresenham_line_draw(the_canvas, (line){
+  draw_line(the_canvas, (line){
       (coord_2d){x1, y2}, (coord_2d){x1, y1}, the_rect.color, the_rect.thickness});
 
   return the_canvas;

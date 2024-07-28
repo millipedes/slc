@@ -22,6 +22,7 @@ typedef struct PIXEL_T {
   uint8_t r;
   uint8_t g;
   uint8_t b;
+  uint8_t a;
 } pixel;
 
 typedef struct CANVAS_T {
@@ -30,7 +31,7 @@ typedef struct CANVAS_T {
   int width;
 } canvas;
 
-canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b);
+canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void write_canvas_png(canvas the_canvas, const char * file_name);
 canvas read_canvas_png(const char *file_name);
 void free_canvas(canvas the_canvas);

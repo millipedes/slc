@@ -3,6 +3,7 @@
 
 #include "bool.h"
 #include "double.h"
+#include "evaluation_drawing.h"
 #include "evaluation_types.h"
 #include "integer.h"
 #include "string.h"

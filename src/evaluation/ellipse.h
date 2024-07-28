@@ -9,9 +9,11 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
+#include <string.h>
+
 #include "canvas.h"
 #include "coordinate.h"
-#include "../parsing/parsing.h"
+#include "../parsing/parsing_ds.h"
 
 #define DEFAULT_ELLIPSE_CENTER_X 0
 #define DEFAULT_ELLIPSE_CENTER_Y 0
@@ -19,9 +21,10 @@
 #define DEFAULT_ELLIPSE_PIXEL_R 0
 #define DEFAULT_ELLIPSE_PIXEL_G 0
 #define DEFAULT_ELLIPSE_PIXEL_B 0
+#define DEFAULT_ELLIPSE_PIXEL_A 255
 
-#define DEFAULT_ELLIPSE_MAJOR_AXIS 15
-#define DEFAULT_ELLIPSE_MINOR_AXIS 15
+#define DEFAULT_ELLIPSE_MAJOR_AXIS 100
+#define DEFAULT_ELLIPSE_MINOR_AXIS 100
 
 #define DEFAULT_ELLIPSE_THICKNESS  10
 

@@ -320,49 +320,72 @@ const char * parse_array(const char * input, void * data) {
   return delimiter;
 }
 
-const char * parse_assignment(const char * input, void * data) {
+const char * parse_slc_primitive(const char * input, void * data) {
   parsed_lline * the_lline = (parsed_lline *)data;
+  // Array?
+  parsed_array maybe_array = {0};
+  const char * maybe_array_remainder;
+  if((maybe_array_remainder = parse_array(parse_ws(input), &maybe_array)) != NULL) {
+    *the_lline = add_to_lline(*the_lline, ARRAY, &maybe_array);
+    return maybe_array_remainder;
+  }
+  // Shape?
+  parsed_shape maybe_shape = {0};
+  const char * maybe_shape_remainder;
+  if((maybe_shape_remainder = parse_shape(parse_ws(input), &maybe_shape)) != NULL) {
+    *the_lline = add_to_lline(*the_lline, SHAPE, &maybe_shape);
+    return maybe_shape_remainder;
+  }
+  // Expression?
+  expression maybe_expression = {0};
+  const char * maybe_expr_remainder;
+  if((maybe_expr_remainder
+        = parse_expression(parse_ws(input), &maybe_expression)) != NULL) {
+    *the_lline = add_to_lline(*the_lline, EXPR, &maybe_expression);
+    return maybe_expr_remainder;
+  } else return NULL;
+}
+
+const char * parse_assignment(const char * input, void * data) {
   expression maybe_variable = {0};
   const char * remainder = parse_variable_name(parse_ws(input), &maybe_variable);
   if(remainder) {
     if((remainder = parse_character(parse_ws(remainder), (void *)"=")) != NULL) {
-      // Array?
-      parsed_array maybe_array = {0};
-      const char * maybe_array_remainder;
-      if((maybe_array_remainder = parse_array(parse_ws(remainder), &maybe_array)) != NULL) {
-        if((maybe_array_remainder
-              = parse_character(parse_ws(maybe_array_remainder), (void *)";")) != NULL) {
-          the_lline->type = ASSIGNMENT;
-          *the_lline = add_to_lline(*the_lline, EXPR, &maybe_variable);
-          *the_lline = add_to_lline(*the_lline, ARRAY, &maybe_array);
-          return maybe_array_remainder;
-        } else return NULL;
+      parsed_lline * the_lline = (parsed_lline *)data;
+      *the_lline = add_to_lline(*the_lline, EXPR, &maybe_variable);
+      the_lline->type = ASSIGNMENT;
+      if((remainder = parse_slc_primitive(parse_ws(remainder), data)) != NULL) {
+        if((remainder = parse_word(parse_ws(remainder), (void *)";")) != NULL) {
+          return remainder;
+        } else {
+          free_parsed_lline(*the_lline);
+          return NULL;
+        }
+      } else {
+        free_parsed_lline(*the_lline);
+        return NULL;
       }
-      // Shape?
-      parsed_shape maybe_shape = {0};
-      const char * maybe_shape_remainder;
-      if((maybe_shape_remainder = parse_shape(parse_ws(remainder), &maybe_shape)) != NULL) {
-        if((maybe_shape_remainder
-              = parse_character(parse_ws(maybe_shape_remainder), (void *)";")) != NULL) {
-          the_lline->type = ASSIGNMENT;
-          *the_lline = add_to_lline(*the_lline, EXPR, &maybe_variable);
-          *the_lline = add_to_lline(*the_lline, SHAPE, &maybe_shape);
-          return maybe_shape_remainder;
-        } else return NULL;
-      }
-      // Expression?
-      expression maybe_expression = {0};
-      const char * maybe_expr_remainder;
-      if((maybe_expr_remainder
-            = parse_expression(parse_ws(remainder), &maybe_expression)) != NULL) {
-        if((maybe_expr_remainder
-              = parse_character(parse_ws(maybe_expr_remainder), (void *)";")) != NULL) {
-          the_lline->type = ASSIGNMENT;
-          *the_lline = add_to_lline(*the_lline, EXPR, &maybe_variable);
-          *the_lline = add_to_lline(*the_lline, EXPR, &maybe_expression);
-          return maybe_expr_remainder;
-        } else return NULL;
+    } else {
+      free_expression(maybe_variable);
+      return NULL;
+    }
+  } else return NULL;
+}
+
+const char * parse_draw_statement(const char * input, void * data) {
+  const char * remainder = parse_word(parse_ws(input), (void *)"draw");
+  if(remainder) {
+    if((remainder = parse_word(parse_ws(remainder), (void *)"(")) != NULL) {
+      remainder = parse_slc_primitive(parse_ws(remainder), data);
+      if((remainder = parse_word(parse_ws(remainder), (void *)");")) != NULL) {
+        parsed_lline * the_lline = (parsed_lline *)data;
+        the_lline->type = DRAW_STMT;
+        return remainder;
       } else return NULL;
     } else return NULL;
   } else return NULL;
+}
+
+const char * parse_lline(const char * input, void * data) {
+  return or_p(input, data, 2, parse_assignment, parse_draw_statement);
 }

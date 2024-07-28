@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_STR 1024
+
 typedef enum {
   INT,
   DOUBLE,
@@ -78,6 +80,7 @@ typedef enum {
 
 typedef enum {
   ASSIGNMENT,
+  DRAW_STMT,
 } lline_type;
 
 struct PARSED_ARRAY_T;

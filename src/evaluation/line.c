@@ -19,6 +19,7 @@ line evaluate_line(parsed_shape the_shape, symbol_table * st) {
   uint8_t pixel_r = DEFAULT_LINE_PIXEL_R;
   uint8_t pixel_g = DEFAULT_LINE_PIXEL_G;
   uint8_t pixel_b = DEFAULT_LINE_PIXEL_B;
+  uint8_t pixel_a = DEFAULT_LINE_PIXEL_A;
 
   int thickness = DEFAULT_LINE_THICKNESS;
 
@@ -52,6 +53,9 @@ line evaluate_line(parsed_shape the_shape, symbol_table * st) {
     } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_LINE]: pixel_b requires an int\n");
       pixel_b = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_a", sizeof("pixel_a") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_LINE]: pixel_a requires an int\n");
+      pixel_a = (uint8_t)tmp_value.value.int_value;
     } else if(!strncmp(tmp_name.value.string_value, "thickness", sizeof("thickness") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_LINE]: thickness requires a int\n");
       thickness = tmp_value.value.int_value;
@@ -67,7 +71,7 @@ line evaluate_line(parsed_shape the_shape, symbol_table * st) {
   return (line){
     (coord_2d){to_x, to_y},
     (coord_2d){from_x, from_y},
-    (pixel){pixel_r, pixel_g, pixel_b},
+    (pixel){pixel_r, pixel_g, pixel_b, pixel_a},
     thickness};
 }
 
@@ -78,7 +82,7 @@ line evaluate_line(parsed_shape the_shape, symbol_table * st) {
  * @param    the_line - The line to be written to the canvas.
  * @return the_canvas - The canvas with the line written to it.
  */
-canvas bresenham_line_draw(canvas the_canvas, line the_line) {
+canvas draw_line(canvas the_canvas, line the_line) {
   int dx = the_line.to.x - the_line.from.x;
   int dy = the_line.to.y - the_line.from.y;
   int x = the_line.from.x;

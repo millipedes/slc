@@ -3,8 +3,7 @@
  * @brief  This file contains the function definitions for rectangle.c.
  * @date   July 02, 2023
  * @bug    None known
- * @todo   Make rectangle use draw_line instead of bresenham_line_draw when
- * styles are more concrete.
+ * @todo   N/a
  */
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
@@ -17,9 +16,10 @@
 #define DEFAULT_RECTANGLE_PIXEL_R   0
 #define DEFAULT_RECTANGLE_PIXEL_G   0
 #define DEFAULT_RECTANGLE_PIXEL_B   0
+#define DEFAULT_RECTANGLE_PIXEL_A   255
 
-#define DEFAULT_RECTANGLE_HEIGHT    15
-#define DEFAULT_RECTANGLE_WIDTH     15
+#define DEFAULT_RECTANGLE_HEIGHT    100
+#define DEFAULT_RECTANGLE_WIDTH     100
 
 #define DEFAULT_RECTANGLE_THICKNESS 10
 

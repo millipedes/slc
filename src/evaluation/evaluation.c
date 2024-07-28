@@ -604,6 +604,9 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
           the_lline.value[0].the_expr.value.string_value,
           evaluate_slc_primitive(the_lline.value[1], the_lline.value_type[1], st));
       break;
+    case DRAW_STMT:
+      draw_shape(the_lline, *st);
+      break;
   }
 }
 

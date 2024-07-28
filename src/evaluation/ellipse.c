@@ -15,6 +15,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
   uint8_t pixel_r = DEFAULT_ELLIPSE_PIXEL_R;
   uint8_t pixel_g = DEFAULT_ELLIPSE_PIXEL_G;
   uint8_t pixel_b = DEFAULT_ELLIPSE_PIXEL_B;
+  uint8_t pixel_a = DEFAULT_ELLIPSE_PIXEL_A;
 
   size_t major_axis = DEFAULT_ELLIPSE_MAJOR_AXIS;
   size_t minor_axis = DEFAULT_ELLIPSE_MINOR_AXIS;
@@ -45,6 +46,9 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
     } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_b requires an int\n");
       pixel_b = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_a", sizeof("pixel_a") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_a requires an int\n");
+      pixel_a = (uint8_t)tmp_value.value.int_value;
     } else if(!strncmp(tmp_name.value.string_value, "major_axis", sizeof("major_axis") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: major_axis requires a int\n");
       major_axis = (size_t)tmp_value.value.int_value;
@@ -65,7 +69,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
   }
   return (ellipse){
     (coord_2d){center_x, center_y},
-    (pixel){pixel_r, pixel_g, pixel_b},
+    (pixel){pixel_r, pixel_g, pixel_b, pixel_a},
     major_axis,
     minor_axis,
     thickness};
