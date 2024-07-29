@@ -1,0 +1,26 @@
+x = 5;
+y = 7;
+z = [1, 2.0, "hello world", true, false,
+  rectangle(
+    center_x 300.0,
+    center_y 300.0,
+    height 500,
+    width 500,
+    pixel_g 35,
+    pixel_b 66
+  ),
+  x,
+  [
+    ellipse(
+      center_x 300.0,
+      center_y 300.0,
+      major_axis 300,
+      minor_axis 500,
+      pixel_g 35,
+      pixel_b 66
+    ),
+    2
+  ]
+];
+draw(z[x]);
+draw(z[y][0]);

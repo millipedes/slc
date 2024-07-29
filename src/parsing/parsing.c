@@ -340,7 +340,7 @@ const char * parse_slc_primitive(const char * input, void * data) {
   expression maybe_expression = {0};
   const char * maybe_expr_remainder;
   if((maybe_expr_remainder
-        = parse_expression(parse_ws(input), &maybe_expression)) != NULL) {
+        = parse_precedence_1_expression(parse_ws(input), &maybe_expression)) != NULL) {
     *the_lline = add_to_lline(*the_lline, EXPR, &maybe_expression);
     return maybe_expr_remainder;
   } else return NULL;

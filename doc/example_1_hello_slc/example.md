@@ -54,3 +54,6 @@ notice:
   low mental overhead).
   3) There is implicit typing in `slc` so the existence of a `.` in a number
   makes it a double (which is required for point specifications).
+
+See the manual for the full set of set of things which can be adjusted for a
+rectangle.

@@ -69,6 +69,33 @@ void debug_expression(expression the_expression, int indent) {
   }
 }
 
+expression deep_copy_expression(expression the_expression) {
+  expression copy = {0};
+  copy.type = the_expression.type;
+  copy.qty_children = the_expression.qty_children;
+  if(the_expression.qty_children > 0) {
+    copy.child = (expression *)calloc(the_expression.qty_children, sizeof(struct EXPRESSION_T));
+    for(uint32_t i = 0; i < the_expression.qty_children; i++) {
+      copy.child[i] = deep_copy_expression(the_expression.child[i]);
+    }
+  }
+
+  size_t len = 0;
+  switch(the_expression.type) {
+    case STRING:
+    case VAR:
+      len = strnlen(the_expression.value.string_value, MAX_STR);
+      copy.value.string_value = (char *)calloc(len + 1, sizeof(char));
+      strncpy(copy.value.string_value, the_expression.value.string_value, len);
+      copy.value.string_value[len] = '\0';
+      break;
+    default:
+      copy.value = the_expression.value;
+      break;
+  }
+  return copy;
+}
+
 expression add_expression_child(expression the_expression, expression addition) {
   the_expression.qty_children++;
   if(the_expression.child) {

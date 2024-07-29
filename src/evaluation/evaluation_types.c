@@ -15,7 +15,7 @@ array add_to_array(array the_array, slc_primitive_type type, void * addition, sy
   switch(type) {
     case EXPR:
       the_array.value[the_array.qty_values - 1].the_expr
-        = evaluate_expression(*(expression *)addition, st).value.the_expr;
+        = deep_copy_expression(evaluate_expression(*(expression *)addition, st).value.the_expr);
       break;
     case SHAPE:
       the_array.value[the_array.qty_values - 1].the_shape

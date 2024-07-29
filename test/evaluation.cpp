@@ -68,31 +68,9 @@ TEST(evaluation, evaluate_expression_test_1) {
   expression result_double = slc_value_double.value.the_expr;
   double value_one_double = 16.0;
   test_expression(result_double, DOUBLE, &value_one_double);
-  // string
-  expression head_string = {0};
-  head_string.type = BIN_PLUS;
-  head_string.child = (expression *)calloc(2, sizeof(struct EXPRESSION_T));
-  head_string.qty_children = 2;
-  expression left_string = {0};
-  left_string.type = STRING;
-  left_string.value.string_value = (char *)calloc(6, sizeof(char));
-  strncpy(left_string.value.string_value, "some ", 5);
-  left_string.value.string_value[5] = '\0';
-  expression right_string = {0};
-  right_string.type = STRING;
-  right_string.value.string_value = (char *)calloc(7, sizeof(char));
-  strncpy(right_string.value.string_value, "string", 6);
-  right_string.value.string_value[6] = '\0';
-  head_string.child[0] = left_string;
-  head_string.child[1] = right_string;
-  slc_value slc_value_string = evaluate_expression(head_string, &st);
-  expression result_string = slc_value_string.value.the_expr;
-  test_expression(result_string, STRING, (void *)"some string");
   // frees
   free_expression(head_int);
   free_expression(head_double);
-  free_expression(head_string);
-  free_expression(result_string);
 }
 
 TEST(evaluation, evaluate_expression_test_2) {
@@ -407,6 +385,7 @@ TEST(evaluation, evaluate_expression_test_17) {
   test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
+  free_slc_value(value_result);
 }
 
 TEST(evaluation, evaluate_expression_test_18) {
@@ -421,6 +400,7 @@ TEST(evaluation, evaluate_expression_test_18) {
   test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
+  free_slc_value(value_result);
 }
 
 TEST(evaluation, evaluate_expression_test_19) {

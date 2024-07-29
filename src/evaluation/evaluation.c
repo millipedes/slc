@@ -139,10 +139,6 @@ expression expression_addition(expression left, expression right) {
       result.value.double_value = double_addition(left, right);
       result.type = DOUBLE;
       return result;
-    case STRING:
-      result.value.string_value = string_addition(left, right);
-      result.type = STRING;
-      return result;
     default:
       fprintf(stderr, "[EXPRESSION_ADDITION]: operation addition not supported "
           "for type: `%s`\n", expression_type_to_string(left.type));

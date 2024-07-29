@@ -18,11 +18,12 @@ int read_evaluate_file(const char * file_name) {
   parsed_lline the_lline = {0};
   symbol_table st = {0};
   const char * remainder = input;
-   while(remainder[0] != '\0') {
+  while(remainder[0] != '\0') {
     remainder = parse_lline(remainder, &the_lline);
     remainder = parse_ws(remainder);
     evaluate_lline(the_lline, &st);
     free_parsed_lline(the_lline);
+    the_lline = (parsed_lline){0};
   }
 
   free_symbol_table(st);

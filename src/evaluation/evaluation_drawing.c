@@ -2,7 +2,17 @@
 
 void draw_shape(parsed_lline the_lline, symbol_table st) {
   if(the_lline.qty_values == 1) {
-    draw_shape_blank_canvas(evaluate_shape(the_lline.value[0].the_shape, &st).value.the_shape);
+    switch(the_lline.value_type[0]) {
+      case EXPR:
+        draw_shape_blank_canvas(evaluate_expression(the_lline.value[0].the_expr, &st).value.the_shape);
+        break;
+      case SHAPE:
+        draw_shape_blank_canvas(evaluate_shape(the_lline.value[0].the_shape, &st).value.the_shape);
+        break;
+      case ARRAY:
+        fprintf(stderr, "[DRAW_SHAPE]: Arrays cannot be drawn\n");
+        break;
+    }
   } else if(the_lline.qty_values == 2) {
     // add -> interface here
   } else {
