@@ -16,7 +16,6 @@ typedef struct SLC_VALUE_LL_T {
   struct SLC_VALUE_LL_T * next;
 } slc_value_ll;
 
-
 typedef struct SYMBOL_TABLE_T {
   slc_value_ll values[QTY_BUCKETS];
 } symbol_table;

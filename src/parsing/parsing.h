@@ -57,6 +57,8 @@ const char * parse_shape(const char * input, void * data);
 
 const char * parse_assignment(const char * input, void * data);
 const char * parse_draw_statement(const char * input, void * data);
+const char * parse_if_statement(const char * input, void * data);
+
 const char * parse_lline(const char * input, void * data);
 
 #endif

@@ -603,6 +603,20 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
     case DRAW_STMT:
       draw_shape(the_lline, *st);
       break;
+    case IF_STMT:
+      expression truth = evaluate_expression(the_lline.value[0].the_expr, st).value.the_expr;
+      if(truth.type == BOOL) {
+        if(truth.value.bool_value) {
+          for(uint32_t i = 0; i < the_lline.qty_children; i++) {
+            evaluate_lline(the_lline.child[i], st);
+          }
+        }
+      } else {
+        fprintf(stderr, "[EVALUATE_LLINE]: if statements only accepts boolean "
+            "values\n");
+        exit(1);
+      }
+      break;
   }
 }
 

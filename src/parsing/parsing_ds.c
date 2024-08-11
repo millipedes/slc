@@ -198,7 +198,7 @@ void free_parsed_array(parsed_array the_array) {
     free(the_array.value_type);
 }
 
-parsed_lline add_to_lline(parsed_lline the_lline, slc_primitive_type type, void * addition) {
+parsed_lline add_primitive_to_lline(parsed_lline the_lline, slc_primitive_type type, void * addition) {
   the_lline.qty_values++;
   if(the_lline.value) {
     the_lline.value = (slc_primitive *)realloc(the_lline.value,
@@ -224,6 +224,18 @@ parsed_lline add_to_lline(parsed_lline the_lline, slc_primitive_type type, void 
   return the_lline;
 }
 
+parsed_lline add_child_to_lline(parsed_lline the_lline, parsed_lline addition) {
+  the_lline.qty_children++;
+  if(the_lline.child) {
+    the_lline.child = (parsed_lline *)realloc(the_lline.child,
+        the_lline.qty_children * sizeof(struct PARSED_LINE_T));
+  } else {
+    the_lline.child = (parsed_lline *)calloc(1, sizeof(struct PARSED_LINE_T));
+  }
+  the_lline.child[the_lline.qty_children - 1] = addition;
+  return the_lline;
+}
+
 void free_parsed_lline(parsed_lline the_lline) {
   for(uint32_t i = 0; i < the_lline.qty_values; i++) {
     switch(the_lline.value_type[i]) {
@@ -240,6 +252,11 @@ void free_parsed_lline(parsed_lline the_lline) {
         break;
     }
   }
+  for(uint32_t i = 0; i < the_lline.qty_children; i++) {
+    free_parsed_lline(the_lline.child[i]);
+  }
+  if(the_lline.child)
+    free(the_lline.child);
   if(the_lline.value)
     free(the_lline.value);
   if(the_lline.value_type)

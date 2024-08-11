@@ -83,10 +83,12 @@ typedef enum {
 typedef enum {
   ASSIGNMENT,
   DRAW_STMT,
+  IF_STMT,
 } lline_type;
 
 struct PARSED_ARRAY_T;
 typedef struct PARSED_ARRAY_T parsed_array;
+
 typedef union {
   expression the_expr;
   parsed_shape the_shape;
@@ -105,11 +107,14 @@ void free_parsed_array(parsed_array the_array);
 typedef struct PARSED_LINE_T {
   slc_primitive * value;
   slc_primitive_type * value_type;
+  struct PARSED_LINE_T * child;
   lline_type type;
   uint32_t qty_values;
+  uint32_t qty_children;
 } parsed_lline;
 
-parsed_lline add_to_lline(parsed_lline the_lline, slc_primitive_type type, void * addition);
+parsed_lline add_primitive_to_lline(parsed_lline the_lline, slc_primitive_type type, void * addition);
+parsed_lline add_child_to_lline(parsed_lline the_lline, parsed_lline addition);
 void free_parsed_lline(parsed_lline the_lline);
 
 #endif

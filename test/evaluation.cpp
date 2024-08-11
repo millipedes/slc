@@ -761,3 +761,30 @@ TEST(evaluation, lline_test_0) {
   free_parsed_lline(the_lline);
   free_symbol_table(st);
 }
+
+TEST(evaluation, lline_test_1) {
+  symbol_table st = {0};
+  const char * input = "x = 18;"
+  "if 1 < 3 == 2 > 1 {"
+  "  x = 19;"
+  "}";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(input, &the_lline);
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  the_lline = {0};
+
+  remainder = parse_lline(remainder, &the_lline);
+  evaluate_lline(the_lline, &st);
+  ASSERT_EQ(remainder[0], '\0');
+
+  int value_one = 19;
+  expression symbol = {0};
+  symbol.type = VAR;
+  symbol.value.string_value = (char *)calloc(sizeof("x"), sizeof(char));
+  strncpy(symbol.value.string_value, "x", sizeof("x"));
+  test_expression(find_symbol(st, symbol).value.the_expr, INT, &value_one);
+  free_expression(symbol);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
