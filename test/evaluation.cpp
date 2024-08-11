@@ -788,3 +788,29 @@ TEST(evaluation, lline_test_1) {
   free_parsed_lline(the_lline);
   free_symbol_table(st);
 }
+
+TEST(evaluation, lline_test_2) {
+  symbol_table st = {0};
+  const char * input = "for i in range(3) {"
+  "  draw(rectangle(center_x i * 35, center_y i * 35));"
+  "}";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(input, &the_lline);
+  evaluate_lline(the_lline, &st);
+
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, lline_test_3) {
+  symbol_table st = {0};
+  const char * input = "for i in range(3, 7) {"
+  "  draw(rectangle(center_x i * 35, center_y i * 35));"
+  "}";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(input, &the_lline);
+  evaluate_lline(the_lline, &st);
+
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}

@@ -32,11 +32,23 @@ rectangle evaluate_rectangle(parsed_shape the_shape, symbol_table * st) {
     validate_type(tmp_name, VAR, "[EVALUATE_RECTANGLE]: name was not specified before value\n");
 
     if(!strncmp(tmp_name.value.string_value, "center_x", sizeof("center_x") - 1)) {
-      validate_type(tmp_value, DOUBLE, "[EVALUATE_RECTANGLE]: center_x requires a double\n");
-      center_x = tmp_value.value.double_value;
+      if(tmp_value.type == DOUBLE) {
+        center_x = tmp_value.value.double_value;
+      } else if(tmp_value.type == INT) {
+        center_x = (double)tmp_value.value.int_value;
+      } else {
+        fprintf(stderr, "[EVALUATE_RECTANGLE]: center_x requires a double or an int\n");
+        exit(1);
+      }
     } else if(!strncmp(tmp_name.value.string_value, "center_y", sizeof("center_y") - 1)) {
-      validate_type(tmp_value, DOUBLE, "[EVALUATE_RECTANGLE]: center_y requires a double\n");
-      center_y = tmp_value.value.double_value;
+      if(tmp_value.type == DOUBLE) {
+        center_y = tmp_value.value.double_value;
+      } else if(tmp_value.type == INT) {
+        center_y = (double)tmp_value.value.int_value;
+      } else {
+        fprintf(stderr, "[EVALUATE_RECTANGLE]: center_y requires a double or an int\n");
+        exit(1);
+      }
     } else if(!strncmp(tmp_name.value.string_value, "pixel_r", sizeof("pixel_r") - 1)) {
       validate_type(tmp_value, INT, "[EVALUATE_RECTANGLE]: pixel_r requires an int\n");
       pixel_r = (uint8_t)tmp_value.value.int_value;

@@ -768,3 +768,120 @@ TEST(parsing, if_test_0) {
 
   free_parsed_lline(the_lline);
 }
+
+TEST(parsing, for_test_0) {
+  const char * the_input = "for i in range(1 + 2) {"
+                           "    draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2));"
+                           "    some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);"
+                           "}";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(the_input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+
+  ASSERT_EQ(the_lline.type, FOR_LOOP);
+  ASSERT_EQ(the_lline.qty_children, 2);
+  ASSERT_EQ(the_lline.qty_values, 2);
+
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_lline.value[0].the_expr, VAR, (void *)"i");
+  test_expression(the_lline.value[1].the_expr, BIN_PLUS, NULL);
+  test_expression(the_lline.value[1].the_expr.child[0], INT, &value_one);
+  test_expression(the_lline.value[1].the_expr.child[1], INT, &value_two);
+
+  ASSERT_EQ(the_lline.child[0].type, DRAW_STMT);
+  ASSERT_EQ(the_lline.child[0].value_type[0], SHAPE);
+  parsed_shape the_shape = the_lline.child[0].value[0].the_shape;
+  ASSERT_EQ(the_shape.type, RECTANGLE);
+  test_expression(the_shape.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape.values[1], BIN_PLUS, NULL);
+  test_expression(the_shape.values[1].child[0], INT, &value_one);
+  test_expression(the_shape.values[1].child[1], INT, &value_two);
+  test_expression(the_shape.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape.values[3], INT, &value_two);
+  test_expression(the_shape.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape.values[5], INT, &value_one);
+  test_expression(the_shape.values[6], VAR, (void *)"width");
+  test_expression(the_shape.values[7], INT, &value_one);
+  test_expression(the_shape.values[8], VAR, (void *)"height");
+  test_expression(the_shape.values[9], INT, &value_two);
+
+  ASSERT_EQ(the_lline.child[1].type, ASSIGNMENT);
+  ASSERT_EQ(the_lline.child[1].value_type[0], EXPR);
+  ASSERT_EQ(the_lline.child[1].value_type[1], SHAPE);
+  test_expression(the_lline.child[1].value[0].the_expr, VAR, (void *)"some_value");
+  parsed_shape the_shape_two = the_lline.child[1].value[1].the_shape;
+  ASSERT_EQ(the_shape_two.type, RECTANGLE);
+  test_expression(the_shape_two.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape_two.values[1], BIN_PLUS, NULL);
+  test_expression(the_shape_two.values[1].child[0], INT, &value_one);
+  test_expression(the_shape_two.values[1].child[1], INT, &value_two);
+  test_expression(the_shape_two.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape_two.values[3], INT, &value_two);
+  test_expression(the_shape_two.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape_two.values[5], INT, &value_one);
+  test_expression(the_shape_two.values[6], VAR, (void *)"width");
+  test_expression(the_shape_two.values[7], INT, &value_one);
+  test_expression(the_shape_two.values[8], VAR, (void *)"height");
+  test_expression(the_shape_two.values[9], INT, &value_two);
+
+  free_parsed_lline(the_lline);
+}
+
+TEST(parsing, for_test_1) {
+  const char * the_input = "for i in range(1, 2) {"
+                           "    draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2));"
+                           "    some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);"
+                           "}";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_lline(the_input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+
+  ASSERT_EQ(the_lline.type, FOR_LOOP);
+  ASSERT_EQ(the_lline.qty_children, 2);
+  ASSERT_EQ(the_lline.qty_values, 3);
+
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_lline.value[0].the_expr, VAR, (void *)"i");
+  test_expression(the_lline.value[1].the_expr, INT, &value_one);
+  test_expression(the_lline.value[2].the_expr, INT, &value_two);
+
+  ASSERT_EQ(the_lline.child[0].type, DRAW_STMT);
+  ASSERT_EQ(the_lline.child[0].value_type[0], SHAPE);
+  parsed_shape the_shape = the_lline.child[0].value[0].the_shape;
+  ASSERT_EQ(the_shape.type, RECTANGLE);
+  test_expression(the_shape.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape.values[1], BIN_PLUS, NULL);
+  test_expression(the_shape.values[1].child[0], INT, &value_one);
+  test_expression(the_shape.values[1].child[1], INT, &value_two);
+  test_expression(the_shape.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape.values[3], INT, &value_two);
+  test_expression(the_shape.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape.values[5], INT, &value_one);
+  test_expression(the_shape.values[6], VAR, (void *)"width");
+  test_expression(the_shape.values[7], INT, &value_one);
+  test_expression(the_shape.values[8], VAR, (void *)"height");
+  test_expression(the_shape.values[9], INT, &value_two);
+
+  ASSERT_EQ(the_lline.child[1].type, ASSIGNMENT);
+  ASSERT_EQ(the_lline.child[1].value_type[0], EXPR);
+  ASSERT_EQ(the_lline.child[1].value_type[1], SHAPE);
+  test_expression(the_lline.child[1].value[0].the_expr, VAR, (void *)"some_value");
+  parsed_shape the_shape_two = the_lline.child[1].value[1].the_shape;
+  ASSERT_EQ(the_shape_two.type, RECTANGLE);
+  test_expression(the_shape_two.values[0], VAR, (void *)"thickness");
+  test_expression(the_shape_two.values[1], BIN_PLUS, NULL);
+  test_expression(the_shape_two.values[1].child[0], INT, &value_one);
+  test_expression(the_shape_two.values[1].child[1], INT, &value_two);
+  test_expression(the_shape_two.values[2], VAR, (void *)"center_x");
+  test_expression(the_shape_two.values[3], INT, &value_two);
+  test_expression(the_shape_two.values[4], VAR, (void *)"center_y");
+  test_expression(the_shape_two.values[5], INT, &value_one);
+  test_expression(the_shape_two.values[6], VAR, (void *)"width");
+  test_expression(the_shape_two.values[7], INT, &value_one);
+  test_expression(the_shape_two.values[8], VAR, (void *)"height");
+  test_expression(the_shape_two.values[9], INT, &value_two);
+
+  free_parsed_lline(the_lline);
+}

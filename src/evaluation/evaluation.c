@@ -594,6 +594,12 @@ slc_value evaluate_slc_primitive(slc_primitive value, slc_primitive_type type, s
 }
 
 void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
+  // if
+  expression truth = {0};
+  // for
+  expression init = {0};
+  expression top_ex = {0};
+  expression bottom_ex = {0};
   switch(the_lline.type) {
     case ASSIGNMENT:
       *st = add_slc_value_to_table(*st,
@@ -604,7 +610,7 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
       draw_shape(the_lline, *st);
       break;
     case IF_STMT:
-      expression truth = evaluate_expression(the_lline.value[0].the_expr, st).value.the_expr;
+      truth = evaluate_expression(the_lline.value[0].the_expr, st).value.the_expr;
       if(truth.type == BOOL) {
         if(truth.value.bool_value) {
           for(uint32_t i = 0; i < the_lline.qty_children; i++) {
@@ -613,6 +619,28 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
         }
       } else {
         fprintf(stderr, "[EVALUATE_LLINE]: if statements only accepts boolean "
+            "values\n");
+        exit(1);
+      }
+      break;
+    case FOR_LOOP:
+      init = the_lline.value[0].the_expr;
+      top_ex = the_lline.qty_values == 2
+        ? evaluate_expression(the_lline.value[1].the_expr, st).value.the_expr
+        : evaluate_expression(the_lline.value[2].the_expr, st).value.the_expr;
+      bottom_ex = the_lline.qty_values == 2
+        ? (expression){0}
+        : evaluate_expression(the_lline.value[1].the_expr, st).value.the_expr;
+      if(top_ex.type == INT) {
+        for(int i = bottom_ex.value.int_value; i < top_ex.value.int_value; i++) {
+          *st = add_slc_value_to_table(*st, init.value.string_value,
+              (slc_value){(expression){{.int_value = i}, NULL, 0, INT}, EXPR});
+          for(uint32_t j = 0; j < the_lline.qty_children; j++) {
+            evaluate_lline(the_lline.child[j], st);
+          }
+        }
+      } else {
+        fprintf(stderr, "[EVALUATE_LLINE]: for loops only accepts integer "
             "values\n");
         exit(1);
       }

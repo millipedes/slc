@@ -84,6 +84,7 @@ typedef enum {
   ASSIGNMENT,
   DRAW_STMT,
   IF_STMT,
+  FOR_LOOP,
 } lline_type;
 
 struct PARSED_ARRAY_T;

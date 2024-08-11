@@ -14,7 +14,6 @@ const char * or_p(const char * input, void * data, uint32_t num_args, ...);
 const char * parse_variable_name(const char * input, void * data);
 const char * parse_number(const char * input, void * data);
 const char * parse_string(const char * input, void * data);
-const char * parse_character(const char * input, void * data);
 const char * parse_word(const char * input, void * data);
 const char * parse_bool(const char * input, void * data);
 const char * parse_array(const char * input, void * data);
@@ -58,6 +57,7 @@ const char * parse_shape(const char * input, void * data);
 const char * parse_assignment(const char * input, void * data);
 const char * parse_draw_statement(const char * input, void * data);
 const char * parse_if_statement(const char * input, void * data);
+const char * parse_for_loop(const char * input, void * data);
 
 const char * parse_lline(const char * input, void * data);
 
