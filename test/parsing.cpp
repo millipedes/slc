@@ -550,6 +550,21 @@ TEST(parsing, shape_test_0) {
   free_parsed_shape(the_shape);
 }
 
+TEST(parsing, shape_test_1) {
+  const char * the_input = "canvas(width 1, height 2)";
+  parsed_shape the_shape = {0};
+  const char * remainder = parse_shape(the_input, &the_shape);
+  ASSERT_EQ(remainder[0], '\0');
+  ASSERT_EQ(the_shape.type, CANVAS);
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_shape.values[0], VAR, (void *)"width");
+  test_expression(the_shape.values[1], INT, &value_one);
+  test_expression(the_shape.values[2], VAR, (void *)"height");
+  test_expression(the_shape.values[3], INT, &value_two);
+  free_parsed_shape(the_shape);
+}
+
 TEST(parsing, array_test_0) {
   const char * the_input = "[1, 2.0, \"hello\", world]";
   parsed_array the_array = {0};

@@ -552,6 +552,10 @@ slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st) {
       result.value.the_shape.type = RECTANGLE;
       result.value.the_shape.value.the_rectangle = evaluate_rectangle(the_shape, st);
       break;
+    case CANVAS:
+      result.value.the_shape.type = CANVAS;
+      result.value.the_shape.value.the_canvas = evaluate_canvas(the_shape, st);
+      break;
   }
   return result;
 }

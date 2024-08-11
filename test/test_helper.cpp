@@ -79,3 +79,18 @@ void validate_rectangle(rectangle truth, rectangle test) {
   ASSERT_EQ(truth.width, test.width);
   ASSERT_EQ(truth.thickness, test.thickness);
 }
+
+void validate_canvas(canvas truth, canvas test) {
+  ASSERT_EQ(truth.height, test.height);
+  ASSERT_EQ(truth.width, test.width);
+  // probably should find a better solution to this (weigh performance vs
+  // accuracy)
+  for(int i = 0; i < truth.height % 100; i++) {
+    for(int j = 0; j < truth.width % 100; j++) {
+      ASSERT_EQ(truth.values[i][j].r, test.values[i][j].r);
+      ASSERT_EQ(truth.values[i][j].g, test.values[i][j].g);
+      ASSERT_EQ(truth.values[i][j].b, test.values[i][j].b);
+      ASSERT_EQ(truth.values[i][j].a, test.values[i][j].a);
+    }
+  }
+}

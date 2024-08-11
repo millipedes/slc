@@ -9,6 +9,7 @@ typedef struct SHAPE_T {
     ellipse the_ellipse;
     line the_line;
     rectangle the_rectangle;
+    canvas the_canvas;
   } value;
   shape_type type;
 } shape;

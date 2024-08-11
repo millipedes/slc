@@ -63,6 +63,7 @@ typedef enum {
   ELLIPSE,
   LINE,
   RECTANGLE,
+  CANVAS,
 } shape_type;
 
 typedef struct PARSED_SHAPE_T {

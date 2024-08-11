@@ -570,6 +570,21 @@ TEST(evaluation, evaluate_shape_test_3) {
   free_parsed_shape(the_shape);
 }
 
+TEST(evaluation, evaluate_shape_test_4) {
+  symbol_table st = {0};
+  const char * the_input = "canvas(pixel_r 1, pixel_b 66 - 66 + 66, pixel_g 35, pixel_a 255, width 1100, height 1200)";
+  parsed_shape the_shape = {0};
+  const char * remainder = parse_shape(the_input, &the_shape);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value value_result = evaluate_shape(the_shape, &st);
+  shape result = value_result.value.the_shape;
+  canvas truth = init_canvas(1200, 1100, 1, 35, 66, 255);
+  validate_canvas(truth, result.value.the_canvas);
+  free_canvas(truth);
+  free_parsed_shape(the_shape);
+  free_slc_value(value_result);
+}
+
 TEST(evaluation, array_test_0) {
   symbol_table st = {0};
   const char * input = "[1 < 3 == 2 > 1, -(((1 - - 2)))]";

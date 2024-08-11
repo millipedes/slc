@@ -258,6 +258,8 @@ const char * parse_shape(const char * input, void * data) {
     the_shape->type = RECTANGLE;
   } else if(!strncmp(name.value.string_value, "ellipse", sizeof("ellipse") - 1)) {
     the_shape->type = ELLIPSE;
+  } else if(!strncmp(name.value.string_value, "canvas", sizeof("canvas") - 1)) {
+    the_shape->type = CANVAS;
   } else {
     free_expression(name);
     return NULL;

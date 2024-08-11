@@ -37,7 +37,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
       } else if(tmp_value.type == INT) {
         center_x = (double)tmp_value.value.int_value;
       } else {
-        fprintf(stderr, "[EVALUATE_RECTANGLE]: center_x requires a double or an int\n");
+        fprintf(stderr, "[EVALUATE_ELLIPSE]: center_x requires a double or an int\n");
         exit(1);
       }
     } else if(!strncmp(tmp_name.value.string_value, "center_y", sizeof("center_y") - 1)) {
@@ -46,7 +46,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
       } else if(tmp_value.type == INT) {
         center_y = (double)tmp_value.value.int_value;
       } else {
-        fprintf(stderr, "[EVALUATE_RECTANGLE]: center_y requires a double or an int\n");
+        fprintf(stderr, "[EVALUATE_ELLIPSE]: center_y requires a double or an int\n");
         exit(1);
       }
     } else if(!strncmp(tmp_name.value.string_value, "pixel_r", sizeof("pixel_r") - 1)) {

@@ -29,6 +29,12 @@ array add_to_array(array the_array, slc_primitive_type type, void * addition, sy
   return the_array;
 }
 
+void free_shape(shape the_shape) {
+  if(the_shape.type == CANVAS) {
+    free_canvas(the_shape.value.the_canvas);
+  }
+}
+
 void free_array(array the_array) {
   for(uint32_t i = 0; i < the_array.qty_values; i++) {
     switch(the_array.value_type[i]) {
@@ -36,6 +42,7 @@ void free_array(array the_array) {
         free_expression(the_array.value[i].the_expr);
         break;
       case SHAPE:
+        free_shape(the_array.value[i].the_shape);
         break;
       case ARRAY:
         free_array(the_array.value[i].the_array[0]);
@@ -56,6 +63,7 @@ void free_slc_value(slc_value the_value) {
       free_expression(the_value.value.the_expr);
       break;
     case SHAPE:
+      free_shape(the_value.value.the_shape);
       break;
     case ARRAY:
       free_array(the_value.value.the_array[0]);

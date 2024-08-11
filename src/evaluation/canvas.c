@@ -9,6 +9,54 @@
  */
 #include "canvas.h"
 
+canvas evaluate_canvas(parsed_shape the_shape, symbol_table * st) {
+  uint8_t pixel_r = DEFAULT_CANVAS_PIXEL_R;
+  uint8_t pixel_g = DEFAULT_CANVAS_PIXEL_G;
+  uint8_t pixel_b = DEFAULT_CANVAS_PIXEL_B;
+  uint8_t pixel_a = DEFAULT_CANVAS_PIXEL_A;
+
+  size_t height = DEFAULT_CANVAS_HEIGHT;
+  size_t width = DEFAULT_CANVAS_WIDTH;
+
+  expression tmp_name = {0};
+  expression tmp_value = {0};
+
+  for(uint32_t i = 0; i < the_shape.qty_values; i++) {
+    tmp_name = the_shape.values[i];
+    i++;
+    tmp_value = opaque_eval_expr(&the_shape.values[i], st);
+    validate_type(tmp_name, VAR, "[EVALUATE_CANVAS]: name was not specified before value\n");
+
+    if(!strncmp(tmp_name.value.string_value, "pixel_r", sizeof("pixel_r") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: pixel_r requires an int\n");
+      pixel_r = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_g", sizeof("pixel_g") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: pixel_g requires an int\n");
+      pixel_g = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: pixel_b requires an int\n");
+      pixel_b = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "pixel_a", sizeof("pixel_a") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: pixel_a requires an int\n");
+      pixel_a = (uint8_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "height", sizeof("height") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: height requires a int\n");
+      height = (size_t)tmp_value.value.int_value;
+    } else if(!strncmp(tmp_name.value.string_value, "width", sizeof("width") - 1)) {
+      validate_type(tmp_value, INT, "[EVALUATE_CANVAS]: width requires a int\n");
+      width = (size_t)tmp_value.value.int_value;
+    } else {
+      fprintf(stderr, "[EVALUATE_CANVAS]: unrecognized directive `%s`\n",
+          tmp_name.value.string_value);
+      exit(1);
+    }
+
+    tmp_name = (expression){0};
+    tmp_value = (expression){0};
+  }
+  return init_canvas(height, width, pixel_r, pixel_g, pixel_b, pixel_a);
+}
+
 /**
  * This function initializes a function with dimensions heighxwidth.
  * @param      height - The height of the canvas.
