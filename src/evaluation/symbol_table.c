@@ -59,19 +59,22 @@ slc_value_ll update_slc_value_ll(slc_value_ll head, slc_value_ll tail) {
   if(!head.name)
     return tail;
   slc_value_ll * tmp = &head;
+  slc_value reference_holder;
   while(tmp->next) {
     if(!strncmp(tmp->name, tail.name, MAX_STR)) {
       free(tail.name);
-      // free_slc_value(tmp->value);
-      tmp->value = tail.value;
+      reference_holder = tmp->value;
+      tmp->value = deep_copy_slc_value(tail.value);
+      free_slc_value(reference_holder);
       return head;
     }
     tmp = tmp->next;
   }
   if(!strncmp(tmp->name, tail.name, MAX_STR)) {
     free(tail.name);
-    // free_slc_value(tmp->value);
-    tmp->value = tail.value;
+    reference_holder = tmp->value;
+    tmp->value = deep_copy_slc_value(tail.value);
+    free_slc_value(reference_holder);
     return head;
   }
   tmp->next = (struct SLC_VALUE_LL_T *)calloc(1, sizeof(struct SLC_VALUE_LL_T));

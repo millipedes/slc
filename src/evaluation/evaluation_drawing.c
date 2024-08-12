@@ -33,8 +33,9 @@ void draw_shape(parsed_lline the_lline, symbol_table * st) {
               maybe_canvas
             ));
       } else if(the_lline.value[1].the_expr.type == STRING) {
-        write_shape_to_file(evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
-            the_lline.value[1].the_expr.value.string_value);
+        the_shape = evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape;
+        write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
+        free_shape(the_shape);
       }
     } else if(the_lline.value_type[0] == EXPR) {
       if(the_lline.value[0].the_expr.type == VAR

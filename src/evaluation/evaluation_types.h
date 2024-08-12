@@ -38,6 +38,7 @@ typedef struct SLC_VALUE_T {
   slc_primitive_type type;
 } slc_value;
 
+slc_value deep_copy_slc_value(slc_value original);
 void free_slc_value(slc_value the_value);
 
 extern slc_value evaluate_expression(expression the_expression, symbol_table * st);

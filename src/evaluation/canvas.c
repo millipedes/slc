@@ -57,6 +57,23 @@ canvas evaluate_canvas(parsed_shape the_shape, symbol_table * st) {
   return init_canvas(height, width, pixel_r, pixel_g, pixel_b, pixel_a);
 }
 
+canvas deep_copy_canvas(canvas original) {
+  canvas copy = {0};
+  copy.height = original.height;
+  copy.width = original.width;
+  copy.values = (pixel **)calloc(original.width, sizeof(struct PIXEL_T *));
+  for(int i = 0; i < copy.height; i++) {
+    copy.values[i] = (pixel *)calloc(original.width, sizeof(struct PIXEL_T));
+    for(int j = 0; j < copy.width; j++) {
+      copy.values[i][j].r = original.values[i][j].r;
+      copy.values[i][j].g = original.values[i][j].g;
+      copy.values[i][j].b = original.values[i][j].b;
+      copy.values[i][j].a = original.values[i][j].a;
+    }
+  }
+  return copy;
+}
+
 /**
  * This function initializes a function with dimensions heighxwidth.
  * @param      height - The height of the canvas.
@@ -67,9 +84,9 @@ canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8
   canvas the_canvas = {0};
   the_canvas.height = height;
   the_canvas.width = width;
-  the_canvas.values = (pixel **)calloc(height, sizeof(struct PIXEL_T **));
+  the_canvas.values = (pixel **)calloc(height, sizeof(struct PIXEL_T *));
   for(int i = 0; i < height; i++) {
-    the_canvas.values[i] = (pixel *)calloc(width, sizeof(struct PIXEL_T *));
+    the_canvas.values[i] = (pixel *)calloc(width, sizeof(struct PIXEL_T));
     for(int j = 0; j < width; j++)
       the_canvas.values[i][j] = (pixel){r, g, b, a};
   }
