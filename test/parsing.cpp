@@ -50,7 +50,7 @@ TEST(parsing, string_test_0) {
   expression the_expression = {0};
   const char * remainder = parse_string(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
-  test_expression(the_expression, STRING, (void *)"\"hello world\"");
+  test_expression(the_expression, STRING, (void *)"hello world");
   free_expression(the_expression);
 }
 
@@ -139,7 +139,7 @@ TEST(parsing, term_test_3) {
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, BIN_DIVIDE, NULL);
-  test_expression(the_expression.child[0], STRING, (void *)"\"some string\"");
+  test_expression(the_expression.child[0], STRING, (void *)"some string");
   test_expression(the_expression.child[1], BIN_MOD, NULL);
   test_expression(the_expression.child[1].child[0], UN_MINUS, NULL);
   test_expression(the_expression.child[1].child[0].child[0], DOUBLE, &value);
@@ -174,7 +174,7 @@ TEST(parsing, expression_test_2) {
   expression the_expression = {0};
   const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
-  test_expression(the_expression, STRING, (void *)"\"hello world\"");
+  test_expression(the_expression, STRING, (void *)"hello world");
   free_expression(the_expression);
 }
 
@@ -574,7 +574,7 @@ TEST(parsing, array_test_0) {
   double value_two = 2.0;
   test_expression(the_array.value[0].the_expr, INT, &value_one);
   test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
-  test_expression(the_array.value[2].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(the_array.value[2].the_expr, STRING, (void *)"hello");
   test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
   free_parsed_array(the_array);
 }
@@ -588,7 +588,7 @@ TEST(parsing, array_test_1) {
   double value_two = 2.0;
   test_expression(the_array.value[0].the_expr, INT, &value_one);
   test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
-  test_expression(the_array.value[2].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(the_array.value[2].the_expr, STRING, (void *)"hello");
   test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
   ASSERT_EQ(the_array.value_type[4], SHAPE);
   parsed_shape the_shape = the_array.value[4].the_shape;
@@ -623,7 +623,7 @@ TEST(parsing, array_test_2) {
   parsed_array sub_array_two = the_array.value[1].the_array[0];
   test_expression(sub_array_one.value[0].the_expr, INT, &value_one);
   test_expression(sub_array_one.value[1].the_expr, DOUBLE, &value_two);
-  test_expression(sub_array_two.value[0].the_expr, STRING, (void *)"\"hello\"");
+  test_expression(sub_array_two.value[0].the_expr, STRING, (void *)"hello");
   test_expression(sub_array_two.value[1].the_expr, VAR, (void *)"world");
   free_parsed_array(the_array);
 }
@@ -751,7 +751,7 @@ TEST(parsing, draw_test_1) {
   test_expression(the_shape.values[9], INT, &value_two);
 
   ASSERT_EQ(the_lline.value_type[1], EXPR);
-  test_expression(the_lline.value[1].the_expr, STRING, (void *)"\"some_place\"");
+  test_expression(the_lline.value[1].the_expr, STRING, (void *)"some_place");
   free_parsed_lline(the_lline);
 }
 

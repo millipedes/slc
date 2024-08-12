@@ -79,9 +79,9 @@ const char * parse_string(const char * input, void * data) {
     inc++;
   }
   inc++;
-  the_expression->value.string_value = (char *)calloc(inc + 1, sizeof(char));
-  strncpy(the_expression->value.string_value, input, inc);
-  the_expression->value.string_value[inc] = '\0';
+  the_expression->value.string_value = (char *)calloc(inc - 1, sizeof(char));
+  strncpy(the_expression->value.string_value, input + 1, inc - 2);
+  the_expression->value.string_value[inc - 2] = '\0';
   the_expression->type = STRING;
   return input + inc;
 }
