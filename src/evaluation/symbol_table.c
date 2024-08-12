@@ -62,7 +62,7 @@ slc_value_ll update_slc_value_ll(slc_value_ll head, slc_value_ll tail) {
   while(tmp->next) {
     if(!strncmp(tmp->name, tail.name, MAX_STR)) {
       free(tail.name);
-      free_slc_value(tmp->value);
+      // free_slc_value(tmp->value);
       tmp->value = tail.value;
       return head;
     }
@@ -70,7 +70,7 @@ slc_value_ll update_slc_value_ll(slc_value_ll head, slc_value_ll tail) {
   }
   if(!strncmp(tmp->name, tail.name, MAX_STR)) {
     free(tail.name);
-    free_slc_value(tmp->value);
+    // free_slc_value(tmp->value);
     tmp->value = tail.value;
     return head;
   }

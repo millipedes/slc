@@ -766,6 +766,62 @@ TEST(evaluation, draw_test_2) {
   free_symbol_table(st);
 }
 
+TEST(evaluation, draw_test_3) {
+  symbol_table st = {0};
+  const char * input = "draw(canvas());";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, draw_test_4) {
+  symbol_table st = {0};
+  const char * input = "draw(canvas()) -> \"test.png\";";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  free_symbol_table(st);
+}
+
+TEST(evaluation, draw_test_5) {
+  symbol_table st = {0};
+  const char * input = "the_canvas = canvas(height 1000, width 1200);";
+  parsed_lline the_lline = {0};
+  const char * remainder = parse_assignment(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  the_lline = {0};
+
+  input = "the_rect = rectangle(thickness 20, center_x 200.0, pixel_b 66, center_y 100.0, width 50, pixel_g 35, height 50, pixel_r 1);";
+  remainder = parse_assignment(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  the_lline = {0};
+
+  input = "draw(the_rect) -> the_canvas;";
+  remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  the_lline = {0};
+
+  input = "draw(the_canvas) -> \"rect_test.png\";";
+  remainder = parse_draw_statement(input, &the_lline);
+  ASSERT_EQ(remainder[0], '\0');
+  evaluate_lline(the_lline, &st);
+  free_parsed_lline(the_lline);
+  the_lline = {0};
+
+  free_symbol_table(st);
+}
+
 TEST(evaluation, lline_test_0) {
   symbol_table st = {0};
   const char * input = "draw(rectangle());";

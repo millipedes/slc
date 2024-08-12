@@ -367,14 +367,20 @@ const char * parse_assignment(const char * input, void * data) {
 }
 
 const char * parse_draw_statement(const char * input, void * data) {
-  const char * remainder = parse_word(parse_ws(input), (void *)"draw");
-  if(remainder) {
+  const char * remainder;
+  if(remainder = parse_word(parse_ws(input), (void *)"draw")) {
     if(remainder = parse_word(parse_ws(remainder), (void *)"(")) {
       remainder = parse_slc_primitive(parse_ws(remainder), data);
-      if(remainder = parse_word(parse_ws(remainder), (void *)");")) {
-        parsed_lline * the_lline = (parsed_lline *)data;
-        the_lline->type = DRAW_STMT;
-        return remainder;
+      const char * maybe_into;
+      parsed_lline * the_lline = (parsed_lline *)data;
+      the_lline->type = DRAW_STMT;
+      remainder = parse_word(parse_ws(remainder), (void *)")");
+      if(maybe_into = parse_word(parse_ws(remainder), (void *)";")) {
+        return parse_word(parse_ws(remainder), (void *)";");
+      } else if(maybe_into = parse_word(parse_ws(remainder), (void *)"->")) {
+        remainder = maybe_into;
+        remainder = parse_slc_primitive(parse_ws(remainder), data);
+        return parse_word(parse_ws(remainder), (void *)";");
       } else return NULL;
     } else return NULL;
   } else return NULL;

@@ -611,7 +611,7 @@ void evaluate_lline(parsed_lline the_lline, symbol_table * st) {
           evaluate_slc_primitive(the_lline.value[1], the_lline.value_type[1], st));
       break;
     case DRAW_STMT:
-      draw_shape(the_lline, *st);
+      draw_shape(the_lline, st);
       break;
     case IF_STMT:
       truth = evaluate_expression(the_lline.value[0].the_expr, st).value.the_expr;

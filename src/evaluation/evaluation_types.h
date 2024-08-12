@@ -14,6 +14,8 @@ typedef struct SHAPE_T {
   shape_type type;
 } shape;
 
+void free_shape(shape the_shape);
+
 struct ARRAY_T;
 typedef struct ARRAY_T array;
 typedef union {
