@@ -30,6 +30,7 @@ const char * expression_type_to_string(expression_type type) {
     case BIN_LEQ:        return "Bin Leq";
     case BIN_LT:         return "Bin Lt";
     case BIN_BOOL_AND:   return "Bin Bool And";
+    case BIN_BOOL_OR:    return "Bin Bool Or";
   }
   return NULL;
 }
@@ -65,6 +66,7 @@ void debug_expression(expression the_expression, int indent) {
     case BIN_LEQ:        printf("<=\n");                                    break;
     case BIN_LT:         printf("<\n");                                     break;
     case BIN_BOOL_AND:   printf("&&\n");                                    break;
+    case BIN_BOOL_OR:    printf("||\n");                                    break;
   }
   for(uint32_t i = 0; i < the_expression.qty_children; i++) {
     debug_expression(the_expression.child[i], indent + 1);

@@ -244,6 +244,17 @@ const char * parse_precedence_11_expr(const char * input, void * data) {
   } else return NULL;
 }
 
+const char * parse_precedence_12_expr(const char * input, void * data) {
+  const char * expr = parse_precedence_11_expr(parse_ws(input), data);
+  const char * maybe_boolean_expr;
+  if(expr) {
+    if(maybe_boolean_expr = parse_word(parse_ws(expr), (void *)"||")) {
+      ADJUST_BINARY_TREE(parse_precedence_12_expr, maybe_boolean_expr, BIN_BOOL_OR);
+      return parse_word(parse_ws(expr), (void *)"||");
+    } else return expr;
+  } else return NULL;
+}
+
 bool is_double_delineator(char c) {
   return c == '.' || c == 'e' || c == 'E';
 }

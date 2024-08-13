@@ -38,6 +38,7 @@ typedef enum {
   BIN_LEQ,
   BIN_LT,
   BIN_BOOL_AND,
+  BIN_BOOL_OR,
 } expression_type;
 
 const char * expression_type_to_string(expression_type type);

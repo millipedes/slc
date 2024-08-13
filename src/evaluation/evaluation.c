@@ -104,6 +104,11 @@ slc_value evaluate_expression(expression the_expression, symbol_table * st) {
           evaluate_expression(the_expression.child[0], st).value.the_expr,
           evaluate_expression(the_expression.child[1], st).value.the_expr);
       break;
+    case BIN_BOOL_OR:
+      result.value.the_expr = expression_or(
+          evaluate_expression(the_expression.child[0], st).value.the_expr,
+          evaluate_expression(the_expression.child[1], st).value.the_expr);
+      break;
   }
   return result;
 }
@@ -556,6 +561,26 @@ expression expression_and(expression left, expression right) {
       return result;
     default:
       fprintf(stderr, "[EXPRESSION_BOOL_AND]: operation ln not supported "
+          "for type: `%s`\n", expression_type_to_string(left.type));
+      exit(1);
+  }
+}
+
+expression expression_or(expression left, expression right) {
+  if(left.type != right.type) {
+      fprintf(stderr, "[EXPRESSION_BOOL_OR]: type do not match: `%s`, `%s`\n",
+          expression_type_to_string(left.type),
+          expression_type_to_string(right.type));
+      exit(1);
+  }
+  expression result = {0};
+  switch(left.type) {
+    case BOOL:
+      result.value.bool_value = bool_or(left, right);
+      result.type = BOOL;
+      return result;
+    default:
+      fprintf(stderr, "[EXPRESSION_BOOL_OR]: operation ln not supported "
           "for type: `%s`\n", expression_type_to_string(left.type));
       exit(1);
   }

@@ -49,6 +49,7 @@ const char * parse_precedence_4_expr(const char * input, void * data);
 const char * parse_precedence_6_expr(const char * input, void * data);
 const char * parse_precedence_7_expr(const char * input, void * data);
 const char * parse_precedence_11_expr(const char * input, void * data);
+const char * parse_precedence_12_expr(const char * input, void * data);
 
 bool is_double_delineator(char c);
 bool is_whitespace(char c);
