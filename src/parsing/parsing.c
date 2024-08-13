@@ -118,6 +118,8 @@ const char * parse_precedence_1_expr(const char * input, void * data) {
   const char * factor;
   if(factor = parse_word(parse_ws(input), (void *)"-")) {
     ADJUST_UNARY_TREE(parse_precedence_1_expr, factor, UN_MINUS);
+  } else if(factor = parse_word(parse_ws(input), (void *)"!")) {
+    ADJUST_UNARY_TREE(parse_precedence_1_expr, factor, BOOL_NOT);
   } else if(factor = parse_word(parse_ws(input), (void *)"sin")) {
     ADJUST_UNARY_TREE(parse_precedence_1_expr, factor, SIN);
   } else if(factor = parse_word(parse_ws(input), (void *)"cos")) {
@@ -135,7 +137,7 @@ const char * parse_precedence_1_expr(const char * input, void * data) {
   } else if(factor = parse_word(parse_ws(input), (void *)"ln")) {
     ADJUST_UNARY_TREE(parse_precedence_1_expr, factor, LN);
   } else if(factor = parse_word(parse_ws(input), (void *)"(")) {
-    factor = parse_precedence_4_expr(parse_ws(factor), data);
+    factor = parse_precedence_12_expr(parse_ws(factor), data);
     factor = parse_word(parse_ws(factor), (void *)")");
   } else {
     factor = or_p(parse_ws(input), data, 4, parse_number, parse_bool,

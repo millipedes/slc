@@ -585,6 +585,34 @@ TEST(evaluation, evaluate_expression_test_31) {
   free_expression(result);
 }
 
+TEST(evaluation, evaluate_expression_test_32) {
+  symbol_table st = {0};
+  const char * the_input = "!true || 9 == 9 && !(31 - 2 < 30)";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_12_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value value_result = evaluate_expression(the_expression, &st);
+  expression result = value_result.value.the_expr;
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_expression_test_33) {
+  symbol_table st = {0};
+  const char * the_input = "!true || 9 == 9 && (31 - 2 < 30)";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_12_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value value_result = evaluate_expression(the_expression, &st);
+  expression result = value_result.value.the_expr;
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
 TEST(evaluation, evaluate_shape_test_0) {
   symbol_table st = {0};
   const char * the_input = "rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1)";

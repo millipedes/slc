@@ -567,7 +567,6 @@ TEST(parsing, expression_test_31) {
   int value_one = 1;
   int value_two = 2;
   int value_three = 3;
-  debug_expression(the_expression, 0);
   test_expression(the_expression, BIN_BOOL_OR, NULL);
   test_expression(the_expression.child[0], BIN_BOOL_AND, NULL);
   test_expression(the_expression.child[0].child[0], BIN_LEQ, NULL);
@@ -579,6 +578,25 @@ TEST(parsing, expression_test_31) {
   test_expression(the_expression.child[1], BIN_EQ, NULL);
   test_expression(the_expression.child[1].child[0], INT, &value_two);
   test_expression(the_expression.child[1].child[1], INT, &value_three);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_32) {
+  const char * the_input = "!-ln(0.5) + 1.0 * 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_11_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  double value_one = 0.5;
+  double value_two = 1.0;
+  double value_three = 2.0;
+  test_expression(the_expression, BIN_PLUS, NULL);
+  test_expression(the_expression.child[0], BOOL_NOT, NULL);
+  test_expression(the_expression.child[0].child[0], UN_MINUS, NULL);
+  test_expression(the_expression.child[0].child[0].child[0], LN, NULL);
+  test_expression(the_expression.child[0].child[0].child[0].child[0], DOUBLE, &value_one);
+  test_expression(the_expression.child[1], BIN_MULT, NULL);
+  test_expression(the_expression.child[1].child[0], DOUBLE, &value_two);
+  test_expression(the_expression.child[1].child[1], DOUBLE, &value_three);
   free_expression(the_expression);
 }
 

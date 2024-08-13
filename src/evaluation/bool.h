@@ -11,5 +11,6 @@ bool bool_leq(expression left, expression right);
 bool bool_lt(expression left, expression right);
 bool bool_and(expression left, expression right);
 bool bool_or(expression left, expression right);
+bool bool_not(expression the_expression);
 
 #endif
