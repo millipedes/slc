@@ -70,7 +70,7 @@ TEST(parsing, word_test_0) {
 TEST(parsing, factor_test_0) {
   const char * the_input = "(((((-1e-2)))))";
   expression the_expression = {0};
-  const char * remainder = parse_factor(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, UN_MINUS, NULL);
@@ -81,7 +81,7 @@ TEST(parsing, factor_test_0) {
 TEST(parsing, factor_test_1) {
   const char * the_input = "-(((((-1e-2)))))";
   expression the_expression = {0};
-  const char * remainder = parse_factor(the_input, &the_expression);
+  const char * remainder = parse_precedence_1_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, UN_MINUS, NULL);
@@ -93,7 +93,7 @@ TEST(parsing, factor_test_1) {
 TEST(parsing, term_test_0) {
   const char * the_input = "1e-2 * 1e-2";
   expression the_expression = {0};
-  const char * remainder = parse_term(the_input, &the_expression);
+  const char * remainder = parse_precedence_3_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, BIN_MULT, NULL);
@@ -105,7 +105,7 @@ TEST(parsing, term_test_0) {
 TEST(parsing, term_test_1) {
   const char * the_input = "1e-2 * 1e-2 * 1e-2";
   expression the_expression = {0};
-  const char * remainder = parse_term(the_input, &the_expression);
+  const char * remainder = parse_precedence_3_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, BIN_MULT, NULL);
@@ -119,7 +119,7 @@ TEST(parsing, term_test_1) {
 TEST(parsing, term_test_2) {
   const char * the_input = "1 / 2 % 3";
   expression the_expression = {0};
-  const char * remainder = parse_term(the_input, &the_expression);
+  const char * remainder = parse_precedence_3_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -135,7 +135,7 @@ TEST(parsing, term_test_2) {
 TEST(parsing, term_test_3) {
   const char * the_input = "\"some string\" / -1e-2 % var_name";
   expression the_expression = {0};
-  const char * remainder = parse_term(the_input, &the_expression);
+  const char * remainder = parse_precedence_3_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, BIN_DIVIDE, NULL);
@@ -150,7 +150,7 @@ TEST(parsing, term_test_3) {
 TEST(parsing, expression_test_0) {
   const char * the_input = "-123";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value = 123;
   test_expression(the_expression, UN_MINUS, NULL);
@@ -161,7 +161,7 @@ TEST(parsing, expression_test_0) {
 TEST(parsing, expression_test_1) {
   const char * the_input = "-1e-2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   double value = 0.01;
   test_expression(the_expression, UN_MINUS, NULL);
@@ -172,7 +172,7 @@ TEST(parsing, expression_test_1) {
 TEST(parsing, expression_test_2) {
   const char * the_input = "\"hello world\"";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   test_expression(the_expression, STRING, (void *)"hello world");
   free_expression(the_expression);
@@ -181,14 +181,14 @@ TEST(parsing, expression_test_2) {
 TEST(parsing, expression_test_3) {
   const char * the_input = "\"hello world";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_TRUE(remainder == NULL);
 }
 
 TEST(parsing, expression_test_4) {
   const char * the_input = "1 + 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -201,7 +201,7 @@ TEST(parsing, expression_test_4) {
 TEST(parsing, expression_test_5) {
   const char * the_input = "1 + 2 * 3";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -217,7 +217,7 @@ TEST(parsing, expression_test_5) {
 TEST(parsing, expression_test_6) {
   const char * the_input = "(1 + 2) * 3";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -232,7 +232,7 @@ TEST(parsing, expression_test_6) {
 TEST(parsing, expression_test_7) {
   const char * the_input = "-(1 + 2)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -246,7 +246,7 @@ TEST(parsing, expression_test_7) {
 TEST(parsing, expression_test_8) {
   const char * the_input = "(((((1 - - 2)))))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -260,7 +260,7 @@ TEST(parsing, expression_test_8) {
 TEST(parsing, expression_test_9) {
   const char * the_input = "1 ^ 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -273,7 +273,7 @@ TEST(parsing, expression_test_9) {
 TEST(parsing, expression_test_10) {
   const char * the_input = "(1 + 2) ^ -(1 + 2)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -291,7 +291,7 @@ TEST(parsing, expression_test_10) {
 TEST(parsing, expression_test_11) {
   const char * the_input = "1 == 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -304,7 +304,7 @@ TEST(parsing, expression_test_11) {
 TEST(parsing, expression_test_12) {
   const char * the_input = "1 != 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -317,7 +317,7 @@ TEST(parsing, expression_test_12) {
 TEST(parsing, expression_test_13) {
   const char * the_input = "1 >= 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -330,7 +330,7 @@ TEST(parsing, expression_test_13) {
 TEST(parsing, expression_test_14) {
   const char * the_input = "1 > 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -343,7 +343,7 @@ TEST(parsing, expression_test_14) {
 TEST(parsing, expression_test_15) {
   const char * the_input = "1 <= 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -356,7 +356,7 @@ TEST(parsing, expression_test_15) {
 TEST(parsing, expression_test_16) {
   const char * the_input = "1 < 2";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -369,7 +369,7 @@ TEST(parsing, expression_test_16) {
 TEST(parsing, expression_test_17) {
   const char * the_input = "true";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   bool value_one = true;
   test_expression(the_expression, BOOL, &value_one);
@@ -378,7 +378,7 @@ TEST(parsing, expression_test_17) {
 TEST(parsing, expression_test_18) {
   const char * the_input = "false";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   bool value_one = false;
   test_expression(the_expression, BOOL, &value_one);
@@ -387,7 +387,7 @@ TEST(parsing, expression_test_18) {
 TEST(parsing, expression_test_19) {
   const char * the_input = "sin((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -401,7 +401,7 @@ TEST(parsing, expression_test_19) {
 TEST(parsing, expression_test_20) {
   const char * the_input = "cos((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -415,7 +415,7 @@ TEST(parsing, expression_test_20) {
 TEST(parsing, expression_test_21) {
   const char * the_input = "tan((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -429,7 +429,7 @@ TEST(parsing, expression_test_21) {
 TEST(parsing, expression_test_22) {
   const char * the_input = "arcsin((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -443,7 +443,7 @@ TEST(parsing, expression_test_22) {
 TEST(parsing, expression_test_23) {
   const char * the_input = "arccos((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -457,7 +457,7 @@ TEST(parsing, expression_test_23) {
 TEST(parsing, expression_test_24) {
   const char * the_input = "arctan((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -471,7 +471,7 @@ TEST(parsing, expression_test_24) {
 TEST(parsing, expression_test_25) {
   const char * the_input = "log((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -485,7 +485,7 @@ TEST(parsing, expression_test_25) {
 TEST(parsing, expression_test_26) {
   const char * the_input = "ln((1 + 2))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 1;
   int value_two = 2;
@@ -499,7 +499,7 @@ TEST(parsing, expression_test_26) {
 TEST(parsing, expression_test_27) {
   const char * the_input = "x[0]";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 0;
   test_expression(the_expression, VAR, (void *)"x");
@@ -511,7 +511,7 @@ TEST(parsing, expression_test_27) {
 TEST(parsing, expression_test_28) {
   const char * the_input = "x[9 * 1][1 + 2]";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   int value_one = 9;
   int value_two = 1;
@@ -524,6 +524,38 @@ TEST(parsing, expression_test_28) {
   test_expression(the_expression.child[0].child[1], BIN_PLUS, NULL);
   test_expression(the_expression.child[0].child[1].child[0], INT, &value_two);
   test_expression(the_expression.child[0].child[1].child[1], INT, &value_three);
+  free_expression(the_expression);
+}
+
+TEST(parsing, expression_test_29) {
+  const char * the_input = "1 <= 2 && 1 == 2";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_11_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  int value_one = 1;
+  int value_two = 2;
+  test_expression(the_expression, BIN_BOOL_AND, NULL);
+  test_expression(the_expression.child[0], BIN_LEQ, NULL);
+  test_expression(the_expression.child[1], BIN_EQ, NULL);
+  free_expression(the_expression);
+}
+
+TEST(evaluation, expression_test_30) {
+  symbol_table st = {0};
+  const char * the_input = "-ln(0.5) + 1.0 * 2.0";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_11_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  double value_one = 0.5;
+  double value_two = 1.0;
+  double value_three = 2.0;
+  test_expression(the_expression, BIN_PLUS, NULL);
+  test_expression(the_expression.child[0], UN_MINUS, NULL);
+  test_expression(the_expression.child[0].child[0], LN, NULL);
+  test_expression(the_expression.child[0].child[0].child[0], DOUBLE, &value_one);
+  test_expression(the_expression.child[1], BIN_MULT, NULL);
+  test_expression(the_expression.child[1].child[0], DOUBLE, &value_two);
+  test_expression(the_expression.child[1].child[1], DOUBLE, &value_three);
   free_expression(the_expression);
 }
 

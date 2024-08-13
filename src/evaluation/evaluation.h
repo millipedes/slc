@@ -31,6 +31,7 @@ expression expression_arccos(expression the_expression);
 expression expression_arctan(expression the_expression);
 expression expression_log(expression the_expression);
 expression expression_ln(expression the_expression);
+expression expression_and(expression left, expression right);
 
 slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st);
 

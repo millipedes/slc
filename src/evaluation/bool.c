@@ -23,3 +23,7 @@ bool bool_leq(expression left, expression right) {
 bool bool_lt(expression left, expression right) {
   return left.value.bool_value < right.value.bool_value;
 }
+
+bool bool_and(expression left, expression right) {
+  return left.value.bool_value && right.value.bool_value;
+}

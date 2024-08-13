@@ -9,5 +9,6 @@ bool bool_geq(expression left, expression right);
 bool bool_gt(expression left, expression right);
 bool bool_leq(expression left, expression right);
 bool bool_lt(expression left, expression right);
+bool bool_and(expression left, expression right);
 
 #endif

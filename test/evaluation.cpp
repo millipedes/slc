@@ -223,7 +223,7 @@ TEST(evaluation, evaluate_expression_test_6) {
   symbol_table st = {0};
   const char * the_input = "(((1 - - 2 * 3)))";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -237,7 +237,7 @@ TEST(evaluation, evaluate_expression_test_7) {
   symbol_table st = {0};
   const char * the_input = "2 ^ 2 ^ 3";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -251,7 +251,7 @@ TEST(evaluation, evaluate_expression_test_8) {
   symbol_table st = {0};
   const char * the_input = "(1.0 + 2.0) ^ -(1.0 + 2.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -265,7 +265,7 @@ TEST(evaluation, evaluate_expression_test_9) {
   symbol_table st = {0};
   const char * the_input = "1.0 == 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -279,7 +279,7 @@ TEST(evaluation, evaluate_expression_test_10) {
   symbol_table st = {0};
   const char * the_input = "1.0 != 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -293,7 +293,7 @@ TEST(evaluation, evaluate_expression_test_11) {
   symbol_table st = {0};
   const char * the_input = "1.0 >= 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -307,7 +307,7 @@ TEST(evaluation, evaluate_expression_test_12) {
   symbol_table st = {0};
   const char * the_input = "1.0 > 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -321,7 +321,7 @@ TEST(evaluation, evaluate_expression_test_13) {
   symbol_table st = {0};
   const char * the_input = "1.0 <= 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -335,7 +335,7 @@ TEST(evaluation, evaluate_expression_test_14) {
   symbol_table st = {0};
   const char * the_input = "1.0 < 2.0";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -349,7 +349,7 @@ TEST(evaluation, evaluate_expression_test_15) {
   symbol_table st = {0};
   const char * the_input = "false == true";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -363,7 +363,7 @@ TEST(evaluation, evaluate_expression_test_16) {
   symbol_table st = {0};
   const char * the_input = "1 < 3 == 2 > 1";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -377,7 +377,7 @@ TEST(evaluation, evaluate_expression_test_17) {
   symbol_table st = {0};
   const char * the_input = "\"some string\" == \"some string\"";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -392,7 +392,7 @@ TEST(evaluation, evaluate_expression_test_18) {
   symbol_table st = {0};
   const char * the_input = "\"some string\" == \"some other string\"";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -407,7 +407,7 @@ TEST(evaluation, evaluate_expression_test_19) {
   symbol_table st = {0};
   const char * the_input = "sin(3.1415926 / 6.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -421,7 +421,7 @@ TEST(evaluation, evaluate_expression_test_20) {
   symbol_table st = {0};
   const char * the_input = "cos(3.1415926 / 3.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -435,7 +435,7 @@ TEST(evaluation, evaluate_expression_test_21) {
   symbol_table st = {0};
   const char * the_input = "tan(3.1415926 / 4.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -449,7 +449,7 @@ TEST(evaluation, evaluate_expression_test_22) {
   symbol_table st = {0};
   const char * the_input = "arcsin(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -463,7 +463,7 @@ TEST(evaluation, evaluate_expression_test_23) {
   symbol_table st = {0};
   const char * the_input = "arccos(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -477,7 +477,7 @@ TEST(evaluation, evaluate_expression_test_24) {
   symbol_table st = {0};
   const char * the_input = "arctan(1.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -491,7 +491,7 @@ TEST(evaluation, evaluate_expression_test_25) {
   symbol_table st = {0};
   const char * the_input = "log(2.0)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
@@ -505,12 +505,40 @@ TEST(evaluation, evaluate_expression_test_26) {
   symbol_table st = {0};
   const char * the_input = "ln(0.5)";
   expression the_expression = {0};
-  const char * remainder = parse_precedence_1_expression(the_input, &the_expression);
+  const char * remainder = parse_precedence_7_expr(the_input, &the_expression);
   ASSERT_EQ(remainder[0], '\0');
   slc_value value_result = evaluate_expression(the_expression, &st);
   expression result = value_result.value.the_expr;
   double value_one = -0.6931;
   test_expression(result, DOUBLE, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_expression_test_27) {
+  symbol_table st = {0};
+  const char * the_input = "-ln(0.5) + 1.0 * 2.0 < 3.0 && 1 == 1";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_11_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value value_result = evaluate_expression(the_expression, &st);
+  expression result = value_result.value.the_expr;
+  bool value_one = true;
+  test_expression(result, BOOL, &value_one);
+  free_expression(the_expression);
+  free_expression(result);
+}
+
+TEST(evaluation, evaluate_expression_test_28) {
+  symbol_table st = {0};
+  const char * the_input = "-ln(0.5) + 1.0 * 2.0 < 2.0 && 1 == 1";
+  expression the_expression = {0};
+  const char * remainder = parse_precedence_11_expr(the_input, &the_expression);
+  ASSERT_EQ(remainder[0], '\0');
+  slc_value value_result = evaluate_expression(the_expression, &st);
+  expression result = value_result.value.the_expr;
+  bool value_one = false;
+  test_expression(result, BOOL, &value_one);
   free_expression(the_expression);
   free_expression(result);
 }
@@ -688,10 +716,10 @@ TEST(evaluation, symbol_table_test_2) {
   const char * remainder = parse_assignment(setup_input, &the_lline);
   ASSERT_EQ(remainder[0], '\0');
   expression accessor_one = {0};
-  const char * evaluation_remainer_one = parse_precedence_1_expression(evaluation_input_one, &accessor_one);
+  const char * evaluation_remainer_one = parse_precedence_7_expr(evaluation_input_one, &accessor_one);
   ASSERT_EQ(evaluation_remainer_one[0], '\0');
   expression accessor_two = {0};
-  const char * evaluation_remainer_two = parse_precedence_1_expression(evaluation_input_two, &accessor_two);
+  const char * evaluation_remainer_two = parse_precedence_7_expr(evaluation_input_two, &accessor_two);
   ASSERT_EQ(evaluation_remainer_two[0], '\0');
   bool value_one = true;
   int value_two = -3;
@@ -719,7 +747,7 @@ TEST(evaluation, symbol_table_test_3) {
   const char * remainder = parse_assignment(setup_input, &the_lline);
   ASSERT_EQ(remainder[0], '\0');
   expression accessor_one = {0};
-  const char * evaluation_remainer_one = parse_precedence_1_expression(evaluation_input_one, &accessor_one);
+  const char * evaluation_remainer_one = parse_precedence_7_expr(evaluation_input_one, &accessor_one);
   ASSERT_EQ(evaluation_remainer_one[0], '\0');
   bool value_one = true;
   evaluate_lline(the_lline, &st);

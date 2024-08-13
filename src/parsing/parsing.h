@@ -43,11 +43,12 @@ const char * parse_array(const char * input, void * data);
     return str;                                                          \
   }
 
-const char * parse_factor(const char * input, void * data);
-const char * parse_term(const char * input, void * data);
-const char * parse_expression(const char * input, void * data);
-const char * parse_relational_expression(const char * input, void * data);
-const char * parse_precedence_1_expression(const char * input, void * data);
+const char * parse_precedence_1_expr(const char * input, void * data);
+const char * parse_precedence_3_expr(const char * input, void * data);
+const char * parse_precedence_4_expr(const char * input, void * data);
+const char * parse_precedence_6_expr(const char * input, void * data);
+const char * parse_precedence_7_expr(const char * input, void * data);
+const char * parse_precedence_11_expr(const char * input, void * data);
 
 bool is_double_delineator(char c);
 bool is_whitespace(char c);

@@ -29,6 +29,7 @@ const char * expression_type_to_string(expression_type type) {
     case BIN_GT:         return "Bin Gt";
     case BIN_LEQ:        return "Bin Leq";
     case BIN_LT:         return "Bin Lt";
+    case BIN_BOOL_AND:   return "Bin Bool And";
   }
   return NULL;
 }
@@ -63,6 +64,7 @@ void debug_expression(expression the_expression, int indent) {
     case BIN_GT:         printf(">\n");                                     break;
     case BIN_LEQ:        printf("<=\n");                                    break;
     case BIN_LT:         printf("<\n");                                     break;
+    case BIN_BOOL_AND:   printf("&&\n");                                    break;
   }
   for(uint32_t i = 0; i < the_expression.qty_children; i++) {
     debug_expression(the_expression.child[i], indent + 1);
