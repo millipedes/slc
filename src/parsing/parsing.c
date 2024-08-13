@@ -414,7 +414,7 @@ const char * parse_if_statement(const char * input, void * data) {
   const char * remainder;
   if(remainder = parse_word(parse_ws(input), (void *)"if")) {
     expression truth = {0};
-    if(remainder = parse_precedence_7_expr(parse_ws(remainder), &truth)) {
+    if(remainder = parse_precedence_12_expr(parse_ws(remainder), &truth)) {
       if(remainder = parse_word(parse_ws(remainder), (void *)"{")) {
         parsed_lline new_child = {0};
         parsed_lline * parent = (parsed_lline *)data;
@@ -442,12 +442,12 @@ const char * parse_for_loop(const char * input, void * data) {
     // "range (" -> we should accept this
     if(!(remainder = parse_word(parse_ws(remainder), (void *)"("))) return NULL;
     expression top_ex = {0};
-    if(!(remainder = parse_precedence_7_expr(parse_ws(remainder), &top_ex))) return NULL;
+    if(!(remainder = parse_precedence_12_expr(parse_ws(remainder), &top_ex))) return NULL;
     parsed_lline * parent = (parsed_lline *)data;
     const char * maybe_comma;
     if(maybe_comma = parse_word(parse_ws(remainder), (void *)",")) {
       expression bottom_ex = {0};
-      if(maybe_comma = parse_precedence_7_expr(parse_ws(maybe_comma), &bottom_ex)) {
+      if(maybe_comma = parse_precedence_12_expr(parse_ws(maybe_comma), &bottom_ex)) {
         *parent = add_primitive_to_lline(*parent, EXPR, &init);
         *parent = add_primitive_to_lline(*parent, EXPR, &top_ex);
         *parent = add_primitive_to_lline(*parent, EXPR, &bottom_ex);
