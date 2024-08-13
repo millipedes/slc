@@ -26,12 +26,9 @@ void draw_shape(parsed_lline the_lline, symbol_table * st) {
     if(the_lline.value_type[0] == SHAPE) {
       if(the_lline.value[1].the_expr.type == VAR) {
         maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
-        *st = add_slc_value_to_table(*st,
-            the_lline.value[1].the_expr.value.string_value,
-            write_shape_to_canvas(
+        maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
               evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
-              maybe_canvas
-            ));
+              maybe_canvas);
       } else if(the_lline.value[1].the_expr.type == STRING) {
         the_shape = evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape;
         write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
@@ -41,15 +38,12 @@ void draw_shape(parsed_lline the_lline, symbol_table * st) {
       if(the_lline.value[0].the_expr.type == VAR
           && the_lline.value[1].the_expr.type == VAR) {
         maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
-        *st = add_slc_value_to_table(*st,
-            the_lline.value[1].the_expr.value.string_value,
-            write_shape_to_canvas(
-              evaluate_expression(the_lline.value[0].the_expr, st).value.the_shape,
-              maybe_canvas
-            ));
+        maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
+              evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
+              maybe_canvas);
       } else if(the_lline.value[0].the_expr.type == VAR
           && the_lline.value[1].the_expr.type == STRING) {
-        the_shape = evaluate_expression(the_lline.value[0].the_expr, st).value.the_shape;
+        the_shape = find_symbol(*st, the_lline.value[0].the_expr).value.the_shape;
         write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
       }
     } else {
@@ -67,7 +61,7 @@ bool file_exists(const char * file_name) {
   return access(file_name, F_OK) == 0 ? true : false;
 }
 
-slc_value write_shape_to_canvas(shape the_shape, slc_value the_slc_value) {
+canvas write_shape_to_canvas(shape the_shape, slc_value the_slc_value) {
   canvas the_canvas = the_slc_value.value.the_shape.value.the_canvas;
   rectangle the_rectangle = the_shape.value.the_rectangle;
   ellipse the_ellipse = the_shape.value.the_ellipse;
@@ -87,8 +81,7 @@ slc_value write_shape_to_canvas(shape the_shape, slc_value the_slc_value) {
           "not supported\n");
       exit(1);
   }
-  the_slc_value.value.the_shape.value.the_canvas = the_canvas;
-  return the_slc_value;
+  return the_canvas;
 }
 
 void write_shape_to_file(shape the_shape, const char * file_name) {
@@ -97,21 +90,25 @@ void write_shape_to_file(shape the_shape, const char * file_name) {
   line the_line = the_shape.value.the_line;
   canvas the_canvas = {0};
   if(file_exists(file_name)) {
-    the_canvas = read_canvas_png(file_name);
     switch(the_shape.type) {
       case RECTANGLE:
+        the_canvas = read_canvas_png(file_name);
         the_canvas = draw_rectangle(the_canvas, the_rectangle);
         break;
       case ELLIPSE:
+        the_canvas = read_canvas_png(file_name);
         the_canvas = draw_ellipse(the_canvas, the_ellipse);
         break;
       case LINE:
+        the_canvas = read_canvas_png(file_name);
         the_canvas = draw_line(the_canvas, the_line);
         break;
       case CANVAS:
         write_canvas_png(the_shape.value.the_canvas, file_name);
+        free_canvas(the_canvas);
         return;
     }
+    free_canvas(the_canvas);
   } else {
     if(the_shape.type == CANVAS) {
       write_canvas_png(the_shape.value.the_canvas, file_name);

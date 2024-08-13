@@ -9,7 +9,7 @@
 #include "symbol_table.h"
 
 void draw_shape(parsed_lline the_lline, symbol_table * st);
-slc_value write_shape_to_canvas(shape the_shape, slc_value the_slc_value);
+canvas write_shape_to_canvas(shape the_shape, slc_value the_slc_value);
 void write_shape_to_file(shape the_shape, const char * file_name);
 void draw_shape_blank_canvas(shape the_shape, const char * file_name);
 
