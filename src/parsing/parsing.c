@@ -3,7 +3,16 @@
 const char * parse_ws(const char * input) {
   if(input) {
     uint32_t inc = 0;
-    while(is_whitespace(*(input + inc))) inc++;
+    while(is_whitespace(*(input + inc)) || *(input + inc) == '#') {
+      if(*(input + inc) == '#') {
+        while(*(input + inc) != '\n') {
+          inc++;
+        }
+      }
+      if(is_whitespace(*(input + inc))) {
+        inc++;
+      }
+    }
     return input + inc;
   } else return NULL;
 }
