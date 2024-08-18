@@ -137,3 +137,34 @@ canvas draw_line(canvas the_canvas, line the_line) {
 
   return the_canvas;
 }
+
+canvas draw_b_curve(canvas the_canvas, line the_line, points the_points) {
+  for(double i = 0.0; i < 1.0; i += B_CURVE_DELTA) {
+    coord_2d at_t = de_casteljau(the_points, i);
+    for(int j = -(int)((double)the_line.thickness/2.0);
+        j < (int)((double)the_line.thickness/2.0); j++) {
+      for(int k = 0; k < the_line.thickness; k++) {
+        if(at_t.y + j < the_canvas.height && at_t.y + j >= 0
+            && at_t.x + k < the_canvas.width && at_t.x + k >= 0) {
+          the_canvas.values[(int)at_t.y + j][((int)at_t.x + k)] = the_line.color;
+        }
+      }
+    }
+  }
+  return the_canvas;
+}
+
+coord_2d de_casteljau(points the_points, double t) {
+  points tmp = deep_copy_points(the_points);
+  coord_2d result = {0};
+  for(uint32_t i = 1; i <= the_points.qty_points; i++) {
+    for(uint32_t j = 0; j < the_points.qty_points - i; j++) {
+      tmp.value[j].x = tmp.value[j].x * (1 - t) + tmp.value[j + 1].x * t;
+      tmp.value[j].y = tmp.value[j].y * (1 - t) + tmp.value[j + 1].y * t;
+    }
+  }
+  result.x = tmp.value[0].x;
+  result.y = tmp.value[0].y;
+  free_points(tmp);
+  return result;
+}

@@ -28,6 +28,8 @@
 
 #define DEFAULT_LINE_THICKNESS 10
 
+#define B_CURVE_DELTA 0.0001
+
 typedef struct LINE_T {
   coord_2d to;
   coord_2d from;
@@ -39,6 +41,9 @@ struct SYMBOL_TABLE_T;
 typedef struct SYMBOL_TABLE_T symbol_table;
 line evaluate_line(parsed_shape the_shape, symbol_table * st);
 canvas draw_line(canvas the_canvas, line the_line);
+
+canvas draw_b_curve(canvas the_canvas, line the_line, points the_points);
+coord_2d de_casteljau(points the_points, double t);
 
 extern expression opaque_eval_expr(expression * value, symbol_table * st);
 

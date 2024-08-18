@@ -19,41 +19,118 @@ void draw_shape(parsed_lline the_lline, symbol_table * st) {
     free_shape(the_shape);
   } else if(the_lline.qty_values == 2) {
     if(the_lline.value_type[0] == ARRAY || the_lline.value_type[1] == ARRAY) {
-      fprintf(stderr, "[DRAW_SHAPE]: Arrays cannot be drawn\n");
-      exit(1);
     }
-    slc_value maybe_canvas = {0};
-    if(the_lline.value_type[0] == SHAPE) {
-      if(the_lline.value[1].the_expr.type == VAR) {
-        maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
-        maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
-              evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
-              maybe_canvas);
-      } else if(the_lline.value[1].the_expr.type == STRING) {
-        the_shape = evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape;
-        write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
-        free_shape(the_shape);
-      }
-    } else if(the_lline.value_type[0] == EXPR) {
-      if(the_lline.value[0].the_expr.type == VAR
-          && the_lline.value[1].the_expr.type == VAR) {
-        maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
-        maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
-              evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
-              maybe_canvas);
-      } else if(the_lline.value[0].the_expr.type == VAR
-          && the_lline.value[1].the_expr.type == STRING) {
-        the_shape = find_symbol(*st, the_lline.value[0].the_expr).value.the_shape;
-        write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
-      }
-    } else {
-      fprintf(stderr, "[DRAW_SHAPE]: unknown error\n");
-      exit(1);
-    }
+    map_operator(the_lline, st);
   } else {
     fprintf(stderr, "[DRAW_SHAPE]: Logical line with more than 2 (or 0) "
         " values passed\n");
     exit(1);
+  }
+}
+
+void map_operator(parsed_lline the_lline, symbol_table * st) {
+  slc_value maybe_canvas = {0};
+  shape the_shape = {0};
+  draw_pairs from_to = determine_draw_pairs(the_lline);
+  switch(from_to) {
+    case VAR_VAR:
+      maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
+      maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
+            evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
+            maybe_canvas);
+      break;
+    case SHAPE_SHAPE:
+      fprintf(stderr, "[MAP_OPERATOR]: drawing from shape to shape not yet "
+          "supported\n");
+      exit(1);
+    case VAR_STRING:
+      the_shape = find_symbol(*st, the_lline.value[0].the_expr).value.the_shape;
+      write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
+      break;
+    case VAR_SHAPE:
+      fprintf(stderr, "[MAP_OPERATOR]: drawing from variable to shape not yet "
+          "supported\n");
+      exit(1);
+      break;
+    case SHAPE_VAR:
+      maybe_canvas = find_symbol(*st, the_lline.value[1].the_expr);
+      maybe_canvas.value.the_shape.value.the_canvas = write_shape_to_canvas(
+            evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape,
+            maybe_canvas);
+      break;
+    case SHAPE_STRING:
+      the_shape = evaluate_shape(the_lline.value[0].the_shape, st).value.the_shape;
+      write_shape_to_file(the_shape, the_lline.value[1].the_expr.value.string_value);
+      free_shape(the_shape);
+      break;
+    default:
+      fprintf(stderr, "[MAP_OPERATOR]: Unknown error\n");
+      exit(1);
+  }
+}
+
+/**
+ * :(
+ */
+draw_pairs determine_draw_pairs(parsed_lline the_lline) {
+  switch(the_lline.value_type[0]) {
+    case EXPR:
+      switch(the_lline.value_type[1]) {
+        case EXPR:
+          if(the_lline.value[0].the_expr.type == VAR) {
+            if(the_lline.value[1].the_expr.type == VAR) {
+              return VAR_VAR;
+            } else if(the_lline.value[1].the_expr.type == STRING) {
+              return VAR_STRING;
+            } else {
+              fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Non variable/string "
+                  "expression passed to map operator: `%s`\n",
+                  expression_type_to_string(the_lline.value[1].the_expr.type));
+              exit(1);
+            }
+          } else {
+            fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Non variable expression "
+                "passed as parameter to draw function: `%s`\n",
+                expression_type_to_string(the_lline.value[1].the_expr.type));
+            exit(1);
+          }
+        case SHAPE:
+          if(the_lline.value[0].the_expr.type == VAR) {
+            return VAR_SHAPE;
+          } else {
+            fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Non variable expression "
+                "passed as parameter to draw function: `%s`\n",
+                expression_type_to_string(the_lline.value[1].the_expr.type));
+            exit(1);
+          }
+        default:
+          fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Arrays cannot be drawn\n");
+          exit(1);
+      }
+      break;
+    case SHAPE:
+      switch(the_lline.value_type[1]) {
+        case EXPR:
+          if(the_lline.value[1].the_expr.type == VAR) {
+            return SHAPE_VAR;
+          } else if(the_lline.value[1].the_expr.type == STRING) {
+            return SHAPE_STRING;
+          } else {
+            fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Non variable/string "
+                "expression passed to map operator: `%s`\n",
+                expression_type_to_string(the_lline.value[1].the_expr.type));
+            exit(1);
+          }
+        case SHAPE:
+          return SHAPE_SHAPE;
+        default:
+          fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Arrays cannot be drawn\n");
+          exit(1);
+      }
+      break;
+    default:
+      fprintf(stderr, "[DETERMINE_DRAW_PAIRS]: Arrays cannot be drawn\n");
+      exit(1);
   }
 }
 

@@ -33,5 +33,6 @@ typedef struct RECTANGLE_T {
 
 rectangle evaluate_rectangle(parsed_shape the_shape, symbol_table * st);
 canvas draw_rectangle(canvas the_canvas, rectangle the_rect);
+bool point_in_rectangle(rectangle the_rect, coord_2d point);
 
 #endif

@@ -185,3 +185,16 @@ canvas draw_ellipse_points(canvas the_canvas, ellipse the_ellipse, int center_x,
   }
   return the_canvas;
 }
+
+bool point_in_ellipse(ellipse the_ellipse, coord_2d point) {
+  double dx = point.x - the_ellipse.center.x;
+  double dy = point.y - the_ellipse.center.y;
+
+  double semi_major_axis = (double)the_ellipse.major_axis / 2.0 + (double)the_ellipse.thickness;
+  double semi_minor_axis = (double)the_ellipse.minor_axis / 2.0 + (double)the_ellipse.thickness;
+
+  double ellipse_value = (dx * dx) / (semi_major_axis * semi_major_axis) +
+    (dy * dy) / (semi_minor_axis * semi_minor_axis);
+
+  return ellipse_value <= 1.0 + the_ellipse.thickness;
+}

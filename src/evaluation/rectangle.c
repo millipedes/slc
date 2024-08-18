@@ -113,3 +113,13 @@ canvas draw_rectangle(canvas the_canvas, rectangle the_rect) {
 
   return the_canvas;
 }
+
+bool point_in_rectangle(rectangle the_rect, coord_2d point) {
+  if(point.x <= (the_rect.center.x + the_rect.width / 2 + the_rect.thickness / 2)
+      && point.x >= (the_rect.center.x - the_rect.width / 2 + the_rect.thickness / 2)
+      && point.y <= (the_rect.center.y + the_rect.width / 2 + the_rect.thickness / 2)
+      && point.y >= (the_rect.center.y - the_rect.width / 2 + the_rect.thickness / 2)) {
+    return true;
+  }
+  return false;
+}

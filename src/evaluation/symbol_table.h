@@ -1,7 +1,7 @@
 #ifndef SYM_TAB_H
 #define SYM_TAB_H
 
-#include "evaluation_types.h"
+#include "draw_stack.h"
 
 #define DJB2_HASH_VALUE    5381
 #define DJB2_HASH_MULTIPLE 33
@@ -18,6 +18,7 @@ typedef struct SLC_VALUE_LL_T {
 
 typedef struct SYMBOL_TABLE_T {
   slc_value_ll values[QTY_BUCKETS];
+  draw_stack ds;
 } symbol_table;
 
 slc_value_ll init_slc_value_ll(const char * name, slc_value the_slc_value);

@@ -6,7 +6,9 @@ set(TEST_DIR "${CMAKE_SOURCE_DIR}/test")
 set(SRC_FILES
   ${SRC_DIR}/evaluation/bool.c
   ${SRC_DIR}/evaluation/canvas.c
+  ${SRC_DIR}/evaluation/coordinate.c
   ${SRC_DIR}/evaluation/double.c
+  ${SRC_DIR}/evaluation/draw_stack.c
   ${SRC_DIR}/evaluation/ellipse.c
   ${SRC_DIR}/evaluation/evaluation.c
   ${SRC_DIR}/evaluation/evaluation_drawing.c
@@ -40,6 +42,7 @@ if(BUILD_TESTS)
     ${TEST_DIR}/parsing.cpp
     ${TEST_DIR}/evaluation.cpp
     ${TEST_DIR}/test_helper.cpp
+    ${TEST_DIR}/drawing_test.cpp
   )
   add_executable(tests ${TEST_SRC_FILES} test/main.cpp)
   target_link_libraries(tests ${SRC_FILES} gtest gtest_main pthread PNG::PNG m)

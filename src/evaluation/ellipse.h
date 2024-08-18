@@ -9,6 +9,7 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
+#include <math.h>
 #include <string.h>
 
 #include "canvas.h"
@@ -42,6 +43,7 @@ ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st);
 canvas draw_ellipse(canvas the_canvas, ellipse the_ellipse);
 canvas draw_ellipse_points(canvas the_canvas, ellipse the_ellipse, int center_x,
     int center_y, int x, int y);
+bool point_in_ellipse(ellipse the_ellipse, coord_2d point);
 
 extern expression opaque_eval_expr(expression * value, symbol_table * st);
 
