@@ -305,47 +305,30 @@ auto is_whitespace(char c) -> bool {
   return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f';
 }
 
-// const char * parse_shape(const char * input, void * data) {
-//   expression name = {0};
-//   expression tmp_value = {0};
-//   const char * remainder = parse_precedence_4_expr(parse_ws(input), &name);
-//   const char * delimiter;
-//   parsed_shape * the_shape = (parsed_shape *)data;
-// 
-//   if (name.type != VAR) {
-//     free_expression(name);
-//     return NULL;
-//   }
-//   if (!strncmp(name.value.string_value, "line", sizeof("line") - 1)) {
-//     the_shape->type = LINE;
-//   } else if (!strncmp(name.value.string_value, "rectangle", sizeof("rectangle") - 1)) {
-//     the_shape->type = RECTANGLE;
-//   } else if (!strncmp(name.value.string_value, "ellipse", sizeof("ellipse") - 1)) {
-//     the_shape->type = ELLIPSE;
-//   } else if (!strncmp(name.value.string_value, "canvas", sizeof("canvas") - 1)) {
-//     the_shape->type = CANVAS;
-//   } else {
-//     free_expression(name);
-//     return NULL;
-//   }
-//   free_expression(name);
-// 
-//   if (remainder = parse_word(parse_ws(remainder), (void *)"(")) {
-//     while((delimiter = parse_word(parse_ws(remainder), (void *)")")) == NULL) {
-//       remainder = parse_precedence_4_expr(parse_ws(remainder), &tmp_value);
-//       the_shape = add_expression(the_shape, tmp_value);
-//       tmp_value = (expression){0};
-//       remainder = parse_precedence_4_expr(parse_ws(remainder), &tmp_value);
-//       the_shape = add_expression(the_shape, tmp_value);
-//       if (delimiter = parse_word(parse_ws(remainder), (void *)",")) {
-//         remainder = delimiter;
-//       }
-//       tmp_value = (expression){0};
-//     }
-//     return delimiter;
-//   } else return NULL;
-// }
-// 
+auto parse_shape(const char * input, Expr& expr) -> const char * {
+  std::vector<Expr> child;
+  child.push_back(Expr());
+  const char * remainder = parse_precedence_4_expr(parse_ws(input), child[0]);
+  const char * delimiter;
+  uint32_t i = 1;
+
+  if (remainder = parse_word(parse_ws(remainder), "(")) {
+    while ((delimiter = parse_word(parse_ws(remainder), ")")) == NULL) {
+      child.push_back(Expr());
+      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
+      i++;
+      child.push_back(Expr());
+      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
+      i++;
+      if (delimiter = parse_word(parse_ws(remainder), ",")) {
+        remainder = delimiter;
+      }
+    }
+    expr.set_value(Expr::Shape{child});
+    return delimiter;
+  } else return NULL;
+}
+
 // const char * parse_array(const char * input, void * data) {
 //   const char * remainder = parse_word(parse_ws(input), (void *)"[");
 //   if (!remainder) return NULL;

@@ -492,44 +492,38 @@ TEST(parsing, expression_test_32) {
   test_expr(expr.child()[1].child()[1], SLCParsing::Expr(2.0));
 }
 
-// TEST(parsing, shape_test_0) {
-//   const char * input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   ASSERT_EQ(the_shape.type, RECTANGLE);
-//   test_expression(the_shape.values[0], VAR, (void *)"thickness");
-//   test_expression(the_shape.values[1], BIN_PLUS, NULL);
-//   int value_one = 1;
-//   int value_two = 2;
-//   test_expression(the_shape.values[1].child[0], INT, &value_one);
-//   test_expression(the_shape.values[1].child[1], INT, &value_two);
-//   test_expression(the_shape.values[2], VAR, (void *)"center_x");
-//   test_expression(the_shape.values[3], INT, &value_two);
-//   test_expression(the_shape.values[4], VAR, (void *)"center_y");
-//   test_expression(the_shape.values[5], INT, &value_one);
-//   test_expression(the_shape.values[6], VAR, (void *)"width");
-//   test_expression(the_shape.values[7], INT, &value_one);
-//   test_expression(the_shape.values[8], VAR, (void *)"height");
-//   test_expression(the_shape.values[9], INT, &value_two);
-//   free_parsed_shape(the_shape);
-// }
-// 
-// TEST(parsing, shape_test_1) {
-//   const char * input = "canvas(width 1, height 2)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   ASSERT_EQ(the_shape.type, CANVAS);
-//   int value_one = 1;
-//   int value_two = 2;
-//   test_expression(the_shape.values[0], VAR, (void *)"width");
-//   test_expression(the_shape.values[1], INT, &value_one);
-//   test_expression(the_shape.values[2], VAR, (void *)"height");
-//   test_expression(the_shape.values[3], INT, &value_two);
-//   free_parsed_shape(the_shape);
-// }
-// 
+TEST(parsing, shape_test_0) {
+  const char * input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
+  SLCParsing::Expr expr;
+  const char * remainder = SLCParsing::parse_shape(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  SLCParsing::Expr thickness_expr = SLCParsing::Expr(SLCParsing::OpType::BinPlus);
+  thickness_expr.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(
+        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2)}));
+  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Shape{
+    std::vector<SLCParsing::Expr>{
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"rectangle"}),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"thickness"}), thickness_expr,
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_x"}), SLCParsing::Expr(2),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_y"}), SLCParsing::Expr(1),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}});
+  test_expr(expr, values);
+}
+
+TEST(parsing, shape_test_1) {
+  const char * input = "canvas(width 1, height 2)";
+  SLCParsing::Expr expr;
+  const char * remainder = SLCParsing::parse_shape(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Shape{
+    std::vector<SLCParsing::Expr>{
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"canvas"}),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}});
+  test_expr(expr, values);
+}
+
 // TEST(parsing, array_test_0) {
 //   const char * input = "[1, 2.0, \"hello\", world]";
 //   parsed_array the_array = {0};
