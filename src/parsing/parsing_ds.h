@@ -1,125 +1,136 @@
-#ifndef PARSING_DS_H
-#define PARSING_DS_H
+#pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdint>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <variant>
+#include <vector>
 
-#define MAX_STR 1024
+namespace SLCParsing {
 
-typedef enum {
-  INT,
-  DOUBLE,
-  VAR,
-  STRING,
-  BOOL,
-  UN_MINUS,
-  SIN,
-  COS,
-  TAN,
-  ARCSIN,
-  ARCCOS,
-  ARCTAN,
-  LOG,
-  LN,
-  ARRAY_ACCESSOR,
-  BIN_PLUS,
-  BIN_MINUS,
-  BIN_MULT,
-  BIN_DIVIDE,
-  BIN_MOD,
-  BIN_POW,
-  BIN_EQ,
-  BIN_NEQ,
-  BIN_GEQ,
-  BIN_GT,
-  BIN_LEQ,
-  BIN_LT,
-  BIN_BOOL_AND,
-  BIN_BOOL_OR,
-  BOOL_NOT,
-} expression_type;
+enum class OpType {
+  UnMinus,
+  Sin,
+  Cos,
+  Tan,
+  ArcSin,
+  ArcCos,
+  ArcTan,
+  Log,
+  Ln,
+  ArrayAccessor,
+  BinPlus,
+  BinMinus,
+  BinMult,
+  BinDivide,
+  BinMod,
+  BinPow,
+  BinEq,
+  BinNeq,
+  BinGeq,
+  BinGt,
+  BinLeq,
+  BinLt,
+  BinBoolAnd,
+  BinBoolOr,
+  BoolNot,
+};
 
-const char * expression_type_to_string(expression_type type);
+struct Expr {
+  using Exprs = std::vector<Expr>;
+  struct Variable { std::string value; };
+  struct Shape { Exprs value; };
+  struct Array { Exprs value; };
+  using ExprVariant = std::variant<int,         // Integer
+                                   double,      // Double
+                                   std::string, // String
+                                   Variable,    // Variable
+                                   bool,        // Bool
+                                   OpType,      // Operator
+                                   Shape,       // Shape
+                                   Array>;      // Array
 
-typedef struct EXPRESSION_T {
-  union {
-    int    int_value;
-    double double_value;
-    char * string_value;
-    bool   bool_value;
-  } value;
-  struct EXPRESSION_T * child;
-  uint32_t qty_children;
-  expression_type type;
-} expression;
+  public:
+    Expr() = default;
+    ~Expr() = default;
 
-expression deep_copy_expression(expression the_expression);
-expression add_expression_child(expression the_expression, expression addition);
-void debug_expression(expression the_expression, int indent);
-void free_expression(expression the_expression);
-void validate_type(expression the_expression, expression_type type, const char * err);
+    Expr(const ExprVariant& value) : value_(value), child_(nullptr) {}
 
-typedef enum {
-  ELLIPSE,
-  LINE,
-  RECTANGLE,
-  CANVAS,
-} shape_type;
+    Expr(const Expr& other) : value_(other.value_),
+      child_(other.child_ ? std::make_unique<Exprs>(*other.child_) : nullptr) {}
 
-typedef struct PARSED_SHAPE_T {
-  expression * values;
-  uint32_t qty_values;
-  shape_type type;
-} parsed_shape;
+    auto operator=(const Expr& other) -> Expr& {
+      if (this != &other) {
+        value_ = other.value_;
+        child_ = other.child_ ? std::make_unique<Exprs>(*other.child_) : nullptr;
+      }
+      return *this;
+    }
 
-parsed_shape * add_expression(parsed_shape * the_shape, expression the_expression);
-void free_parsed_shape(parsed_shape the_shape);
+    auto operator=(Expr&& other) noexcept -> Expr& {
+      if (this != &other) {
+        value_ = std::move(other.value_);
+        child_ = std::move(other.child_);
+      }
+      return *this;
+    }
 
-typedef enum {
-  EXPR,
-  SHAPE,
-  ARRAY,
-} slc_primitive_type;
+    auto operator==(const Expr& other) const -> bool;
 
-typedef enum {
-  ASSIGNMENT,
-  DRAW_STMT,
-  IF_STMT,
-  FOR_LOOP,
-} lline_type;
+    auto debug_expr(int indent) -> void;
 
-struct PARSED_ARRAY_T;
-typedef struct PARSED_ARRAY_T parsed_array;
+    auto set_value(const ExprVariant& value) -> void;
+    auto value() -> ExprVariant { return value_; }
 
-typedef union {
-  expression the_expr;
-  parsed_shape the_shape;
-  parsed_array * the_array;
-} slc_primitive;
+    auto set_child(std::unique_ptr<Exprs> child) -> void;
+    auto child() -> Exprs;
 
-typedef struct PARSED_ARRAY_T {
-  slc_primitive * value;
-  slc_primitive_type * value_type;
-  uint32_t qty_values;
-} parsed_array;
+  private:
+    ExprVariant value_;
+    std::unique_ptr<Exprs> child_;
+};
 
-parsed_array add_to_parsed_array(parsed_array the_array, slc_primitive_type type, void * addition);
-void free_parsed_array(parsed_array the_array);
+enum class LLineType {
+  Assignment,
+  DrawStmt,
+  IfStmt,
+  ForLoop,
+};
 
-typedef struct PARSED_LINE_T {
-  slc_primitive * value;
-  slc_primitive_type * value_type;
-  struct PARSED_LINE_T * child;
-  lline_type type;
-  uint32_t qty_values;
-  uint32_t qty_children;
-} parsed_lline;
+struct ParsedLLine {
+  using Exprs = std::vector<Expr>;
 
-parsed_lline add_primitive_to_lline(parsed_lline the_lline, slc_primitive_type type, void * addition);
-parsed_lline add_child_to_lline(parsed_lline the_lline, parsed_lline addition);
-void free_parsed_lline(parsed_lline the_lline);
+  public:
+    ParsedLLine() = default;
+    ~ParsedLLine() = default;
 
-#endif
+    ParsedLLine(const ParsedLLine& other) : value_(other.value_),
+      child_(other.child_ ? std::make_unique<ParsedLLine>(*other.child_) : nullptr),
+      type_(other.type_) {}
+
+    auto operator=(const ParsedLLine& other) -> ParsedLLine& {
+      if (this != &other) {
+        value_ = other.value_;
+        child_ = other.child_ ? std::make_unique<ParsedLLine>(*other.child_) : nullptr;
+        type_ = other.type_;
+      }
+      return *this;
+    }
+
+    auto operator=(ParsedLLine&& other) noexcept -> ParsedLLine& {
+      if (this != &other) {
+        value_ = std::move(other.value_);
+        child_ = std::move(other.child_);
+        type_ = other.type_;
+      }
+      return *this;
+    }
+
+  private:
+    Exprs value_;
+    std::unique_ptr<ParsedLLine> child_;
+    LLineType type_;
+};
+
+} // namespace SLCParsing

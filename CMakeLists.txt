@@ -4,31 +4,31 @@ project(slc)
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(TEST_DIR "${CMAKE_SOURCE_DIR}/test")
 set(SRC_FILES
-  ${SRC_DIR}/evaluation/bool.c
-  ${SRC_DIR}/evaluation/canvas.c
-  ${SRC_DIR}/evaluation/coordinate.c
-  ${SRC_DIR}/evaluation/double.c
-  ${SRC_DIR}/evaluation/draw_stack.c
-  ${SRC_DIR}/evaluation/ellipse.c
-  ${SRC_DIR}/evaluation/evaluation.c
-  ${SRC_DIR}/evaluation/evaluation_drawing.c
-  ${SRC_DIR}/evaluation/evaluation_types.c
-  ${SRC_DIR}/evaluation/integer.c
-  ${SRC_DIR}/evaluation/line.c
-  ${SRC_DIR}/evaluation/rectangle.c
-  ${SRC_DIR}/evaluation/string.c
-  ${SRC_DIR}/evaluation/symbol_table.c
-  ${SRC_DIR}/io/default_output_file.c
-  ${SRC_DIR}/io/read_evaluate_file.c
-  ${SRC_DIR}/parsing/parsing.c
-  ${SRC_DIR}/parsing/parsing_ds.c
+  ${SRC_DIR}/evaluation/bool.cpp
+  ${SRC_DIR}/evaluation/canvas.cpp
+  ${SRC_DIR}/evaluation/coordinate.cpp
+  ${SRC_DIR}/evaluation/double.cpp
+  ${SRC_DIR}/evaluation/draw_stack.cpp
+  ${SRC_DIR}/evaluation/ellipse.cpp
+  ${SRC_DIR}/evaluation/evaluation.cpp
+  ${SRC_DIR}/evaluation/evaluation_drawing.cpp
+  ${SRC_DIR}/evaluation/evaluation_types.cpp
+  ${SRC_DIR}/evaluation/integer.cpp
+  ${SRC_DIR}/evaluation/line.cpp
+  ${SRC_DIR}/evaluation/rectangle.cpp
+  ${SRC_DIR}/evaluation/string.cpp
+  ${SRC_DIR}/evaluation/symbol_table.cpp
+  ${SRC_DIR}/io/default_output_file.cpp
+  ${SRC_DIR}/io/read_evaluate_file.cpp
+  ${SRC_DIR}/parsing/parsing.cpp
+  ${SRC_DIR}/parsing/parsing_ds.cpp
 )
 
 include_directories(
   ${SRC_DIR}
 )
 
-add_executable(slc ${SRC_FILES} src/main/main.c)
+add_executable(slc ${SRC_FILES} src/main/main.cpp)
 
 find_package(PNG REQUIRED)
 

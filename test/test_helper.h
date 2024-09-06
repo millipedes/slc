@@ -1,15 +1,12 @@
-#ifndef TEST_HELPER_H
-#define TEST_HELPER_H
+#pragma once
 
 #include <gtest/gtest.h>
 
-#include "evaluation/evaluation.h"
+// #include "evaluation/evaluation.h"
 #include "parsing/parsing.h"
 
-void test_expression(expression the_expression, expression_type type, void * value);
-void validate_rectangle(rectangle truth, rectangle test);
-void validate_line(line truth, line test);
-void validate_ellipse(ellipse truth, ellipse test);
-void validate_canvas(canvas truth, canvas test);
-
-#endif
+auto test_expr(const SLCParsing::Expr& the_expr, const SLCParsing::Expr& value) -> void;
+// void validate_rectangle(rectangle truth, rectangle test);
+// void validate_line(line truth, line test);
+// void validate_ellipse(ellipse truth, ellipse test);
+// void validate_canvas(canvas truth, canvas test);
