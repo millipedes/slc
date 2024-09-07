@@ -140,7 +140,7 @@ auto Expr::debug_expr(int indent) -> void {
         std::cout << "%" << std::endl;
         break;
       case OpType::BinPow:
-        std::cout << "^" << std::endl;
+        std::cout << "**" << std::endl;
         break;
       case OpType::BinEq:
         std::cout << "==" << std::endl;
@@ -169,14 +169,17 @@ auto Expr::debug_expr(int indent) -> void {
       case OpType::BoolNot:
         std::cout << "!" << std::endl;
         break;
+      case OpType::BinAssignment:
+        std::cout << "=" << std::endl;
     }
   } else if (std::holds_alternative<Shape>(value_)) {
     for (auto& shape_mems : std::get<Shape>(value_).value) {
       shape_mems.debug_expr(indent);
     }
   } else if (std::holds_alternative<Array>(value_)) {
+    std::cout << "[...]" << std::endl;
     for (auto& array_mems : std::get<Array>(value_).value) {
-      array_mems.debug_expr(indent);
+      array_mems.debug_expr(indent + 1);
     }
   }
   if (child_) {

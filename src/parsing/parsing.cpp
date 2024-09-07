@@ -227,13 +227,13 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
     return make_unary_tree(parse_ws(factor), expr, child,
         OpType::Ln, parse_precedence_1_expr);
   } else if (factor = parse_word(parse_ws(input), "(")) {
-    factor = parse_precedence_12_expr(parse_ws(factor), expr);
+    factor = parse_precedence_14_expr(parse_ws(factor), expr);
     factor = parse_word(parse_ws(factor), ")");
   } else {
     factor = parse_axiom(parse_ws(input), expr);
   }
   const char * maybe_factor;
-  if (maybe_factor = parse_word(parse_ws(factor), "^")) {
+  if (maybe_factor = parse_word(parse_ws(factor), "**")) {
     return make_binary_tree(parse_ws(maybe_factor), expr, child,
         OpType::BinPow, parse_precedence_3_expr);
   }
@@ -265,7 +265,8 @@ auto parse_precedence_3_expr(const char * input, Expr& expr) -> const char * {
   Exprs child;
   child.push_back(Expr());
   if (factor) {
-    if (maybe_term = parse_word(parse_ws(factor), "*")) {
+    if (!(maybe_term = parse_word(parse_ws(factor), "**"))
+        && (maybe_term = parse_word(parse_ws(factor), "*"))) {
       return make_binary_tree(parse_ws(maybe_term), expr, child,
           OpType::BinMult, parse_precedence_3_expr);
     } else if (maybe_term = parse_word(parse_ws(factor), "/")) {
@@ -302,16 +303,16 @@ auto parse_precedence_6_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), ">=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinGeq, parse_precedence_4_expr);
+          OpType::BinGeq, parse_precedence_6_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), ">")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinGt, parse_precedence_4_expr);
+          OpType::BinGt, parse_precedence_6_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "<=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinLeq, parse_precedence_4_expr);
+          OpType::BinLeq, parse_precedence_6_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "<")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinLt, parse_precedence_4_expr);
+          OpType::BinLt, parse_precedence_6_expr);
     } else return expression;
 
   } else return NULL;
@@ -325,10 +326,10 @@ auto parse_precedence_7_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "==")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinEq, parse_precedence_4_expr);
+          OpType::BinEq, parse_precedence_7_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "!=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinNeq, parse_precedence_4_expr);
+          OpType::BinNeq, parse_precedence_7_expr);
     } else return expression;
   } else return NULL;
 }
@@ -365,7 +366,8 @@ auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char * {
   Exprs child;
   child.push_back(Expr());
   if (expression) {
-    if (maybe_boolean_expr = parse_word(parse_ws(expression), "=")) {
+    if (!(maybe_boolean_expr = parse_word(parse_ws(expression), "=="))
+        && (maybe_boolean_expr = parse_word(parse_ws(expression), "="))) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
           OpType::BinAssignment, parse_precedence_14_expr);
     } else return expression;
@@ -378,42 +380,6 @@ auto is_double_delineator(char c) -> bool {
 
 auto is_whitespace(char c) -> bool {
   return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f';
-}
-
-auto parse_top_level_expr(const char * input, Expr& expr) -> const char * {
-  // Array?
-  const char * maybe_array_remainder;
-  if (maybe_array_remainder = parse_array(parse_ws(input), expr)) {
-    return maybe_array_remainder;
-  }
-  // Shape?
-  const char * maybe_shape_remainder;
-  if (maybe_shape_remainder = parse_shape(parse_ws(input), expr)) {
-    return maybe_shape_remainder;
-  }
-  // Expression?
-  const char * maybe_expr_remainder;
-  if (maybe_expr_remainder = parse_precedence_12_expr(parse_ws(input), expr)) {
-    return maybe_expr_remainder;
-  } else return NULL;
-}
-
-auto parse_assignment(const char * input, ParsedLLine& lline) -> const char * {
-  Exprs values;
-  values.push_back(Expr());
-  const char * remainder = parse_variable_name(parse_ws(input), values[0]);
-  if (remainder) {
-    if (remainder = parse_word(parse_ws(remainder), "=")) {
-      values.push_back(Expr());
-      if (remainder = parse_top_level_expr(parse_ws(remainder), values[1])) {
-        if (remainder = parse_word(parse_ws(remainder), ";")) {
-          lline.set_type(LLineType::Assignment);
-          lline.set_value(values);
-          return remainder;
-        } else return NULL;
-      } else return NULL;
-    } else return NULL;
-  } else return NULL;
 }
 
 // const char * parse_draw_statement(const char * input, void * data) {

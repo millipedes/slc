@@ -33,8 +33,6 @@ auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char *;
 auto is_double_delineator(char c) -> bool;
 auto is_whitespace(char c) -> bool;
 
-auto parse_assignment(const char * input, ParsedLLine& lline) -> const char *;
-
 // const char * parse_draw_statement(const char * input, void * data);
 // const char * parse_if_statement(const char * input, void * data);
 // const char * parse_for_loop(const char * input, void * data);
