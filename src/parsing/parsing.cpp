@@ -329,90 +329,70 @@ auto parse_shape(const char * input, Expr& expr) -> const char * {
   } else return NULL;
 }
 
-// const char * parse_array(const char * input, void * data) {
-//   const char * remainder = parse_word(parse_ws(input), (void *)"[");
-//   if (!remainder) return NULL;
-//   const char * delimiter;
-//   parsed_array * the_array = (parsed_array *)data;
-//   while((delimiter = parse_word(parse_ws(remainder), (void *)"]")) == NULL) {
-//       parsed_shape maybe_shape = {0};
-//       const char * maybe_shape_remainder;
-//       expression maybe_expression = {0};
-//       const char * maybe_expr_remainder;
-//       parsed_array maybe_array = {0};
-//       const char * maybe_array_remainder;
-//       if (maybe_array_remainder = parse_word(parse_ws(remainder), (void *)"[")) {
-//         remainder = parse_array(parse_ws(remainder), &maybe_array);
-//         *the_array = add_to_parsed_array(*the_array, ARRAY, &maybe_array);
-//       } else if ((maybe_shape_remainder
-//             = parse_shape(parse_ws(remainder), &maybe_shape)) != NULL) {
-//         *the_array = add_to_parsed_array(*the_array, SHAPE, &maybe_shape);
-//         remainder = maybe_shape_remainder;
-//       } else if (maybe_expr_remainder
-//             = parse_precedence_7_expr(parse_ws(remainder), &maybe_expression)) {
-//         *the_array = add_to_parsed_array(*the_array, EXPR, &maybe_expression);
-//         remainder = maybe_expr_remainder;
-//       }
-// 
-//     if (delimiter = parse_word(parse_ws(remainder), (void *)",")) {
-//       remainder = delimiter;
-//     }
-//   }
-//   return delimiter;
-// }
-// 
-// const char * parse_slc_primitive(const char * input, void * data) {
-//   parsed_lline * the_lline = (parsed_lline *)data;
-//   // Array?
-//   parsed_array maybe_array = {0};
-//   const char * maybe_array_remainder;
-//   if (maybe_array_remainder = parse_array(parse_ws(input), &maybe_array)) {
-//     *the_lline = add_primitive_to_lline(*the_lline, ARRAY, &maybe_array);
-//     return maybe_array_remainder;
-//   }
-//   // Shape?
-//   parsed_shape maybe_shape = {0};
-//   const char * maybe_shape_remainder;
-//   if (maybe_shape_remainder = parse_shape(parse_ws(input), &maybe_shape)) {
-//     *the_lline = add_primitive_to_lline(*the_lline, SHAPE, &maybe_shape);
-//     return maybe_shape_remainder;
-//   }
-//   // Expression?
-//   expression maybe_expression = {0};
-//   const char * maybe_expr_remainder;
-//   if (maybe_expr_remainder
-//         = parse_precedence_7_expr(parse_ws(input), &maybe_expression)) {
-//     *the_lline = add_primitive_to_lline(*the_lline, EXPR, &maybe_expression);
-//     return maybe_expr_remainder;
-//   } else return NULL;
-// }
-// 
-// const char * parse_assignment(const char * input, void * data) {
-//   expression maybe_variable = {0};
-//   const char * remainder = parse_variable_name(parse_ws(input), &maybe_variable);
-//   if (remainder) {
-//     if (remainder = parse_word(parse_ws(remainder), (void *)"=")) {
-//       parsed_lline * the_lline = (parsed_lline *)data;
-//       *the_lline = add_primitive_to_lline(*the_lline, EXPR, &maybe_variable);
-//       the_lline->type = ASSIGNMENT;
-//       if (remainder = parse_slc_primitive(parse_ws(remainder), data)) {
-//         if (remainder = parse_word(parse_ws(remainder), (void *)";")) {
-//           return remainder;
-//         } else {
-//           free_parsed_lline(*the_lline);
-//           return NULL;
-//         }
-//       } else {
-//         free_parsed_lline(*the_lline);
-//         return NULL;
-//       }
-//     } else {
-//       free_expression(maybe_variable);
-//       return NULL;
-//     }
-//   } else return NULL;
-// }
-// 
+auto parse_array(const char * input, Expr& expr) -> const char * {
+  const char * remainder = parse_word(parse_ws(input), "[");
+  if (!remainder) return NULL;
+  const char * delimiter;
+  const char * maybe_array;
+  const char * maybe_shape;
+  const char * maybe_expr;
+  std::vector<Expr> child;
+  uint32_t i = 0;
+  while((delimiter = parse_word(parse_ws(remainder), "]")) == NULL) {
+    child.push_back(Expr());
+    if (maybe_array = parse_word(parse_ws(remainder), "[")) {
+      remainder = parse_array(parse_ws(remainder), child[i]);
+    } else if ((maybe_shape = parse_shape(parse_ws(remainder), child[i])) != NULL) {
+      remainder = maybe_shape;
+    } else if (maybe_expr = parse_precedence_12_expr(parse_ws(remainder), child[i])) {
+      remainder = maybe_expr;
+    }
+
+    if (delimiter = parse_word(parse_ws(remainder), ",")) {
+      remainder = delimiter;
+    }
+    i++;
+  }
+  expr.set_value(Expr::Array{child});
+  return delimiter;
+}
+
+auto parse_top_level_expr(const char * input, Expr& expr) -> const char * {
+  // Array?
+  const char * maybe_array_remainder;
+  if (maybe_array_remainder = parse_array(parse_ws(input), expr)) {
+    return maybe_array_remainder;
+  }
+  // Shape?
+  const char * maybe_shape_remainder;
+  if (maybe_shape_remainder = parse_shape(parse_ws(input), expr)) {
+    return maybe_shape_remainder;
+  }
+  // Expression?
+  const char * maybe_expr_remainder;
+  if (maybe_expr_remainder = parse_precedence_12_expr(parse_ws(input), expr)) {
+    return maybe_expr_remainder;
+  } else return NULL;
+}
+
+auto parse_assignment(const char * input, ParsedLLine& lline) -> const char * {
+  std::vector<Expr> values;
+  values.push_back(Expr());
+  const char * remainder = parse_variable_name(parse_ws(input), values[0]);
+  if (remainder) {
+    if (remainder = parse_word(parse_ws(remainder), "=")) {
+      values.push_back(Expr());
+      if (remainder = parse_top_level_expr(parse_ws(remainder), values[1])) {
+        if (remainder = parse_word(parse_ws(remainder), ";")) {
+          lline.set_type(LLineType::Assignment);
+          lline.set_value(values);
+          return remainder;
+        } else return NULL;
+      } else return NULL;
+    } else return NULL;
+  } else return NULL;
+}
+
 // const char * parse_draw_statement(const char * input, void * data) {
 //   const char * remainder;
 //   if (remainder = parse_word(parse_ws(input), (void *)"draw")) {

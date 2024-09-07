@@ -80,11 +80,11 @@ struct Expr {
 
     auto debug_expr(int indent) -> void;
 
-    auto set_value(const ExprVariant& value) -> void;
+    auto set_value(const ExprVariant& value) -> void { value_ = value; }
     auto value() -> ExprVariant { return value_; }
 
-    auto set_child(std::unique_ptr<Exprs> child) -> void;
-    auto child() -> Exprs;
+    auto set_child(std::unique_ptr<Exprs> child) -> void { child_ = std::move(child); }
+    auto child() -> Exprs { return *child_; }
 
   private:
     ExprVariant value_;
@@ -126,6 +126,17 @@ struct ParsedLLine {
       }
       return *this;
     }
+
+    auto operator==(const ParsedLLine& other) const -> bool;
+
+    auto set_value(const Exprs& value) -> void { value_ = value; }
+    auto value() -> Exprs { return value_; }
+
+    auto set_child(std::unique_ptr<ParsedLLine> child) -> void { child_ = std::move(child); }
+    auto child() -> ParsedLLine { return *child_; }
+
+    auto set_type(const LLineType& type) -> void { type_ = type; }
+    auto type() -> LLineType { return type_; }
 
   private:
     Exprs value_;

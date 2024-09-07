@@ -5,22 +5,34 @@ namespace SLCParsing {
 auto Expr::operator==(const Expr& other) const -> bool {
   if (std::holds_alternative<int>(other.value_)
       && std::holds_alternative<int>(value_)) {
-    return std::get<int>(other.value_) == std::get<int>(value_);
+    if (!(std::get<int>(other.value_) == std::get<int>(value_))) {
+      return false;
+    }
   } else if (std::holds_alternative<double>(other.value_)
       && std::holds_alternative<double>(value_)) {
-    return std::get<double>(other.value_) == std::get<double>(value_);
+    if (!(std::get<double>(other.value_) == std::get<double>(value_))) {
+      return false;
+    }
   } else if (std::holds_alternative<std::string>(other.value_)
       && std::holds_alternative<std::string>(value_)) {
-    return std::get<std::string>(other.value_) == std::get<std::string>(value_);
+    if (!(std::get<std::string>(other.value_) == std::get<std::string>(value_))) {
+      return false;
+    }
   } else if (std::holds_alternative<Variable>(other.value_)
       && std::holds_alternative<Variable>(value_)) {
-    return std::get<Variable>(other.value_).value == std::get<Variable>(value_).value;
+    if (!(std::get<Variable>(other.value_).value == std::get<Variable>(value_).value)) {
+      return false;
+    }
   } else if (std::holds_alternative<bool>(other.value_)
       && std::holds_alternative<bool>(value_)) {
-    return std::get<bool>(other.value_) == std::get<bool>(value_);
+    if (!(std::get<bool>(other.value_) == std::get<bool>(value_))) {
+      return false;
+    }
   } else if (std::holds_alternative<OpType>(other.value_)
       && std::holds_alternative<OpType>(value_)) {
-    return std::get<OpType>(other.value_) == std::get<OpType>(value_);
+    if (!(std::get<OpType>(other.value_) == std::get<OpType>(value_))) {
+      return false;
+    }
   } else if (std::holds_alternative<Shape>(other.value_)
       && std::holds_alternative<Shape>(value_)) {
     auto other_shape = std::get<Shape>(other.value_).value;
@@ -33,7 +45,6 @@ auto Expr::operator==(const Expr& other) const -> bool {
         return false;
       }
     }
-    return true;
   } else if (std::holds_alternative<Array>(other.value_)
       && std::holds_alternative<Array>(value_)) {
     auto other_array = std::get<Array>(other.value_).value;
@@ -46,9 +57,12 @@ auto Expr::operator==(const Expr& other) const -> bool {
         return false;
       }
     }
-    return true;
   }
-  return false;
+  if (child_ && other.child_) {
+    return *child_ == *other.child_;
+  } else if (!child_ && !other.child_) {
+    return true;
+  } else return false;
 }
 
 auto Expr::debug_expr(int indent) -> void {
@@ -56,13 +70,13 @@ auto Expr::debug_expr(int indent) -> void {
     std::cout << " ";
   }
   if (std::holds_alternative<int>(value_)) {
-    std::cout << std::get<int>(value_) << std::endl;
+    std::cout << "integer: " << std::get<int>(value_) << std::endl;
   } else if (std::holds_alternative<double>(value_)) {
-    std::cout << std::get<double>(value_) << std::endl;
+    std::cout << "double: " << std::get<double>(value_) << std::endl;
   } else if (std::holds_alternative<std::string>(value_)) {
-    std::cout << std::get<std::string>(value_) << std::endl;
+    std::cout << "string: " << std::get<std::string>(value_) << std::endl;
   } else if (std::holds_alternative<Variable>(value_)) {
-    std::cout << std::get<Variable>(value_).value << std::endl;
+    std::cout << "variable: " << std::get<Variable>(value_).value << std::endl;
   } else if (std::holds_alternative<bool>(value_)) {
     std::cout << std::get<bool>(value_) << std::endl;
   } else if (std::holds_alternative<OpType>(value_)) {
@@ -159,16 +173,10 @@ auto Expr::debug_expr(int indent) -> void {
   }
 }
 
-auto Expr::set_value(const ExprVariant& value) -> void {
-  value_ = value;
-}
-
-auto Expr::set_child(std::unique_ptr<Exprs> child) -> void {
-  child_ = std::move(child);
-}
-
-auto Expr::child() -> Exprs {
-  return *child_;
+auto ParsedLLine::operator==(const ParsedLLine& other) const -> bool {
+  return value_ == other.value_
+    && *child_ == *other.child_
+    && type_ == other.type_;
 }
 
 } // namespace SLCParsing

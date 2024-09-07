@@ -67,8 +67,9 @@ TEST(parsing, factor_test_0) {
   SLCParsing::Expr expr;
   const char * remainder = SLCParsing::parse_precedence_1_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(0.01));
+  SLCParsing::Expr result = SLCParsing::Expr(SLCParsing::OpType::UnMinus);
+  result.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(std::vector<SLCParsing::Expr>{SLCParsing::Expr(0.01)}));
+  test_expr(expr, result);
 }
 
 TEST(parsing, factor_test_1) {
@@ -524,84 +525,73 @@ TEST(parsing, shape_test_1) {
   test_expr(expr, values);
 }
 
-// TEST(parsing, array_test_0) {
-//   const char * input = "[1, 2.0, \"hello\", world]";
-//   parsed_array the_array = {0};
-//   const char * remainder = parse_array(input, &the_array);
-//   ASSERT_EQ(remainder[0], '\0');
-//   int value_one = 1;
-//   double value_two = 2.0;
-//   test_expression(the_array.value[0].the_expr, INT, &value_one);
-//   test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
-//   test_expression(the_array.value[2].the_expr, STRING, (void *)"hello");
-//   test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
-//   free_parsed_array(the_array);
-// }
-// 
-// TEST(parsing, array_test_1) {
-//   const char * input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
-//   parsed_array the_array = {0};
-//   const char * remainder = parse_array(input, &the_array);
-//   ASSERT_EQ(remainder[0], '\0');
-//   int value_one = 1;
-//   double value_two = 2.0;
-//   test_expression(the_array.value[0].the_expr, INT, &value_one);
-//   test_expression(the_array.value[1].the_expr, DOUBLE, &value_two);
-//   test_expression(the_array.value[2].the_expr, STRING, (void *)"hello");
-//   test_expression(the_array.value[3].the_expr, VAR, (void *)"world");
-//   ASSERT_EQ(the_array.value_type[4], SHAPE);
-//   parsed_shape the_shape = the_array.value[4].the_shape;
-//   ASSERT_EQ(the_shape.type, RECTANGLE);
-//   test_expression(the_shape.values[0], VAR, (void *)"thickness");
-//   test_expression(the_shape.values[1], BIN_PLUS, NULL);
-//   int value_three = 1;
-//   int value_four = 2;
-//   test_expression(the_shape.values[1].child[0], INT, &value_three);
-//   test_expression(the_shape.values[1].child[1], INT, &value_four);
-//   test_expression(the_shape.values[2], VAR, (void *)"center_x");
-//   test_expression(the_shape.values[3], INT, &value_four);
-//   test_expression(the_shape.values[4], VAR, (void *)"center_y");
-//   test_expression(the_shape.values[5], INT, &value_three);
-//   test_expression(the_shape.values[6], VAR, (void *)"width");
-//   test_expression(the_shape.values[7], INT, &value_three);
-//   test_expression(the_shape.values[8], VAR, (void *)"height");
-//   test_expression(the_shape.values[9], INT, &value_four);
-//   free_parsed_array(the_array);
-// }
-// 
-// TEST(parsing, array_test_2) {
-//   const char * input = "[[1, 2.0], [\"hello\", world]]";
-//   parsed_array the_array = {0};
-//   const char * remainder = parse_array(input, &the_array);
-//   ASSERT_EQ(remainder[0], '\0');
-//   int value_one = 1;
-//   double value_two = 2.0;
-//   ASSERT_EQ(the_array.value_type[0], ARRAY);
-//   ASSERT_EQ(the_array.value_type[1], ARRAY);
-//   parsed_array sub_array_one = the_array.value[0].the_array[0];
-//   parsed_array sub_array_two = the_array.value[1].the_array[0];
-//   test_expression(sub_array_one.value[0].the_expr, INT, &value_one);
-//   test_expression(sub_array_one.value[1].the_expr, DOUBLE, &value_two);
-//   test_expression(sub_array_two.value[0].the_expr, STRING, (void *)"hello");
-//   test_expression(sub_array_two.value[1].the_expr, VAR, (void *)"world");
-//   free_parsed_array(the_array);
-// }
-// 
-// TEST(parsing, assignment_test_0) {
-//   const char * input = "x = rectangle();";
-//   parsed_lline the_lline = {0};
-//   const char * remainder = parse_assignment(input, &the_lline);
-//   ASSERT_EQ(remainder[0], '\0');
-//   ASSERT_EQ(the_lline.type, ASSIGNMENT);
-//   ASSERT_EQ(the_lline.value_type[0], EXPR);
-//   ASSERT_EQ(the_lline.value_type[1], SHAPE);
-//   test_expression(the_lline.value[0].the_expr, VAR, (void *)"x");
-//   ASSERT_EQ(the_lline.value[1].the_shape.type, RECTANGLE);
-//   ASSERT_EQ(the_lline.value[1].the_shape.qty_values, 0);
-//   ASSERT_TRUE(the_lline.value[1].the_shape.values == NULL);
-//   free_parsed_lline(the_lline);
-// }
-// 
+TEST(parsing, array_test_0) {
+  const char * input = "[1, 2.0, \"hello\", world]";
+  SLCParsing::Expr expr;
+  const char * remainder = SLCParsing::parse_array(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
+    std::vector<SLCParsing::Expr>{
+    SLCParsing::Expr(1), SLCParsing::Expr(2.0), SLCParsing::Expr("hello"),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"world"})}
+  });
+  test_expr(expr, values);
+}
+
+TEST(parsing, array_test_1) {
+  const char * input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
+  SLCParsing::Expr expr;
+  const char * remainder = SLCParsing::parse_array(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  SLCParsing::Expr thickness_expr = SLCParsing::Expr(SLCParsing::OpType::BinPlus);
+  thickness_expr.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(
+        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2)}));
+  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
+    std::vector<SLCParsing::Expr>{
+    SLCParsing::Expr(1), SLCParsing::Expr(2.0), SLCParsing::Expr("hello"),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"world"}),
+    SLCParsing::Expr(SLCParsing::Expr::Shape{std::vector<SLCParsing::Expr>{
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"rectangle"}),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"thickness"}), thickness_expr,
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_x"}), SLCParsing::Expr(2),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_y"}), SLCParsing::Expr(1),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
+    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}})}
+  });
+  test_expr(expr, values);
+}
+
+TEST(parsing, array_test_2) {
+  const char * input = "[[1, 2.0], [\"hello\", world]]";
+  SLCParsing::Expr expr;
+  const char * remainder = SLCParsing::parse_array(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
+      std::vector<SLCParsing::Expr>{
+      SLCParsing::Expr(SLCParsing::Expr::Array{
+        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2.0)}
+      }),
+      SLCParsing::Expr(SLCParsing::Expr::Array{std::vector<SLCParsing::Expr>{
+        SLCParsing::Expr("hello"), SLCParsing::Expr(SLCParsing::Expr::Variable{"world"})}
+      })
+      }});
+}
+
+TEST(parsing, assignment_test_0) {
+  const char * input = "x = rectangle();";
+  SLCParsing::ParsedLLine lline;
+  const char * remainder = SLCParsing::parse_assignment(input, lline);
+  ASSERT_EQ(remainder[0], '\0');
+  // ASSERT_EQ(the_lline.type, ASSIGNMENT);
+  // ASSERT_EQ(the_lline.value_type[0], EXPR);
+  // ASSERT_EQ(the_lline.value_type[1], SHAPE);
+  // test_expression(the_lline.value[0].the_expr, VAR, (void *)"x");
+  // ASSERT_EQ(the_lline.value[1].the_shape.type, RECTANGLE);
+  // ASSERT_EQ(the_lline.value[1].the_shape.qty_values, 0);
+  // ASSERT_TRUE(the_lline.value[1].the_shape.values == NULL);
+  // free_parsed_lline(the_lline);
+}
+
 // TEST(parsing, assignment_test_1) {
 //   const char * input = "some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);";
 //   parsed_lline the_lline = {0};

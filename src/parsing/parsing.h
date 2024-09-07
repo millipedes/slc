@@ -31,8 +31,10 @@ auto is_double_delineator(char c) -> bool;
 auto is_whitespace(char c) -> bool;
 
 auto parse_shape(const char * input, Expr& expr) -> const char *;
+auto parse_array(const char * input, Expr& expr) -> const char *;
 
-// const char * parse_assignment(const char * input, void * data);
+auto parse_assignment(const char * input, ParsedLLine& lline) -> const char *;
+
 // const char * parse_draw_statement(const char * input, void * data);
 // const char * parse_if_statement(const char * input, void * data);
 // const char * parse_for_loop(const char * input, void * data);
