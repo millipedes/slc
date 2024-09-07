@@ -59,10 +59,23 @@ auto Expr::operator==(const Expr& other) const -> bool {
     }
   }
   if (child_ && other.child_) {
-    return *child_ == *other.child_;
+    if (child_->size() != other.child_->size()) {
+      return false;
+    }
+    for (uint32_t i = 0; i < child_->size(); i++) {
+      // Better synteax for this I am unaware of?
+      if ((*child_)[i] != (*other.child_)[i]) {
+        return false;
+      }
+    }
+    return true;
   } else if (!child_ && !other.child_) {
     return true;
   } else return false;
+}
+
+auto Expr::operator!=(const Expr& other) const -> bool {
+  return !(other == *this);
 }
 
 auto Expr::debug_expr(int indent) -> void {

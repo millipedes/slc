@@ -35,6 +35,7 @@ enum class OpType {
   BinBoolAnd,
   BinBoolOr,
   BoolNot,
+  BinAssignment,
 };
 
 struct Expr {
@@ -77,6 +78,7 @@ struct Expr {
     }
 
     auto operator==(const Expr& other) const -> bool;
+    auto operator!=(const Expr& other) const -> bool;
 
     auto debug_expr(int indent) -> void;
 
@@ -86,10 +88,44 @@ struct Expr {
     auto set_child(std::unique_ptr<Exprs> child) -> void { child_ = std::move(child); }
     auto child() -> Exprs { return *child_; }
 
+    auto add_children(Expr child) -> void {
+      if (!child_) {
+        child_ = std::make_unique<Exprs>(Exprs());
+      }
+      child_->push_back(child);
+    }
+
+    template <typename... Rest>
+    auto add_children(Expr child, Rest... children) -> void {
+      if (!child_) {
+        child_ = std::make_unique<Exprs>(Exprs());
+      }
+      child_->push_back(child);
+      add_children(children...);
+    }
+
+    auto add_children(ExprVariant child) -> void {
+      if (!child_) {
+        child_ = std::make_unique<Exprs>(Exprs());
+      }
+      child_->push_back(Expr(child));
+    }
+
+    template <typename... Rest>
+    auto add_children(ExprVariant child, Rest... children) -> void {
+      if (!child_) {
+        child_ = std::make_unique<Exprs>(Exprs());
+      }
+      child_->push_back(Expr(child));
+      add_children(children...);
+    }
+
   private:
     ExprVariant value_;
     std::unique_ptr<Exprs> child_;
 };
+
+using Exprs = std::vector<Expr>;
 
 enum class LLineType {
   Assignment,
@@ -99,8 +135,6 @@ enum class LLineType {
 };
 
 struct ParsedLLine {
-  using Exprs = std::vector<Expr>;
-
   public:
     ParsedLLine() = default;
     ~ParsedLLine() = default;

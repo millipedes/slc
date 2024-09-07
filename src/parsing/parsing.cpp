@@ -96,43 +96,105 @@ auto parse_bool(const char * input, Expr& expr) -> const char * {
   } else return NULL;
 }
 
+auto parse_array(const char * input, Expr& expr) -> const char * {
+  const char * remainder = parse_word(parse_ws(input), "[");
+  if (!remainder) return NULL;
+  const char * delimiter;
+  const char * maybe_array;
+  const char * maybe_shape;
+  const char * maybe_expr;
+  Exprs child;
+  uint32_t i = 0;
+  while((delimiter = parse_word(parse_ws(remainder), "]")) == NULL) {
+    child.push_back(Expr());
+    if (maybe_array = parse_word(parse_ws(remainder), "[")) {
+      remainder = parse_array(parse_ws(remainder), child[i]);
+    } else if ((maybe_shape = parse_shape(parse_ws(remainder), child[i])) != NULL) {
+      remainder = maybe_shape;
+    } else if (maybe_expr = parse_precedence_12_expr(parse_ws(remainder), child[i])) {
+      remainder = maybe_expr;
+    }
+
+    if (delimiter = parse_word(parse_ws(remainder), ",")) {
+      remainder = delimiter;
+    }
+    i++;
+  }
+  expr.set_value(Expr::Array{child});
+  return delimiter;
+}
+
+auto parse_shape(const char * input, Expr& expr) -> const char * {
+  Exprs child;
+  child.push_back(Expr());
+  const char * remainder;
+  if (!((remainder = parse_word(parse_ws(input), "rectangle"))
+    || (remainder = parse_word(parse_ws(input), "ellipse"))
+    || (remainder = parse_word(parse_ws(input), "line"))
+    || (remainder = parse_word(parse_ws(input), "canvas")))) {
+    return NULL;
+  }
+  const char * delimiter;
+  uint32_t i = 1;
+
+  if (remainder = parse_word(parse_ws(remainder), "(")) {
+    while ((delimiter = parse_word(parse_ws(remainder), ")")) == NULL) {
+      child.push_back(Expr());
+      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
+      i++;
+      child.push_back(Expr());
+      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
+      i++;
+      if (delimiter = parse_word(parse_ws(remainder), ",")) {
+        remainder = delimiter;
+      }
+    }
+    expr.set_value(Expr::Shape{child});
+    return delimiter;
+  } else return NULL;
+}
+
 auto parse_axiom(const char * input, Expr& expr) -> const char * {
   const char * maybe_axiom;
   if (maybe_axiom = parse_number(parse_ws(input), expr)) {
     return maybe_axiom;
   } else if (maybe_axiom = parse_bool(parse_ws(input), expr)) {
     return maybe_axiom;
+  } else if (maybe_axiom = parse_shape(parse_ws(input), expr)) {
+    return maybe_axiom;
   } else if (maybe_axiom = parse_string(parse_ws(input), expr)) {
     return maybe_axiom;
   } else if (maybe_axiom = parse_variable_name(parse_ws(input), expr)) {
     return maybe_axiom;
+  } else if (maybe_axiom = parse_array(parse_ws(input), expr)) {
+    return maybe_axiom;
   } else return NULL;
 }
 
-auto make_unary_tree(const char * input, Expr& expr, std::vector<Expr>& child,
+auto make_unary_tree(const char * input, Expr& expr, Exprs& child,
     OpType type, std::function<const char *(const char *, Expr&)> parser) -> const char * {
   expr = Expr(type);
   input = parser(parse_ws(input), child[0]);
   if (!input) return NULL;
-  expr.set_child(std::make_unique<std::vector<Expr>>(child));
+  expr.set_child(std::make_unique<Exprs>(child));
   return input;
 }
 
-auto make_binary_tree(const char * input, Expr& expr, std::vector<Expr>& child,
+auto make_binary_tree(const char * input, Expr& expr, Exprs& child,
     OpType type, std::function<const char *(const char *, Expr&)> parser) -> const char * {
     Expr parent = Expr(type);
     child[0] = expr;
     child.push_back(Expr());
     input = parser(parse_ws(input), child[1]);
     if (!input) return NULL;
-    parent.set_child(std::make_unique<std::vector<Expr>>(child));
+    parent.set_child(std::make_unique<Exprs>(child));
     expr = parent;
     return input;
 }
 
 auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
   const char * factor;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (factor = parse_word(parse_ws(input), "-")) {
     return make_unary_tree(parse_ws(factor), expr, child,
@@ -190,8 +252,8 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
       factor = maybe_accessors;
       i++;
     }
-    accessor_parent.set_child(std::make_unique<std::vector<Expr>>(child));
-    parent.set_child(std::make_unique<std::vector<Expr>>(std::vector<Expr>{accessor_parent}));
+    accessor_parent.set_child(std::make_unique<Exprs>(child));
+    parent.set_child(std::make_unique<Exprs>(Exprs{accessor_parent}));
     expr = parent;
   }
   return factor;
@@ -200,7 +262,7 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_3_expr(const char * input, Expr& expr) -> const char * {
   const char * factor = parse_precedence_1_expr(parse_ws(input), expr);
   const char * maybe_term;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (factor) {
     if (maybe_term = parse_word(parse_ws(factor), "*")) {
@@ -219,7 +281,7 @@ auto parse_precedence_3_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_4_expr(const char * input, Expr& expr) -> const char * {
   const char * term = parse_precedence_3_expr(parse_ws(input), expr);
   const char * maybe_expression;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (term) {
     if (maybe_expression = parse_word(parse_ws(term), "+")) {
@@ -235,7 +297,7 @@ auto parse_precedence_4_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_6_expr(const char * input, Expr& expr) -> const char * {
   const char * expression = parse_precedence_4_expr(parse_ws(input), expr);
   const char * maybe_boolean_expr;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), ">=")) {
@@ -258,7 +320,7 @@ auto parse_precedence_6_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_7_expr(const char * input, Expr& expr) -> const char * {
   const char * expression = parse_precedence_6_expr(parse_ws(input), expr);
   const char * maybe_boolean_expr;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "==")) {
@@ -274,7 +336,7 @@ auto parse_precedence_7_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_11_expr(const char * input, Expr& expr) -> const char * {
   const char * expression = parse_precedence_7_expr(parse_ws(input), expr);
   const char * maybe_boolean_expr;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "&&")) {
@@ -287,12 +349,25 @@ auto parse_precedence_11_expr(const char * input, Expr& expr) -> const char * {
 auto parse_precedence_12_expr(const char * input, Expr& expr) -> const char * {
   const char * expression = parse_precedence_11_expr(parse_ws(input), expr);
   const char * maybe_boolean_expr;
-  std::vector<Expr> child;
+  Exprs child;
   child.push_back(Expr());
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "||")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
           OpType::BinBoolOr, parse_precedence_12_expr);
+    } else return expression;
+  } else return NULL;
+}
+
+auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char * {
+  const char * expression = parse_precedence_12_expr(parse_ws(input), expr);
+  const char * maybe_boolean_expr;
+  Exprs child;
+  child.push_back(Expr());
+  if (expression) {
+    if (maybe_boolean_expr = parse_word(parse_ws(expression), "=")) {
+      return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
+          OpType::BinAssignment, parse_precedence_14_expr);
     } else return expression;
   } else return NULL;
 }
@@ -303,58 +378,6 @@ auto is_double_delineator(char c) -> bool {
 
 auto is_whitespace(char c) -> bool {
   return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f';
-}
-
-auto parse_shape(const char * input, Expr& expr) -> const char * {
-  std::vector<Expr> child;
-  child.push_back(Expr());
-  const char * remainder = parse_precedence_4_expr(parse_ws(input), child[0]);
-  const char * delimiter;
-  uint32_t i = 1;
-
-  if (remainder = parse_word(parse_ws(remainder), "(")) {
-    while ((delimiter = parse_word(parse_ws(remainder), ")")) == NULL) {
-      child.push_back(Expr());
-      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
-      i++;
-      child.push_back(Expr());
-      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
-      i++;
-      if (delimiter = parse_word(parse_ws(remainder), ",")) {
-        remainder = delimiter;
-      }
-    }
-    expr.set_value(Expr::Shape{child});
-    return delimiter;
-  } else return NULL;
-}
-
-auto parse_array(const char * input, Expr& expr) -> const char * {
-  const char * remainder = parse_word(parse_ws(input), "[");
-  if (!remainder) return NULL;
-  const char * delimiter;
-  const char * maybe_array;
-  const char * maybe_shape;
-  const char * maybe_expr;
-  std::vector<Expr> child;
-  uint32_t i = 0;
-  while((delimiter = parse_word(parse_ws(remainder), "]")) == NULL) {
-    child.push_back(Expr());
-    if (maybe_array = parse_word(parse_ws(remainder), "[")) {
-      remainder = parse_array(parse_ws(remainder), child[i]);
-    } else if ((maybe_shape = parse_shape(parse_ws(remainder), child[i])) != NULL) {
-      remainder = maybe_shape;
-    } else if (maybe_expr = parse_precedence_12_expr(parse_ws(remainder), child[i])) {
-      remainder = maybe_expr;
-    }
-
-    if (delimiter = parse_word(parse_ws(remainder), ",")) {
-      remainder = delimiter;
-    }
-    i++;
-  }
-  expr.set_value(Expr::Array{child});
-  return delimiter;
 }
 
 auto parse_top_level_expr(const char * input, Expr& expr) -> const char * {
@@ -376,7 +399,7 @@ auto parse_top_level_expr(const char * input, Expr& expr) -> const char * {
 }
 
 auto parse_assignment(const char * input, ParsedLLine& lline) -> const char * {
-  std::vector<Expr> values;
+  Exprs values;
   values.push_back(Expr());
   const char * remainder = parse_variable_name(parse_ws(input), values[0]);
   if (remainder) {

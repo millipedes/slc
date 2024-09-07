@@ -1,601 +1,621 @@
 #include "test_helper.h"
 
+namespace slcp = SLCParsing;
+
 TEST(parsing, variable_name_test_0) {
   const char * input = "some_string";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_variable_name(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_variable_name(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::Expr::Variable{"some_string"}));
+  test_expr(expr, slcp::Expr(slcp::Expr::Variable{"some_string"}));
 }
 
 TEST(parsing, number_test_0) {
   const char * input = "123";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_number(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_number(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  int value = 123;
-  test_expr(expr, SLCParsing::Expr(123));
+  test_expr(expr, slcp::Expr(123));
 }
 
 TEST(parsing, number_test_1) {
   const char * input = "123.123";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_number(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_number(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(123.123));
+  test_expr(expr, slcp::Expr(123.123));
 }
 
 TEST(parsing, number_test_2) {
   const char * input = "1e-2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_number(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_number(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(0.01));
+  test_expr(expr, slcp::Expr(0.01));
 }
 
 TEST(parsing, number_test_3) {
   const char * input = "1E-2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_number(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_number(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(0.01));
+  test_expr(expr, slcp::Expr(0.01));
 }
 
 TEST(parsing, string_test_0) {
   const char * input = "\"hello world\"";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_string(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_string(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr("hello world"));
+  test_expr(expr, slcp::Expr("hello world"));
 }
 
 TEST(parsing, string_test_1) {
   const char * input = "\"hello world";
-  SLCParsing::Expr expr;
-  const char * remainder = parse_string(input, expr);
+  slcp::Expr expr;
+  auto remainder = parse_string(input, expr);
   ASSERT_TRUE(remainder == NULL);
 }
 
 TEST(parsing, word_test_0) {
   const char * input = ".\\";
-  const char * remainder = SLCParsing::parse_word(input, ".\\");
+  auto remainder = slcp::parse_word(input, ".\\");
   ASSERT_EQ(remainder[0], '\0');
 }
 
 TEST(parsing, factor_test_0) {
   const char * input = "(((((-1e-2)))))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_1_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_1_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr result = SLCParsing::Expr(SLCParsing::OpType::UnMinus);
-  result.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(std::vector<SLCParsing::Expr>{SLCParsing::Expr(0.01)}));
+  auto result = slcp::Expr(slcp::OpType::UnMinus);
+  result.add_children(0.01);
   test_expr(expr, result);
 }
 
 TEST(parsing, factor_test_1) {
   const char * input = "-(((((-1e-2)))))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_1_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_1_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(0.01));
+  auto result_child = slcp::Expr(slcp::OpType::UnMinus);
+  result_child.add_children(0.01);
+  auto result = slcp::Expr(slcp::OpType::UnMinus);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, term_test_0) {
   const char * input = "1e-2 * 1e-2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_3_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_3_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[0], SLCParsing::Expr(0.01));
-  test_expr(expr.child()[1], SLCParsing::Expr(0.01));
+  auto result = slcp::Expr(slcp::OpType::BinMult);
+  result.add_children(0.01, 0.01);
+  test_expr(expr, result);
 }
 
 TEST(parsing, term_test_1) {
   const char * input = "1e-2 * 1e-2 * 1e-2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_3_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_3_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[0], SLCParsing::Expr(0.01));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(0.01));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(0.01));
+  auto result_child = slcp::Expr(slcp::OpType::BinMult);
+  result_child.add_children(0.01, 0.01);
+  auto result = slcp::Expr(slcp::OpType::BinMult);
+  result.add_children(0.01, result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, term_test_2) {
   const char * input = "1 / 2 % 3";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_3_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_3_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinDivide));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMod));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(2));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(3));
+  auto result_child = slcp::Expr(slcp::OpType::BinMod);
+  result_child.add_children(2, 3);
+  auto result = slcp::Expr(slcp::OpType::BinDivide);
+  result.add_children(1, result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, term_test_3) {
   const char * input = "\"some string\" / -1e-2 % var_name";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_3_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_3_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinDivide));
-  test_expr(expr.child()[0], SLCParsing::Expr("some string"));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMod));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[1].child()[0].child()[0], SLCParsing::Expr(0.01));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(SLCParsing::Expr::Variable{"var_name"}));
+  auto result_child_child = slcp::Expr(slcp::OpType::UnMinus);
+  result_child_child.add_children(0.01);
+  auto result_child = slcp::Expr(slcp::OpType::BinMod);
+  result_child.add_children(result_child_child, slcp::Expr::Variable{"var_name"});
+  auto result = slcp::Expr(slcp::OpType::BinDivide);
+  result.add_children("some string", result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_0) {
   const char * input = "-123";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(123));
+  auto result = slcp::Expr(slcp::OpType::UnMinus);
+  result.add_children(123);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_1) {
   const char * input = "-1e-2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(0.01));
+  auto result = slcp::Expr(slcp::OpType::UnMinus);
+  result.add_children(0.01);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_2) {
   const char * input = "\"hello world\"";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr("hello world"));
+  test_expr(expr, slcp::Expr("hello world"));
 }
 
 TEST(parsing, expression_test_3) {
   const char * input = "\"hello world";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_TRUE(remainder == NULL);
 }
 
 TEST(parsing, expression_test_4) {
   const char * input = "1 + 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinPlus);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_5) {
   const char * input = "1 + 2 * 3";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(2));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(3));
+  auto result_child = slcp::Expr(slcp::OpType::BinMult);
+  result_child.add_children(2, 3);
+  auto result = slcp::Expr(slcp::OpType::BinPlus);
+  result.add_children(1, result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_6) {
   const char * input = "(1 + 2) * 3";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
-  test_expr(expr.child()[1], SLCParsing::Expr(3));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::BinMult);
+  result.add_children(result_child, 3);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_7) {
   const char * input = "-(1 + 2)";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::UnMinus);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_8) {
   const char * input = "(((((1 - - 2)))))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinMinus));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::UnMinus);
+  result_child.add_children(2);
+  auto result = slcp::Expr(slcp::OpType::BinMinus);
+  result.add_children(1, result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_9) {
   const char * input = "1 ^ 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPow));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinPow);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_10) {
   const char * input = "(1 + 2) ^ -(1 + 2)";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPow));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[1].child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1].child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child_one = slcp::Expr(slcp::OpType::BinPlus);
+  result_child_one.add_children(1, 2);
+  auto result_child_two_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child_two_child.add_children(1, 2);
+  auto result_child_two = slcp::Expr(slcp::OpType::UnMinus);
+  result_child_two.add_children(result_child_two_child);
+  auto result = slcp::Expr(slcp::OpType::BinPow);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_11) {
   const char * input = "1 == 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinEq));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinEq);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_12) {
   const char * input = "1 != 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinNeq));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinNeq);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_13) {
   const char * input = "1 >= 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinGeq));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinGeq);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_14) {
   const char * input = "1 > 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinGt));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinGt);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_15) {
   const char * input = "1 <= 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinLeq));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinLeq);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_16) {
   const char * input = "1 < 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinLt));
-  test_expr(expr.child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1], SLCParsing::Expr(2));
+  auto result = slcp::Expr(slcp::OpType::BinLt);
+  result.add_children(1, 2);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_17) {
   const char * input = "true";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(true));
+  test_expr(expr, slcp::Expr(true));
 }
 
 TEST(parsing, expression_test_18) {
   const char * input = "false";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(false));
+  test_expr(expr, slcp::Expr(false));
 }
 
 TEST(parsing, expression_test_19) {
   const char * input = "sin((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::Sin));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::Sin);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_20) {
   const char * input = "cos((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::Cos));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::Cos);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_21) {
   const char * input = "tan((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::Tan));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::Tan);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_22) {
   const char * input = "arcsin((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::ArcSin));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::ArcSin);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_23) {
   const char * input = "arccos((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::ArcCos));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::ArcCos);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_24) {
   const char * input = "arctan((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::ArcTan));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::ArcTan);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_25) {
   const char * input = "log((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::Log));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::Log);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_26) {
   const char * input = "ln((1 + 2))";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::Ln));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
+  auto result_child = slcp::Expr(slcp::OpType::BinPlus);
+  result_child.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::Ln);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_27) {
   const char * input = "x[0]";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::Expr::Variable{"x"}));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::ArrayAccessor));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(0));
+  auto result_child = slcp::Expr(slcp::OpType::ArrayAccessor);
+  result_child.add_children(0);
+  auto result = slcp::Expr(slcp::Expr::Variable{"x"});
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_28) {
   const char * input = "x[9 * 1][1 + 2]";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_7_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_7_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::Expr::Variable{"x"}));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::ArrayAccessor));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[0].child()[0].child()[0], SLCParsing::Expr(9));
-  test_expr(expr.child()[0].child()[0].child()[1], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0].child()[1].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1].child()[1], SLCParsing::Expr(2));
+  auto result_child_child_one = slcp::Expr(slcp::OpType::BinMult);
+  result_child_child_one.add_children(9, 1);
+  auto result_child_child_two = slcp::Expr(slcp::OpType::BinPlus);
+  result_child_child_two.add_children(1, 2);
+  auto result_child = slcp::Expr(slcp::OpType::ArrayAccessor);
+  result_child.add_children(result_child_child_one, result_child_child_two);
+  auto result = slcp::Expr(slcp::Expr::Variable{"x"});
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_29) {
   const char * input = "1 <= 2 && 1 == 2";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_11_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_11_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinBoolAnd));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinLeq));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(2));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinEq));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(2));
+  auto result_child_one = slcp::Expr(slcp::OpType::BinLeq);
+  result_child_one.add_children(1, 2);
+  auto result_child_two = slcp::Expr(slcp::OpType::BinEq);
+  result_child_two.add_children(1, 2);
+  auto result = slcp::Expr(slcp::OpType::BinBoolAnd);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_30) {
   const char * input = "-ln(0.5) + 1.0 * 2.0";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_11_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_11_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(SLCParsing::OpType::Ln));
-  test_expr(expr.child()[0].child()[0].child()[0], SLCParsing::Expr(0.5));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(1.0));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(2.0));
+  auto result_child_child_one = slcp::Expr(slcp::OpType::Ln);
+  result_child_child_one.add_children(0.5);
+  auto result_child_one = slcp::Expr(slcp::OpType::UnMinus);
+  result_child_one.add_children(result_child_child_one);
+  auto result_child_two = slcp::Expr(slcp::OpType::BinMult);
+  result_child_two.add_children(1.0, 2.0);
+  auto result = slcp::Expr(slcp::OpType::BinPlus);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_31) {
   const char * input = "1 <= 2 && 1 == 2 || 2 == 3";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_12_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_12_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinBoolOr));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BinBoolAnd));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(SLCParsing::OpType::BinLeq));
-  test_expr(expr.child()[0].child()[0].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[0].child()[1], SLCParsing::Expr(2));
-  test_expr(expr.child()[0].child()[1], SLCParsing::Expr(SLCParsing::OpType::BinEq));
-  test_expr(expr.child()[0].child()[1].child()[0], SLCParsing::Expr(1));
-  test_expr(expr.child()[0].child()[1].child()[1], SLCParsing::Expr(2));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinEq));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(2));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(3));
+  auto result_child_child_one = slcp::Expr(slcp::OpType::BinLeq);
+  result_child_child_one.add_children(1, 2);
+  auto result_child_child_two = slcp::Expr(slcp::OpType::BinEq);
+  result_child_child_two.add_children(1, 2);
+  auto result_child_one = slcp::Expr(slcp::OpType::BinBoolAnd);
+  result_child_one.add_children(result_child_child_one, result_child_child_two);
+  auto result_child_two = slcp::Expr(slcp::OpType::BinEq);
+  result_child_two.add_children(2, 3);
+  auto result = slcp::Expr(slcp::OpType::BinBoolOr);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
 }
 
 TEST(parsing, expression_test_32) {
   const char * input = "!-ln(0.5) + 1.0 * 2.0";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_precedence_11_expr(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_11_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  test_expr(expr, SLCParsing::Expr(SLCParsing::OpType::BinPlus));
-  test_expr(expr.child()[0], SLCParsing::Expr(SLCParsing::OpType::BoolNot));
-  test_expr(expr.child()[0].child()[0], SLCParsing::Expr(SLCParsing::OpType::UnMinus));
-  test_expr(expr.child()[0].child()[0].child()[0], SLCParsing::Expr(SLCParsing::OpType::Ln));
-  test_expr(expr.child()[0].child()[0].child()[0].child()[0], SLCParsing::Expr(0.5));
-  test_expr(expr.child()[1], SLCParsing::Expr(SLCParsing::OpType::BinMult));
-  test_expr(expr.child()[1].child()[0], SLCParsing::Expr(1.0));
-  test_expr(expr.child()[1].child()[1], SLCParsing::Expr(2.0));
+  auto result_child_child_child_one = slcp::Expr(slcp::OpType::Ln);
+  result_child_child_child_one.add_children(0.5);
+  auto result_child_child_one = slcp::Expr(slcp::OpType::UnMinus);
+  result_child_child_one.add_children(result_child_child_child_one);
+  auto result_child_one = slcp::Expr(slcp::OpType::BoolNot);
+  result_child_one.add_children(result_child_child_one);
+  auto result_child_two = slcp::Expr(slcp::OpType::BinMult);
+  result_child_two.add_children(1.0, 2.0);
+  auto result = slcp::Expr(slcp::OpType::BinPlus);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
 }
 
 TEST(parsing, shape_test_0) {
   const char * input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_shape(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_12_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr thickness_expr = SLCParsing::Expr(SLCParsing::OpType::BinPlus);
-  thickness_expr.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(
-        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2)}));
-  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Shape{
-    std::vector<SLCParsing::Expr>{
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"rectangle"}),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"thickness"}), thickness_expr,
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_x"}), SLCParsing::Expr(2),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_y"}), SLCParsing::Expr(1),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}});
+  auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
+  thickness_expr.add_children(1, 2);
+  slcp::Expr values = slcp::Expr(slcp::Expr::Shape{
+    slcp::Exprs{
+    slcp::Expr(slcp::Expr::Variable{"rectangle"}),
+    slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
+    slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
+    slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
+    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
+    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
   test_expr(expr, values);
 }
 
 TEST(parsing, shape_test_1) {
   const char * input = "canvas(width 1, height 2)";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_shape(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_12_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Shape{
-    std::vector<SLCParsing::Expr>{
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"canvas"}),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}});
+  slcp::Expr values = slcp::Expr(slcp::Expr::Shape{
+    slcp::Exprs{ 
+    slcp::Expr(slcp::Expr::Variable{"canvas"}),
+    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
+    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
   test_expr(expr, values);
 }
 
 TEST(parsing, array_test_0) {
   const char * input = "[1, 2.0, \"hello\", world]";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_array(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_array(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
-    std::vector<SLCParsing::Expr>{
-    SLCParsing::Expr(1), SLCParsing::Expr(2.0), SLCParsing::Expr("hello"),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"world"})}
+  slcp::Expr values = slcp::Expr(slcp::Expr::Array{
+    slcp::Exprs{ 
+    slcp::Expr(1), slcp::Expr(2.0), slcp::Expr("hello"),
+    slcp::Expr(slcp::Expr::Variable{"world"})}
   });
   test_expr(expr, values);
 }
 
 TEST(parsing, array_test_1) {
   const char * input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_array(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_12_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr thickness_expr = SLCParsing::Expr(SLCParsing::OpType::BinPlus);
-  thickness_expr.set_child(std::make_unique<std::vector<SLCParsing::Expr>>(
-        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2)}));
-  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
-    std::vector<SLCParsing::Expr>{
-    SLCParsing::Expr(1), SLCParsing::Expr(2.0), SLCParsing::Expr("hello"),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"world"}),
-    SLCParsing::Expr(SLCParsing::Expr::Shape{std::vector<SLCParsing::Expr>{
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"rectangle"}),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"thickness"}), thickness_expr,
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_x"}), SLCParsing::Expr(2),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"center_y"}), SLCParsing::Expr(1),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"width"}), SLCParsing::Expr(1),
-    SLCParsing::Expr(SLCParsing::Expr::Variable{"height"}), SLCParsing::Expr(2)}})}
+  slcp::Expr thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
+  thickness_expr.add_children(1, 2);
+  slcp::Expr values = slcp::Expr(slcp::Expr::Array{
+    slcp::Exprs{ 
+    slcp::Expr(1), slcp::Expr(2.0), slcp::Expr("hello"),
+    slcp::Expr(slcp::Expr::Variable{"world"}),
+    slcp::Expr(slcp::Expr::Shape{slcp::Exprs{ 
+    slcp::Expr(slcp::Expr::Variable{"rectangle"}),
+    slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
+    slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
+    slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
+    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
+    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}})}
   });
   test_expr(expr, values);
 }
 
 TEST(parsing, array_test_2) {
   const char * input = "[[1, 2.0], [\"hello\", world]]";
-  SLCParsing::Expr expr;
-  const char * remainder = SLCParsing::parse_array(input, expr);
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_12_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  SLCParsing::Expr values = SLCParsing::Expr(SLCParsing::Expr::Array{
-      std::vector<SLCParsing::Expr>{
-      SLCParsing::Expr(SLCParsing::Expr::Array{
-        std::vector<SLCParsing::Expr>{SLCParsing::Expr(1), SLCParsing::Expr(2.0)}
+  slcp::Expr values = slcp::Expr(slcp::Expr::Array{
+      slcp::Exprs{ 
+      slcp::Expr(slcp::Expr::Array{
+        slcp::Exprs{slcp::Expr(1), slcp::Expr(2.0)}
       }),
-      SLCParsing::Expr(SLCParsing::Expr::Array{std::vector<SLCParsing::Expr>{
-        SLCParsing::Expr("hello"), SLCParsing::Expr(SLCParsing::Expr::Variable{"world"})}
+      slcp::Expr(slcp::Expr::Array{slcp::Exprs{ 
+        slcp::Expr("hello"), slcp::Expr(slcp::Expr::Variable{"world"})}
       })
       }});
 }
 
 TEST(parsing, assignment_test_0) {
-  const char * input = "x = rectangle();";
-  SLCParsing::ParsedLLine lline;
-  const char * remainder = SLCParsing::parse_assignment(input, lline);
+  const char * input = "x = rectangle()";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_14_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  // ASSERT_EQ(the_lline.type, ASSIGNMENT);
-  // ASSERT_EQ(the_lline.value_type[0], EXPR);
-  // ASSERT_EQ(the_lline.value_type[1], SHAPE);
-  // test_expression(the_lline.value[0].the_expr, VAR, (void *)"x");
-  // ASSERT_EQ(the_lline.value[1].the_shape.type, RECTANGLE);
-  // ASSERT_EQ(the_lline.value[1].the_shape.qty_values, 0);
-  // ASSERT_TRUE(the_lline.value[1].the_shape.values == NULL);
-  // free_parsed_lline(the_lline);
+
+  auto result = slcp::Expr(slcp::OpType::BinAssignment);
+  result.add_children(slcp::Expr::Variable{"x"}, slcp::Expr::Shape{slcp::Exprs{slcp::Expr(slcp::Expr::Variable{"rectangle"})}});
+  test_expr(expr, result);
+
 }
 
 // TEST(parsing, assignment_test_1) {
 //   const char * input = "some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_assignment(input, &the_lline);
+//   auto remainder = parse_assignment(input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 //   ASSERT_EQ(the_lline.type, ASSIGNMENT);
 //   ASSERT_EQ(the_lline.value_type[0], EXPR);
@@ -623,7 +643,7 @@ TEST(parsing, assignment_test_0) {
 // TEST(parsing, assignment_test_2) {
 //   const char * input = "x = [1 < 3 == 2 > 1, -(((1 - - 2)))];";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_assignment(input, &the_lline);
+//   auto remainder = parse_assignment(input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 //   ASSERT_EQ(the_lline.type, ASSIGNMENT);
 //   ASSERT_EQ(the_lline.value_type[0], EXPR);
@@ -652,7 +672,7 @@ TEST(parsing, assignment_test_0) {
 // TEST(parsing, draw_test_0) {
 //   const char * input = "draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2));";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_draw_statement(input, &the_lline);
+//   auto remainder = parse_draw_statement(input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 //   ASSERT_EQ(the_lline.type, DRAW_STMT);
 //   ASSERT_EQ(the_lline.value_type[0], SHAPE);
@@ -678,7 +698,7 @@ TEST(parsing, assignment_test_0) {
 // TEST(parsing, draw_test_1) {
 //   const char * input = "draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)) -> \"some_place\";";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_draw_statement(input, &the_lline);
+//   auto remainder = parse_draw_statement(input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 //   ASSERT_EQ(the_lline.type, DRAW_STMT);
 //   ASSERT_EQ(the_lline.value_type[0], SHAPE);
@@ -710,7 +730,7 @@ TEST(parsing, assignment_test_0) {
 //                            "    some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);"
 //                            "}";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_lline(input, &the_lline);
+//   auto remainder = parse_lline(input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 // 
 //   ASSERT_EQ(the_lline.type, IF_STMT);
@@ -768,7 +788,7 @@ TEST(parsing, assignment_test_0) {
 //                            "    some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);"
 //                            "}";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_lline(the_input, &the_lline);
+//   auto remainder = parse_lline(the_input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 // 
 //   ASSERT_EQ(the_lline.type, FOR_LOOP);
@@ -827,7 +847,7 @@ TEST(parsing, assignment_test_0) {
 //                            "    some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2);"
 //                            "}";
 //   parsed_lline the_lline = {0};
-//   const char * remainder = parse_lline(the_input, &the_lline);
+//   auto remainder = parse_lline(the_input, &the_lline);
 //   ASSERT_EQ(remainder[0], '\0');
 // 
 //   ASSERT_EQ(the_lline.type, FOR_LOOP);
