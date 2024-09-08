@@ -38,8 +38,8 @@ auto expr_and(slcp::Expr left, slcp::Expr right) -> slcp::Expr;
 auto expr_or(slcp::Expr left, slcp::Expr right) -> slcp::Expr;
 auto expr_not(slcp::Expr expr) -> slcp::Expr;
 
-// slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st);
-// 
+auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr;
+
 // slc_value evaluate_array(parsed_array the_array, symbol_table * st);
 // 
 // slc_value evaluate_slc_primitive(slc_primitive value, slc_primitive_type type, symbol_table * st);

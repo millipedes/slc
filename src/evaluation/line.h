@@ -1,50 +1,41 @@
-// /**
-//  * @file   line.h.
-//  * @brief  This file contains the function definitions for line.c.
-//  * @author Matthew C. Lindeman
-//  * @date   July 23, 2023
-//  * @bug    None known
-//  * @todo   Write the dotten line style implementation.
-//  */
-// #ifndef LINE_H
-// #define LINE_H
-// 
-// #include <string.h>
+// #pragma once
 // 
 // #include "canvas.h"
 // #include "coordinate.h"
-// #include "../parsing/parsing_ds.h"
+// #include "symbol_table.h"
 // 
-// #define DEFAULT_LINE_TO_X 0
-// #define DEFAULT_LINE_TO_Y 0
+// namespace slcp = SLCParsing;
 // 
-// #define DEFAULT_LINE_FROM_X 100
-// #define DEFAULT_LINE_FROM_Y 100
+// namespace SLCEvaluation {
 // 
-// #define DEFAULT_LINE_PIXEL_R 0
-// #define DEFAULT_LINE_PIXEL_G 0
-// #define DEFAULT_LINE_PIXEL_B 0
-// #define DEFAULT_LINE_PIXEL_A 255
+// constexpr static auto default_line_to_x = 0;
+// constexpr static auto default_line_to_y = 0;
 // 
-// #define DEFAULT_LINE_THICKNESS 10
+// constexpr static auto default_line_from_x = 100;
+// constexpr static auto default_line_from_y = 100;
 // 
-// #define B_CURVE_DELTA 0.0001
+// constexpr static auto default_line_pixel_r = 0;
+// constexpr static auto default_line_pixel_g = 0;
+// constexpr static auto default_line_pixel_b = 0;
+// constexpr static auto default_line_pixel_a = 255;
 // 
-// typedef struct LINE_T {
+// constexpr static auto default_line_thickness = 10;
+// 
+// constexpr static auto b_curve_delta = 0.0001;
+// 
+// struct line {
 //   coord_2d to;
 //   coord_2d from;
 //   pixel color;
 //   int thickness;
-// } line;
+// };
 // 
-// struct SYMBOL_TABLE_T;
-// typedef struct SYMBOL_TABLE_T symbol_table;
-// line evaluate_line(parsed_shape the_shape, symbol_table * st);
-// canvas draw_line(canvas the_canvas, line the_line);
+// auto evaluate_line(slcp::Expr& expr, SymbolTableStack& sts) -> line;
+// // canvas draw_line(canvas the_canvas, line the_line);
+// // 
+// // canvas draw_b_curve(canvas the_canvas, line the_line, points the_points);
+// // coord_2d de_casteljau(points the_points, double t);
 // 
-// canvas draw_b_curve(canvas the_canvas, line the_line, points the_points);
-// coord_2d de_casteljau(points the_points, double t);
+// extern auto opaque_eval_expr(slcp::Expr& value, SymbolTableStack& sts) -> slcp::Expr;
 // 
-// extern expression opaque_eval_expr(expression * value, symbol_table * st);
-// 
-// #endif
+// } // namespace SLCEvaluation

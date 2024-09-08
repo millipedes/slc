@@ -3,7 +3,7 @@
 #include <stack>
 #include <unordered_map>
 
-#include "../parsing/parsing.h"
+#include "../parsing/parsing_ds.h"
 
 namespace slcp = SLCParsing;
 

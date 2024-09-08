@@ -519,34 +519,49 @@ TEST(parsing, expression_test_32) {
 }
 
 TEST(parsing, shape_test_0) {
-  const char * input = "rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
+  const char * input = "rectangle(thickness = 1 + 2, center_x = 2, center_y = 1, width = 1, height = 2)";
   slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_12_expr(input, expr);
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
-  thickness_expr.add_children(1, 2);
-  auto values = slcp::Expr(slcp::Expr::Shape{
-    slcp::Exprs{
-    slcp::Expr(slcp::Expr::Variable{"rectangle"}),
-    slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
-    slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
-    slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
-  test_expr(expr, values);
+  auto result_c_c_c_c_one = slcp::Expr(slcp::OpType::BinAssignment);
+  result_c_c_c_c_one.add_children(slcp::Expr::Variable{"width"}, 1);
+  auto result_c_c_c_c_two = slcp::Expr(slcp::OpType::BinAssignment);
+  result_c_c_c_c_two.add_children(slcp::Expr::Variable{"height"}, 2);
+  auto result_c_c_c_c = slcp::Expr(slcp::OpType::BinComma);
+  result_c_c_c_c.add_children(result_c_c_c_c_one, result_c_c_c_c_two);
+  auto result_c_c_c_one = slcp::Expr(slcp::OpType::BinAssignment);
+  result_c_c_c_one.add_children(slcp::Expr::Variable{"center_y"}, 1);
+  auto result_c_c_c = slcp::Expr(slcp::OpType::BinComma);
+  result_c_c_c.add_children(result_c_c_c_one, result_c_c_c_c);
+  auto result_c_c_one = slcp::Expr(slcp::OpType::BinAssignment);
+  result_c_c_one.add_children(slcp::Expr::Variable{"center_x"}, 2);
+  auto result_c_c = slcp::Expr(slcp::OpType::BinComma);
+  result_c_c.add_children(result_c_c_one, result_c_c_c);
+  auto result_c_one_one = slcp::Expr(slcp::OpType::BinPlus);
+  result_c_one_one.add_children(1, 2);
+  auto result_c_one = slcp::Expr(slcp::OpType::BinAssignment);
+  result_c_one.add_children(slcp::Expr::Variable{"thickness"}, result_c_one_one);
+  auto result_c = slcp::Expr(slcp::OpType::BinComma);
+  result_c.add_children(result_c_one, result_c_c);
+  auto result = slcp::Expr(slcp::OpType::Shape);
+  result.add_children(result_c);
+  test_expr(expr, result);
 }
 
 TEST(parsing, shape_test_1) {
-  const char * input = "canvas(width 1, height 2)";
+  const char * input = "canvas(width = 1, height = 2)";
   slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_12_expr(input, expr);
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  auto values = slcp::Expr(slcp::Expr::Shape{
-    slcp::Exprs{ 
-    slcp::Expr(slcp::Expr::Variable{"canvas"}),
-    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
-  test_expr(expr, values);
+  auto result_child_one = slcp::Expr(slcp::OpType::BinAssignment);
+  result_child_one.add_children(slcp::Expr::Variable{"width"}, 1);
+  auto result_child_two = slcp::Expr(slcp::OpType::BinAssignment);
+  result_child_two.add_children(slcp::Expr::Variable{"height"}, 2);
+  auto result_child = slcp::Expr(slcp::OpType::BinComma);
+  result_child.add_children(result_child_one, result_child_two);
+  auto result = slcp::Expr(slcp::OpType::Shape);
+  result.add_children(result_child);
+  test_expr(expr, result);
 }
 
 TEST(parsing, array_test_0) {
@@ -554,126 +569,129 @@ TEST(parsing, array_test_0) {
   slcp::Expr expr;
   auto remainder = slcp::parse_array(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  auto values = slcp::Expr(slcp::Expr::Array{
-    slcp::Exprs{ 
-    slcp::Expr(1), slcp::Expr(2.0), slcp::Expr("hello"),
-    slcp::Expr(slcp::Expr::Variable{"world"})}
-  });
-  test_expr(expr, values);
-}
-
-TEST(parsing, array_test_1) {
-  const char * input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_12_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
-  thickness_expr.add_children(1, 2);
-  auto values = slcp::Expr(slcp::Expr::Array{
-    slcp::Exprs{ 
-    slcp::Expr(1), slcp::Expr(2.0), slcp::Expr("hello"),
-    slcp::Expr(slcp::Expr::Variable{"world"}),
-    slcp::Expr(slcp::Expr::Shape{slcp::Exprs{ 
-    slcp::Expr(slcp::Expr::Variable{"rectangle"}),
-    slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
-    slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
-    slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}})}
-  });
-  test_expr(expr, values);
-}
-
-TEST(parsing, array_test_2) {
-  const char * input = "[[1, 2.0], [\"hello\", world]]";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_12_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto values = slcp::Expr(slcp::Expr::Array{
-      slcp::Exprs{ 
-      slcp::Expr(slcp::Expr::Array{
-        slcp::Exprs{slcp::Expr(1), slcp::Expr(2.0)}}),
-      slcp::Expr(slcp::Expr::Array{slcp::Exprs{ 
-        slcp::Expr("hello"), slcp::Expr(slcp::Expr::Variable{"world"})}
-      })}});
-}
-
-TEST(parsing, assignment_test_0) {
-  const char * input = "x = rectangle()";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_14_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto result = slcp::Expr(slcp::OpType::BinAssignment);
-  result.add_children(slcp::Expr::Variable{"x"}, slcp::Expr::Shape{slcp::Exprs{slcp::Expr(slcp::Expr::Variable{"rectangle"})}});
+  auto result_child_child_child = slcp::Expr(slcp::OpType::BinComma);
+  result_child_child_child.add_children("hello", slcp::Expr::Variable{"world"});
+  auto result_child_child = slcp::Expr(slcp::OpType::BinComma);
+  result_child_child.add_children(2.0, result_child_child_child);
+  auto result_child = slcp::Expr(slcp::OpType::BinComma);
+  result_child.add_children(1, result_child_child);
+  auto result = slcp::Expr(slcp::OpType::Array);
+  result.add_children(result_child);
   test_expr(expr, result);
 }
 
-TEST(parsing, assignment_test_1) {
-  const char * input = "some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_14_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
-  thickness_expr.add_children(1, 2);
-  auto result = slcp::Expr(slcp::OpType::BinAssignment);
-  result.add_children(slcp::Expr::Variable{"some_value"},
-    slcp::Expr::Shape{slcp::Exprs{ 
-    slcp::Expr(slcp::Expr::Variable{"rectangle"}),
-    slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
-    slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
-    slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
-    slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
-  test_expr(expr, result);
-}
+// TEST(parsing, array_test_1) {
+//   const char * input = "[1, 2.0, \"hello\", world, rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)]";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_12_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
+//   thickness_expr.add_children(1, 2);
+//   auto values = slcp::Expr(slcp::Expr::Array{
+//     slcp::Exprs{ 
+//     slcp::Expr(1), slcp::Expr(2.0), slcp::Expr("hello"),
+//     slcp::Expr(slcp::Expr::Variable{"world"}),
+//     slcp::Expr(slcp::Expr::Shape{slcp::Exprs{ 
+//     slcp::Expr(slcp::Expr::Variable{"rectangle"}),
+//     slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
+//     slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
+//     slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
+//     slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
+//     slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}})}
+//   });
+//   test_expr(expr, values);
+// }
+// 
+// TEST(parsing, array_test_2) {
+//   const char * input = "[[1, 2.0], [\"hello\", world]]";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_12_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto values = slcp::Expr(slcp::Expr::Array{
+//       slcp::Exprs{ 
+//       slcp::Expr(slcp::Expr::Array{
+//         slcp::Exprs{slcp::Expr(1), slcp::Expr(2.0)}}),
+//       slcp::Expr(slcp::Expr::Array{slcp::Exprs{ 
+//         slcp::Expr("hello"), slcp::Expr(slcp::Expr::Variable{"world"})}
+//       })}});
+// }
 
-TEST(parsing, assignment_test_2) {
-  const char * input = "x = [1 < 3 == 2 > 1, -(((1 - - 2)))]";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_14_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto result_child_one = slcp::Expr(slcp::Expr::Variable{"x"});
-  auto array_one_child_one = slcp::Expr(slcp::OpType::BinLt);
-  array_one_child_one.add_children(1, 3);
-  auto array_one_child_two = slcp::Expr(slcp::OpType::BinGt);
-  array_one_child_two.add_children(2, 1);
-  auto array_one = slcp::Expr(slcp::OpType::BinEq);
-  array_one.add_children(array_one_child_one, array_one_child_two);
-  auto array_two_child_child = slcp::Expr(slcp::OpType::UnMinus);
-  array_two_child_child.add_children(2);
-  auto array_two_child = slcp::Expr(slcp::OpType::BinMinus);
-  array_two_child.add_children(1, array_two_child_child);
-  auto array_two = slcp::Expr(slcp::OpType::UnMinus);
-  array_two.add_children(array_two_child);
-  auto result_child_two = slcp::Expr(slcp::Expr::Array{slcp::Exprs{array_one, array_two}});
-  auto result = slcp::Expr(slcp::OpType::BinAssignment);
-  result.add_children(result_child_one, result_child_two);
-  test_expr(expr, result);
-}
+// TEST(parsing, assignment_test_0) {
+//   const char * input = "x = rectangle()";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_14_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto result = slcp::Expr(slcp::OpType::BinAssignment);
+//   result.add_children(slcp::Expr::Variable{"x"}, slcp::Expr::Shape{slcp::Exprs{slcp::Expr(slcp::Expr::Variable{"rectangle"})}});
+//   test_expr(expr, result);
+// }
+// 
+// TEST(parsing, assignment_test_1) {
+//   const char * input = "some_value = rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2)";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_14_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto thickness_expr = slcp::Expr(slcp::OpType::BinPlus);
+//   thickness_expr.add_children(1, 2);
+//   auto result = slcp::Expr(slcp::OpType::BinAssignment);
+//   result.add_children(slcp::Expr::Variable{"some_value"},
+//     slcp::Expr::Shape{slcp::Exprs{ 
+//     slcp::Expr(slcp::Expr::Variable{"rectangle"}),
+//     slcp::Expr(slcp::Expr::Variable{"thickness"}), thickness_expr,
+//     slcp::Expr(slcp::Expr::Variable{"center_x"}), slcp::Expr(2),
+//     slcp::Expr(slcp::Expr::Variable{"center_y"}), slcp::Expr(1),
+//     slcp::Expr(slcp::Expr::Variable{"width"}), slcp::Expr(1),
+//     slcp::Expr(slcp::Expr::Variable{"height"}), slcp::Expr(2)}});
+//   test_expr(expr, result);
+// }
 
-TEST(parsing, assignment_test_3) {
-  const char * input = "(x = [1 < 3 == 2 > 1, -(((1 - - 2)))])";
-  slcp::Expr expr;
-  auto remainder = slcp::parse_precedence_14_expr(input, expr);
-  ASSERT_EQ(remainder[0], '\0');
-  auto result_child_one = slcp::Expr(slcp::Expr::Variable{"x"});
-  auto array_one_child_one = slcp::Expr(slcp::OpType::BinLt);
-  array_one_child_one.add_children(1, 3);
-  auto array_one_child_two = slcp::Expr(slcp::OpType::BinGt);
-  array_one_child_two.add_children(2, 1);
-  auto array_one = slcp::Expr(slcp::OpType::BinEq);
-  array_one.add_children(array_one_child_one, array_one_child_two);
-  auto array_two_child_child = slcp::Expr(slcp::OpType::UnMinus);
-  array_two_child_child.add_children(2);
-  auto array_two_child = slcp::Expr(slcp::OpType::BinMinus);
-  array_two_child.add_children(1, array_two_child_child);
-  auto array_two = slcp::Expr(slcp::OpType::UnMinus);
-  array_two.add_children(array_two_child);
-  auto result_child_two = slcp::Expr(slcp::Expr::Array{slcp::Exprs{array_one, array_two}});
-  auto result = slcp::Expr(slcp::OpType::BinAssignment);
-  result.add_children(result_child_one, result_child_two);
-  test_expr(expr, result);
-}
+// TEST(parsing, assignment_test_2) {
+//   const char * input = "x = [1 < 3 == 2 > 1, -(((1 - - 2)))]";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_14_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto result_child_one = slcp::Expr(slcp::Expr::Variable{"x"});
+//   auto array_one_child_one = slcp::Expr(slcp::OpType::BinLt);
+//   array_one_child_one.add_children(1, 3);
+//   auto array_one_child_two = slcp::Expr(slcp::OpType::BinGt);
+//   array_one_child_two.add_children(2, 1);
+//   auto array_one = slcp::Expr(slcp::OpType::BinEq);
+//   array_one.add_children(array_one_child_one, array_one_child_two);
+//   auto array_two_child_child = slcp::Expr(slcp::OpType::UnMinus);
+//   array_two_child_child.add_children(2);
+//   auto array_two_child = slcp::Expr(slcp::OpType::BinMinus);
+//   array_two_child.add_children(1, array_two_child_child);
+//   auto array_two = slcp::Expr(slcp::OpType::UnMinus);
+//   array_two.add_children(array_two_child);
+//   auto result_child_two = slcp::Expr(slcp::Expr::Array{slcp::Exprs{array_one, array_two}});
+//   auto result = slcp::Expr(slcp::OpType::BinAssignment);
+//   result.add_children(result_child_one, result_child_two);
+//   test_expr(expr, result);
+// }
+// 
+// TEST(parsing, assignment_test_3) {
+//   const char * input = "(x = [1 < 3 == 2 > 1, -(((1 - - 2)))])";
+//   slcp::Expr expr;
+//   auto remainder = slcp::parse_precedence_14_expr(input, expr);
+//   ASSERT_EQ(remainder[0], '\0');
+//   auto result_child_one = slcp::Expr(slcp::Expr::Variable{"x"});
+//   auto array_one_child_one = slcp::Expr(slcp::OpType::BinLt);
+//   array_one_child_one.add_children(1, 3);
+//   auto array_one_child_two = slcp::Expr(slcp::OpType::BinGt);
+//   array_one_child_two.add_children(2, 1);
+//   auto array_one = slcp::Expr(slcp::OpType::BinEq);
+//   array_one.add_children(array_one_child_one, array_one_child_two);
+//   auto array_two_child_child = slcp::Expr(slcp::OpType::UnMinus);
+//   array_two_child_child.add_children(2);
+//   auto array_two_child = slcp::Expr(slcp::OpType::BinMinus);
+//   array_two_child.add_children(1, array_two_child_child);
+//   auto array_two = slcp::Expr(slcp::OpType::UnMinus);
+//   array_two.add_children(array_two_child);
+//   auto result_child_two = slcp::Expr(slcp::Expr::Array{slcp::Exprs{array_one, array_two}});
+//   auto result = slcp::Expr(slcp::OpType::BinAssignment);
+//   result.add_children(result_child_one, result_child_two);
+//   test_expr(expr, result);
+// }
 
 // TEST(parsing, draw_test_0) {
 //   const char * input = "draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2));";

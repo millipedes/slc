@@ -33,30 +33,6 @@ auto Expr::operator==(const Expr& other) const -> bool {
     if (!(std::get<OpType>(other.value_) == std::get<OpType>(value_))) {
       return false;
     }
-  } else if (std::holds_alternative<Shape>(other.value_)
-      && std::holds_alternative<Shape>(value_)) {
-    auto other_shape = std::get<Shape>(other.value_).value;
-    auto shape = std::get<Shape>(value_).value;
-    if (other_shape.size() != shape.size()) {
-      return false;
-    }
-    for (uint32_t i = 0; i < shape.size(); i++) {
-      if (!(shape[i] == other_shape[i])) {
-        return false;
-      }
-    }
-  } else if (std::holds_alternative<Array>(other.value_)
-      && std::holds_alternative<Array>(value_)) {
-    auto other_array = std::get<Array>(other.value_).value;
-    auto array = std::get<Array>(value_).value;
-    if (other_array.size() != array.size()) {
-      return false;
-    }
-    for (uint32_t i = 0; i < array.size(); i++) {
-      if (!(array[i] == other_array[i])) {
-        return false;
-      }
-    }
   }
   if (child_ && other.child_) {
     if (child_->size() != other.child_->size()) {
@@ -121,6 +97,9 @@ auto Expr::debug_expr(int indent) -> void {
       case OpType::Ln:
         std::cout << "ln" << std::endl;
         break;
+      case OpType::Array:
+        std::cout << "[...]" << std::endl;
+        break;
       case OpType::ArrayAccessor:
         std::cout << "[x]" << std::endl;
         break;
@@ -171,15 +150,13 @@ auto Expr::debug_expr(int indent) -> void {
         break;
       case OpType::BinAssignment:
         std::cout << "=" << std::endl;
-    }
-  } else if (std::holds_alternative<Shape>(value_)) {
-    for (auto& shape_mems : std::get<Shape>(value_).value) {
-      shape_mems.debug_expr(indent);
-    }
-  } else if (std::holds_alternative<Array>(value_)) {
-    std::cout << "[...]" << std::endl;
-    for (auto& array_mems : std::get<Array>(value_).value) {
-      array_mems.debug_expr(indent + 1);
+        break;
+      case OpType::BinComma:
+        std::cout << "," << std::endl;
+        break;
+      case OpType::Shape:
+        std::cout << "<|>" << std::endl;
+        break;
     }
   }
   if (child_) {

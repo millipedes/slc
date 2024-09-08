@@ -459,21 +459,7 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
   }
 }
 
-// expression expression_not(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case BOOL:
-//       result.value.bool_value = bool_not(the_expression);
-//       result.type = BOOL;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_NOT]: operation ln not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// slc_value evaluate_shape(parsed_shape the_shape, symbol_table * st) {
+// auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
 //   slc_value result = {0};
 //   result.type = SHAPE;
 //   switch(the_shape.type) {
@@ -496,7 +482,7 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
 //   }
 //   return result;
 // }
-// 
+
 // slc_value evaluate_array(parsed_array the_array, symbol_table * st) {
 //   slc_value result = {0};
 //   result.value.the_array = (array *)calloc(1, sizeof(struct ARRAY_T));
@@ -588,10 +574,9 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
 //       break;
 //   }
 // }
-// 
-// expression opaque_eval_expr(expression * value, symbol_table * st) {
-//   return evaluate_expression(*value, st).value.the_expr;
-// }
-//
+
+auto opaque_eval_expr(slcp::Expr& value, SymbolTableStack& sts) -> slcp::Expr {
+  return evaluate_expression(value, sts);
+}
 
 } // namespace SLCEvaluation

@@ -29,6 +29,7 @@ auto parse_precedence_7_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_11_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_12_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char *;
+auto parse_precedence_15_expr(const char * input, Expr& expr) -> const char *;
 
 auto is_double_delineator(char c) -> bool;
 auto is_whitespace(char c) -> bool;

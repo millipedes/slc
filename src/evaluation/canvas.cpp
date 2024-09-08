@@ -1,12 +1,3 @@
-// /**
-//  * @file   canvas.c
-//  * @brief  This file contains the functions related to the canvas data
-//  * structure.
-//  * @author Matthew C. Lindeman
-//  * @date   January 30, 2024
-//  * @bug    None known
-//  * @todo   Nothing
-//  */
 // #include "canvas.h"
 // 
 // canvas evaluate_canvas(parsed_shape the_shape, symbol_table * st) {
@@ -74,12 +65,6 @@
 //   return copy;
 // }
 // 
-// /**
-//  * This function initializes a function with dimensions heighxwidth.
-//  * @param      height - The height of the canvas.
-//  * @param       width - The width of the canvas.
-//  * @return the_canvas - The inited canvas.
-//  */
 // canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 //   canvas the_canvas = {0};
 //   the_canvas.height = height;
@@ -93,12 +78,6 @@
 //   return the_canvas;
 // }
 // 
-// /**
-//   * This function writes a canvas to a png file.
-//   * @param the_canvas - The canvas to be written to the png file.
-//   * @param  file_name - The name of the file which it will write to.
-//   * @return       N/a
-//   */
 // void write_canvas_png(canvas the_canvas, const char * file_name) {
 //   FILE * fp = fopen(file_name, "w");
 //   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
@@ -127,12 +106,7 @@
 //   fclose(fp);
 // }
 // 
-// /**
-//  * This function reads a png file into a canvas.
-//  * @param   file_name - The name of the netpbm file.
-//  * @return the_canvas - The canvas the file was written to.
-//  */
-// canvas read_canvas_png(const char *file_name) {
+// auto read_canvas_png(const char * file_name) -> canvas {
 //   FILE *fp = fopen(file_name, "r");
 // 
 //   png_byte header[8];
@@ -184,18 +158,4 @@
 //   fclose(fp);
 //   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 //   return the_canvas;
-// }
-// 
-// /**
-//  * This function frees a canvas.
-//  * @param the_canvas - The canvas to be freed.
-//  * @return       N/a
-//  */
-// void free_canvas(canvas the_canvas) {
-//   if(the_canvas.values) {
-//     for(int i = 0; i < the_canvas.height; i++) {
-//       free(the_canvas.values[i]);
-//     }
-//     free(the_canvas.values);
-//   }
 // }

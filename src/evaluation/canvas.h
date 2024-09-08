@@ -1,51 +1,44 @@
-// /**
-//  * @file   canvas.h
-//  * @brief  This file contains the function definitions for canvas.c.
-//  * @author Matthew C. Lindeman
-//  * @date   January 30, 2024
-//  * @bug    None known
-//  * @todo   Nothing
-//  */
-// #ifndef CAN_H
-// #define CAN_H
+// #pragma once
 // 
 // #include <png.h>
 // 
 // #include "../parsing/parsing_ds.h"
+// #include "symbol_table.h"
 // 
-// #define MAX_COL 255
-// #define MIN_COL 0
+// namespace slcp = SLCParsing;
 // 
-// #define DEFAULT_CANVAS_PIXEL_R 0
-// #define DEFAULT_CANVAS_PIXEL_G 0
-// #define DEFAULT_CANVAS_PIXEL_B 0
-// #define DEFAULT_CANVAS_PIXEL_A 255
-// #define DEFAULT_CANVAS_HEIGHT  1000
-// #define DEFAULT_CANVAS_WIDTH   1000
+// namespace SLCEvaluation {
 // 
-// typedef struct PIXEL_T {
+// constexpr static auto max_col = 255;
+// constexpr static auto min_col = 0;
+// 
+// constexpr static auto default_canvas_pixel_r = 0;
+// constexpr static auto default_canvas_pixel_g = 0;
+// constexpr static auto default_canvas_pixel_b = 0;
+// constexpr static auto default_canvas_pixel_a = 255;
+// 
+// constexpr static auto default_canvas_height = 1000;
+// constexpr static auto default_canvas_width  = 1000;
+// 
+// struct pixel {
 //   uint8_t r;
 //   uint8_t g;
 //   uint8_t b;
 //   uint8_t a;
-// } pixel;
+// };
 // 
 // typedef struct CANVAS_T {
-//   pixel ** values;
-//   int height;
-//   int width;
+//   std::vector<std::vector<pixel>> values;
 // } canvas;
 // 
-// struct SYMBOL_TABLE_T;
-// typedef struct SYMBOL_TABLE_T symbol_table;
-// canvas evaluate_canvas(parsed_shape the_shape, symbol_table * st);
+// auto evaluate_canvas(slcp::Expr::expr, SymbolTableStack& st) -> canvas;
 // 
-// canvas deep_copy_canvas(canvas original);
-// canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-// void write_canvas_png(canvas the_canvas, const char * file_name);
-// canvas read_canvas_png(const char *file_name);
-// void free_canvas(canvas the_canvas);
+// // canvas deep_copy_canvas(canvas original);
+// // canvas init_canvas(int height, int width, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+// // void write_canvas_png(canvas the_canvas, const char * file_name);
+// // canvas read_canvas_png(const char *file_name);
+// // void free_canvas(canvas the_canvas);
 // 
-// extern expression opaque_eval_expr(expression * value, symbol_table * st);
+// extern auto opaque_eval_expr(slcp::Expr& value, SymbolTableStack& sts) -> slcp::Expr;
 // 
-// #endif
+// } // namespace SLCEvaluation

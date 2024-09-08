@@ -99,59 +99,28 @@ auto parse_bool(const char * input, Expr& expr) -> const char * {
 auto parse_array(const char * input, Expr& expr) -> const char * {
   const char * remainder = parse_word(parse_ws(input), "[");
   if (!remainder) return NULL;
-  const char * delimiter;
-  const char * maybe_array;
-  const char * maybe_shape;
-  const char * maybe_expr;
-  Exprs child;
-  uint32_t i = 0;
-  while((delimiter = parse_word(parse_ws(remainder), "]")) == NULL) {
-    child.push_back(Expr());
-    if (maybe_array = parse_word(parse_ws(remainder), "[")) {
-      remainder = parse_array(parse_ws(remainder), child[i]);
-    } else if ((maybe_shape = parse_shape(parse_ws(remainder), child[i])) != NULL) {
-      remainder = maybe_shape;
-    } else if (maybe_expr = parse_precedence_12_expr(parse_ws(remainder), child[i])) {
-      remainder = maybe_expr;
-    }
-
-    if (delimiter = parse_word(parse_ws(remainder), ",")) {
-      remainder = delimiter;
-    }
-    i++;
-  }
-  expr.set_value(Expr::Array{child});
-  return delimiter;
+  expr = Expr(OpType::Array);
+  Expr child;
+  remainder = parse_precedence_15_expr(parse_ws(remainder), child);
+  remainder = parse_word(parse_ws(remainder), "]");
+  expr.add_children(child);
+  return remainder;
 }
 
 auto parse_shape(const char * input, Expr& expr) -> const char * {
-  Exprs child;
-  child.push_back(Expr());
   const char * remainder;
-  if (!((remainder = parse_word(parse_ws(input), "rectangle"))
-    || (remainder = parse_word(parse_ws(input), "ellipse"))
-    || (remainder = parse_word(parse_ws(input), "line"))
-    || (remainder = parse_word(parse_ws(input), "canvas")))) {
+  if (!((remainder = parse_word(parse_ws(input), "rectangle("))
+    || (remainder = parse_word(parse_ws(input), "ellipse("))
+    || (remainder = parse_word(parse_ws(input), "line("))
+    || (remainder = parse_word(parse_ws(input), "canvas(")))) {
     return NULL;
   }
-  const char * delimiter;
-  uint32_t i = 1;
-
-  if (remainder = parse_word(parse_ws(remainder), "(")) {
-    while ((delimiter = parse_word(parse_ws(remainder), ")")) == NULL) {
-      child.push_back(Expr());
-      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
-      i++;
-      child.push_back(Expr());
-      remainder = parse_precedence_4_expr(parse_ws(remainder), child[i]);
-      i++;
-      if (delimiter = parse_word(parse_ws(remainder), ",")) {
-        remainder = delimiter;
-      }
-    }
-    expr.set_value(Expr::Shape{child});
-    return delimiter;
-  } else return NULL;
+  expr = Expr(OpType::Shape);
+  Expr child;
+  remainder = parse_precedence_15_expr(parse_ws(remainder), child);
+  remainder = parse_word(parse_ws(remainder), ")");
+  expr.add_children(child);
+  return remainder;
 }
 
 auto parse_axiom(const char * input, Expr& expr) -> const char * {
@@ -160,8 +129,6 @@ auto parse_axiom(const char * input, Expr& expr) -> const char * {
     return maybe_axiom;
   } else if (maybe_axiom = parse_bool(parse_ws(input), expr)) {
     return maybe_axiom;
-  // This could be in parse_precedence_1_expr but, this is the same semantics
-  // and is a little less verbose/confusing imo
   } else if (maybe_axiom = parse_shape(parse_ws(input), expr)) {
     return maybe_axiom;
   } else if (maybe_axiom = parse_string(parse_ws(input), expr)) {
@@ -229,7 +196,7 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
     return make_unary_tree(parse_ws(factor), expr, child,
         OpType::Ln, parse_precedence_1_expr);
   } else if (factor = parse_word(parse_ws(input), "(")) {
-    factor = parse_precedence_14_expr(parse_ws(factor), expr);
+    factor = parse_precedence_15_expr(parse_ws(factor), expr);
     factor = parse_word(parse_ws(factor), ")");
   } else {
     factor = parse_axiom(parse_ws(input), expr);
@@ -372,6 +339,19 @@ auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char * {
         && (maybe_boolean_expr = parse_word(parse_ws(expression), "="))) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
           OpType::BinAssignment, parse_precedence_14_expr);
+    } else return expression;
+  } else return NULL;
+}
+
+auto parse_precedence_15_expr(const char * input, Expr& expr) -> const char * {
+  const char * expression = parse_precedence_14_expr(parse_ws(input), expr);
+  const char * maybe_boolean_expr;
+  Exprs child;
+  child.push_back(Expr());
+  if (expression) {
+    if (maybe_boolean_expr = parse_word(parse_ws(expression), ",")) {
+      return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
+          OpType::BinComma, parse_precedence_15_expr);
     } else return expression;
   } else return NULL;
 }

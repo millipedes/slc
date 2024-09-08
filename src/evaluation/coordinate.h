@@ -1,24 +1,17 @@
-// #ifndef COORDINATE_H
-// #define COORDINATE_H
+// #pragma once
 // 
-// #include <stdint.h>
-// #include <stdlib.h>
+// #include <vector>
 // 
-// #define DEFAULT_X 0.0
-// #define DEFAULT_Y 0.0
+// namespace SLCEvaluation {
 // 
-// typedef struct COORD2D_T {
+// static constexpr auto coord_2d_default_x = 0.0;
+// static constexpr auto coord_2d_default_y = 0.0;
+// 
+// struct coord_2d {
 //   double x;
 //   double y;
-// } coord_2d;
+// };
 // 
-// typedef struct POINTS_T {
-//   coord_2d * value;
-//   uint32_t qty_points;
-// } points;
+// using points = std::vector<coord_2d>;
 // 
-// points deep_copy_points(points original);
-// points add_point(points the_points, coord_2d addition);
-// void free_points(points the_points);
-// 
-// #endif
+// } // namespace SLCEvaluation

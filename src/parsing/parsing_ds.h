@@ -19,6 +19,7 @@ enum class OpType {
   ArcTan,
   Log,
   Ln,
+  Array,
   ArrayAccessor,
   BinPlus,
   BinMinus,
@@ -36,21 +37,19 @@ enum class OpType {
   BinBoolOr,
   BoolNot,
   BinAssignment,
+  BinComma,
+  Shape,
 };
 
 struct Expr {
   using Exprs = std::vector<Expr>;
   struct Variable { std::string value; };
-  struct Shape { Exprs value; };
-  struct Array { Exprs value; };
   using ExprVariant = std::variant<int,         // Integer
                                    double,      // Double
                                    std::string, // String
                                    Variable,    // Variable
                                    bool,        // Bool
-                                   OpType,      // Operator
-                                   Shape,       // Shape
-                                   Array>;      // Array
+                                   OpType>;     // Operator
 
   public:
     Expr() = default;
