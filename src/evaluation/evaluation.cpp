@@ -16,8 +16,6 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
       throw std::runtime_error("[evaluate_expression]: variable "
           + std::get<slcp::Expr::Variable>(expr.value()).value + " not defined");
     }
-  // } else if (std::holds_alternative<slcp::Expr::Array>(expr.value())) {
-  // } else if (std::holds_alternative<slcp::Expr::Shape>(expr.value())) {
   } else if (std::holds_alternative<slcp::OpType>(expr.value())) {
     auto type = std::get<slcp::OpType>(expr.value());
     switch(type) {
@@ -39,6 +37,7 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
         return expr_log(evaluate_expression(expr.child()[0], sts));
       case slcp::OpType::Ln:
         return expr_ln(evaluate_expression(expr.child()[0], sts));
+      // case slcp::OpType::Array:
       // case slcp::OpType::ArrayAccessor:
       case slcp::OpType::BinPlus:
         return expr_addition(evaluate_expression(expr.child()[0], sts),
@@ -85,110 +84,15 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
       case slcp::OpType::BoolNot:
         return expr_not(evaluate_expression(expr.child()[0], sts));
       // case slcp::OpType::BinAssignment:
+      // case slcp::OpType::BinComma:
+      // case slcp::OpType::Rectangle:
+      // case slcp::OpType::Line:
+      // case slcp::OpType::Ellipse:
+      // case slcp::OpType::Canvas:
     }
+  } else {
+    throw std::runtime_error("[evaluate_expression]: something went very wrong");
   }
-  //   case UN_MINUS:
-  //     result.value.the_expr = expression_unary_minus(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case SIN:
-  //     result.value.the_expr = expression_sin(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case COS:
-  //     result.value.the_expr = expression_cos(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case TAN:
-  //     result.value.the_expr = expression_tan(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case ARCSIN:
-  //     result.value.the_expr = expression_arcsin(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case ARCCOS:
-  //     result.value.the_expr = expression_arccos(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case ARCTAN:
-  //     result.value.the_expr = expression_arctan(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case LOG:
-  //     result.value.the_expr = expression_log(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case LN:
-  //     result.value.the_expr = expression_ln(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  //   case BIN_PLUS:
-  //     result.value.the_expr = expression_addition(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_MINUS:
-  //     result.value.the_expr = expression_subtraction(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_MULT:
-  //     result.value.the_expr = expression_multiplication(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_DIVIDE:
-  //     result.value.the_expr = expression_division(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_MOD:
-  //     result.value.the_expr = expression_modulus(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_POW:
-  //     result.value.the_expr = expression_pow(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_EQ:
-  //     result.value.the_expr = expression_eq(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_NEQ:
-  //     result.value.the_expr = expression_neq(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_GEQ:
-  //     result.value.the_expr = expression_geq(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_GT:
-  //     result.value.the_expr = expression_gt(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_LEQ:
-  //     result.value.the_expr = expression_leq(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_LT:
-  //     result.value.the_expr = expression_lt(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_BOOL_AND:
-  //     result.value.the_expr = expression_and(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BIN_BOOL_OR:
-  //     result.value.the_expr = expression_or(
-  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
-  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
-  //     break;
-  //   case BOOL_NOT:
-  //     result.value.the_expr = expression_not(evaluate_expression(the_expression.child[0], st).value.the_expr);
-  //     break;
-  // }
-  // return result;
 }
 
 auto expr_unary_minus(slcp::Expr expr) -> slcp::Expr {

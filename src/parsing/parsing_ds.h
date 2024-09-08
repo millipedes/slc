@@ -38,7 +38,10 @@ enum class OpType {
   BoolNot,
   BinAssignment,
   BinComma,
-  Shape,
+  Line,
+  Rectangle,
+  Ellipse,
+  Canvas,
 };
 
 struct Expr {

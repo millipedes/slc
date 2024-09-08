@@ -101,24 +101,34 @@ auto parse_array(const char * input, Expr& expr) -> const char * {
   if (!remainder) return NULL;
   expr = Expr(OpType::Array);
   Expr child;
-  remainder = parse_precedence_15_expr(parse_ws(remainder), child);
+  if (!(remainder = parse_precedence_15_expr(parse_ws(remainder), child))) {
+    return parse_word(parse_ws(input), "[]");
+  }
   remainder = parse_word(parse_ws(remainder), "]");
   expr.add_children(child);
   return remainder;
 }
 
 auto parse_shape(const char * input, Expr& expr) -> const char * {
+  const char * shape_name;
+  if (shape_name = parse_word(parse_ws(input), "rectangle")) {
+    expr = Expr(OpType::Rectangle);
+  } else if (shape_name = parse_word(parse_ws(input), "line")) {
+    expr = Expr(OpType::Line);
+  } else if (shape_name = parse_word(parse_ws(input), "ellipse")) {
+    expr = Expr(OpType::Ellipse);
+  } else if (shape_name = parse_word(parse_ws(input), "canvas")) {
+    expr = Expr(OpType::Canvas);
+  } else return NULL;
+  Expr child;
+  const char * maybe_empty;
+  if (maybe_empty = parse_word(parse_ws(shape_name), "()")) {
+    return maybe_empty;
+  }
   const char * remainder;
-  if (!((remainder = parse_word(parse_ws(input), "rectangle("))
-    || (remainder = parse_word(parse_ws(input), "ellipse("))
-    || (remainder = parse_word(parse_ws(input), "line("))
-    || (remainder = parse_word(parse_ws(input), "canvas(")))) {
+  if (!(remainder = parse_precedence_15_expr(parse_ws(shape_name), child))) {
     return NULL;
   }
-  expr = Expr(OpType::Shape);
-  Expr child;
-  remainder = parse_precedence_15_expr(parse_ws(remainder), child);
-  remainder = parse_word(parse_ws(remainder), ")");
   expr.add_children(child);
   return remainder;
 }

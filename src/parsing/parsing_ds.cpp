@@ -154,8 +154,17 @@ auto Expr::debug_expr(int indent) -> void {
       case OpType::BinComma:
         std::cout << "," << std::endl;
         break;
-      case OpType::Shape:
-        std::cout << "<|>" << std::endl;
+      case OpType::Line:
+        std::cout << "-->" << std::endl;
+        break;
+      case OpType::Rectangle:
+        std::cout << "[==]" << std::endl;
+        break;
+      case OpType::Ellipse:
+        std::cout << "(==)" << std::endl;
+        break;
+      case OpType::Canvas:
+        std::cout << "|==|" << std::endl;
         break;
     }
   }
