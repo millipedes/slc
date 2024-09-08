@@ -1,594 +1,464 @@
-// #include "evaluation.h"
-// 
-// slc_value evaluate_expression(expression the_expression, symbol_table * st) {
-//   slc_value result = {0};
-//   result.type = EXPR;
-//   switch(the_expression.type) {
-//     case INT:
-//     case DOUBLE:
-//     case STRING:
-//     case BOOL:
-//       result.value.the_expr = the_expression;
-//       break;
-//     case VAR:
-//       return find_symbol(*st, the_expression);
-//     case UN_MINUS:
-//       result.value.the_expr = expression_unary_minus(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case SIN:
-//       result.value.the_expr = expression_sin(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case COS:
-//       result.value.the_expr = expression_cos(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case TAN:
-//       result.value.the_expr = expression_tan(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case ARCSIN:
-//       result.value.the_expr = expression_arcsin(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case ARCCOS:
-//       result.value.the_expr = expression_arccos(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case ARCTAN:
-//       result.value.the_expr = expression_arctan(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case LOG:
-//       result.value.the_expr = expression_log(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case LN:
-//       result.value.the_expr = expression_ln(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//     case BIN_PLUS:
-//       result.value.the_expr = expression_addition(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_MINUS:
-//       result.value.the_expr = expression_subtraction(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_MULT:
-//       result.value.the_expr = expression_multiplication(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_DIVIDE:
-//       result.value.the_expr = expression_division(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_MOD:
-//       result.value.the_expr = expression_modulus(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_POW:
-//       result.value.the_expr = expression_pow(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_EQ:
-//       result.value.the_expr = expression_eq(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_NEQ:
-//       result.value.the_expr = expression_neq(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_GEQ:
-//       result.value.the_expr = expression_geq(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_GT:
-//       result.value.the_expr = expression_gt(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_LEQ:
-//       result.value.the_expr = expression_leq(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_LT:
-//       result.value.the_expr = expression_lt(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_BOOL_AND:
-//       result.value.the_expr = expression_and(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BIN_BOOL_OR:
-//       result.value.the_expr = expression_or(
-//           evaluate_expression(the_expression.child[0], st).value.the_expr,
-//           evaluate_expression(the_expression.child[1], st).value.the_expr);
-//       break;
-//     case BOOL_NOT:
-//       result.value.the_expr = expression_not(evaluate_expression(the_expression.child[0], st).value.the_expr);
-//       break;
-//   }
-//   return result;
-// }
-// 
-// expression expression_unary_minus(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case INT:
-//       result.value.int_value = int_unary_minus(the_expression);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_unary_minus(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_UNARY_MINUS]: operation unary minus not "
-//           "supported for type: `%s`\n",
-//           expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_addition(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_ADDITION]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_addition(left, right);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_addition(left, right);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_ADDITION]: operation addition not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_subtraction(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_SUBTRACTION]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_subtraction(left, right);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_subtraction(left, right);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_SUBTRACTION]: operation subtraction not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_multiplication(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_MULTIPLICATION]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_multiplication(left, right);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_multiplication(left, right);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_MULTIPLICATION]: operation multiplication not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_division(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_DIVISION]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_division(left, right);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_division(left, right);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_DIVISION]: operation division not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_modulus(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_MODULUS]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_modulus(left, right);
-//       result.type = INT;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_MODULUS]: operation modulus not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_pow(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_POW]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case INT:
-//       result.value.int_value = int_pow(left, right);
-//       result.type = INT;
-//       return result;
-//     case DOUBLE:
-//       result.value.double_value = double_pow(left, right);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_POW]: operation power not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_eq(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_EQ]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_eq(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_eq(left, right);
-//       return result;
-//     case STRING:
-//       result.value.bool_value = string_eq(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_eq(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_EQ]: operation equality not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_neq(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_NEQ]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_neq(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_neq(left, right);
-//       return result;
-//     case STRING:
-//       result.value.bool_value = string_neq(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_neq(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_NEQ]: operation inequality not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_geq(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_GEQ]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_geq(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_geq(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_geq(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_GEQ]: operation greater than or equal not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_gt(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_GT]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_gt(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_gt(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_gt(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_GT]: operation greater than not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_leq(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_LEQ]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_leq(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_leq(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_leq(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_LEQ]: operation less than or equal not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_lt(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_LT]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   result.type = BOOL;
-//   switch(left.type) {
-//     case INT:
-//       result.value.bool_value = int_lt(left, right);
-//       return result;
-//     case DOUBLE:
-//       result.value.bool_value = double_lt(left, right);
-//       return result;
-//     case BOOL:
-//       result.value.bool_value = bool_lt(left, right);
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_LT]: operation less than not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_sin(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_sin(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_SIN]: operation sin not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_cos(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_cos(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_COS]: operation cos not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_tan(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_tan(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_TAN]: operation tan not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_arcsin(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_arcsin(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_ARCSIN]: operation arcsin not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_arccos(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_arccos(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_ARCCOS]: operation arccos not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_arctan(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_arctan(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_ARCTAN]: operation arctan not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_log(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_log(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_LOG]: operation log not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_ln(expression the_expression) {
-//   expression result = {0};
-//   switch(the_expression.type) {
-//     case DOUBLE:
-//       result.value.double_value = double_ln(the_expression);
-//       result.type = DOUBLE;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_NATURAL_LOG]: operation ln not supported "
-//           "for type: `%s`\n", expression_type_to_string(the_expression.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_and(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_BOOL_AND]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case BOOL:
-//       result.value.bool_value = bool_and(left, right);
-//       result.type = BOOL;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_BOOL_AND]: operation ln not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
-// expression expression_or(expression left, expression right) {
-//   if(left.type != right.type) {
-//       fprintf(stderr, "[EXPRESSION_BOOL_OR]: type do not match: `%s`, `%s`\n",
-//           expression_type_to_string(left.type),
-//           expression_type_to_string(right.type));
-//       exit(1);
-//   }
-//   expression result = {0};
-//   switch(left.type) {
-//     case BOOL:
-//       result.value.bool_value = bool_or(left, right);
-//       result.type = BOOL;
-//       return result;
-//     default:
-//       fprintf(stderr, "[EXPRESSION_BOOL_OR]: operation ln not supported "
-//           "for type: `%s`\n", expression_type_to_string(left.type));
-//       exit(1);
-//   }
-// }
-// 
+#include "evaluation.h"
+
+namespace SLCEvaluation {
+
+auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
+  if (std::holds_alternative<int>(expr.value())
+      || std::holds_alternative<double>(expr.value())
+      || std::holds_alternative<std::string>(expr.value())
+      || std::holds_alternative<bool>(expr.value())) {
+    return slcp::Expr(expr);
+  } else if (std::holds_alternative<slcp::Expr::Variable>(expr.value())) {
+    auto it = sts.top().find(std::get<slcp::Expr::Variable>(expr.value()).value);
+    if (it != sts.top().end()) {
+      return sts.top()[std::get<slcp::Expr::Variable>(expr.value()).value];
+    } else {
+      throw std::runtime_error("[evaluate_expression]: variable "
+          + std::get<slcp::Expr::Variable>(expr.value()).value + " not defined");
+    }
+  // } else if (std::holds_alternative<slcp::Expr::Array>(expr.value())) {
+  // } else if (std::holds_alternative<slcp::Expr::Shape>(expr.value())) {
+  } else if (std::holds_alternative<slcp::OpType>(expr.value())) {
+    auto type = std::get<slcp::OpType>(expr.value());
+    switch(type) {
+      case slcp::OpType::UnMinus:
+        return expr_unary_minus(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::Sin:
+        return expr_sin(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::Cos:
+        return expr_cos(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::Tan:
+        return expr_tan(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::ArcSin:
+        return expr_arcsin(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::ArcCos:
+        return expr_arccos(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::ArcTan:
+        return expr_arctan(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::Log:
+        return expr_log(evaluate_expression(expr.child()[0], sts));
+      case slcp::OpType::Ln:
+        return expr_ln(evaluate_expression(expr.child()[0], sts));
+      // case slcp::OpType::ArrayAccessor:
+      case slcp::OpType::BinPlus:
+        return expr_addition(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinMinus:
+        return expr_subtraction(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinMult:
+        return expr_multiplication(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinDivide:
+        return expr_division(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinMod:
+        return expr_modulus(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinPow:
+        return expr_pow(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinEq:
+        return expr_eq(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinNeq:
+        return expr_neq(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinGeq:
+        return expr_geq(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinGt:
+        return expr_gt(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinLeq:
+        return expr_leq(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinLt:
+        return expr_lt(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinBoolAnd:
+        return expr_and(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BinBoolOr:
+        return expr_or(evaluate_expression(expr.child()[0], sts),
+            evaluate_expression(expr.child()[1], sts));
+      case slcp::OpType::BoolNot:
+        return expr_not(evaluate_expression(expr.child()[0], sts));
+      // case slcp::OpType::BinAssignment:
+    }
+  }
+  //   case UN_MINUS:
+  //     result.value.the_expr = expression_unary_minus(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case SIN:
+  //     result.value.the_expr = expression_sin(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case COS:
+  //     result.value.the_expr = expression_cos(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case TAN:
+  //     result.value.the_expr = expression_tan(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case ARCSIN:
+  //     result.value.the_expr = expression_arcsin(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case ARCCOS:
+  //     result.value.the_expr = expression_arccos(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case ARCTAN:
+  //     result.value.the_expr = expression_arctan(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case LOG:
+  //     result.value.the_expr = expression_log(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case LN:
+  //     result.value.the_expr = expression_ln(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  //   case BIN_PLUS:
+  //     result.value.the_expr = expression_addition(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_MINUS:
+  //     result.value.the_expr = expression_subtraction(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_MULT:
+  //     result.value.the_expr = expression_multiplication(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_DIVIDE:
+  //     result.value.the_expr = expression_division(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_MOD:
+  //     result.value.the_expr = expression_modulus(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_POW:
+  //     result.value.the_expr = expression_pow(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_EQ:
+  //     result.value.the_expr = expression_eq(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_NEQ:
+  //     result.value.the_expr = expression_neq(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_GEQ:
+  //     result.value.the_expr = expression_geq(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_GT:
+  //     result.value.the_expr = expression_gt(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_LEQ:
+  //     result.value.the_expr = expression_leq(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_LT:
+  //     result.value.the_expr = expression_lt(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_BOOL_AND:
+  //     result.value.the_expr = expression_and(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BIN_BOOL_OR:
+  //     result.value.the_expr = expression_or(
+  //         evaluate_expression(the_expression.child[0], st).value.the_expr,
+  //         evaluate_expression(the_expression.child[1], st).value.the_expr);
+  //     break;
+  //   case BOOL_NOT:
+  //     result.value.the_expr = expression_not(evaluate_expression(the_expression.child[0], st).value.the_expr);
+  //     break;
+  // }
+  // return result;
+}
+
+auto expr_unary_minus(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<int>(expr.value())) {
+    return slcp::Expr(int_unary_minus(expr));
+  } else if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_unary_minus(expr));
+  } else {
+    throw std::runtime_error("[expression_unary_minus]: unsupported type passed");
+  }
+}
+
+auto expr_addition(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_addition(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_addition(left, right));
+  } else if (std::holds_alternative<std::string>(left.value())
+      && std::holds_alternative<std::string>(right.value())) {
+    return slcp::Expr(string_addition(left, right));
+  } else {
+    throw std::runtime_error("[expression_addition]: unsupported type passed");
+  }
+}
+
+auto expr_subtraction(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_subtraction(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_subtraction(left, right));
+  } else {
+    throw std::runtime_error("[expression_subtraction]: unsupported type passed");
+  }
+}
+
+auto expr_multiplication(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_multiplication(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_multiplication(left, right));
+  } else {
+    throw std::runtime_error("[expression_multiplication]: unsupported type passed");
+  }
+}
+
+auto expr_division(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_division(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_division(left, right));
+  } else {
+    throw std::runtime_error("[expression_division]: unsupported type passed");
+  }
+}
+
+auto expr_modulus(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_modulus(left, right));
+  } else {
+    throw std::runtime_error("[expression_modulus]: unsupported type passed");
+  }
+}
+
+auto expr_pow(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_pow(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_pow(left, right));
+  } else {
+    throw std::runtime_error("[expression_pow]: unsupported type passed");
+  }
+}
+
+auto expr_eq(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_eq(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_eq(left, right));
+  } else if (std::holds_alternative<std::string>(left.value())
+      && std::holds_alternative<std::string>(right.value())) {
+    return slcp::Expr(string_eq(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_eq(left, right));
+  } else {
+    throw std::runtime_error("[expression_eq]: unsupported type passed");
+  }
+}
+
+auto expr_neq(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_neq(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_neq(left, right));
+  } else if (std::holds_alternative<std::string>(left.value())
+      && std::holds_alternative<std::string>(right.value())) {
+    return slcp::Expr(string_neq(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_neq(left, right));
+  } else {
+    throw std::runtime_error("[expression_neq]: unsupported type passed");
+  }
+}
+
+auto expr_geq(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_geq(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_geq(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_geq(left, right));
+  } else {
+    throw std::runtime_error("[expression_geq]: unsupported type passed");
+  }
+}
+
+auto expr_gt(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_gt(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_gt(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_gt(left, right));
+  } else {
+    throw std::runtime_error("[expression_gt]: unsupported type passed");
+  }
+}
+
+auto expr_leq(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_leq(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_leq(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_leq(left, right));
+  } else {
+    throw std::runtime_error("[expression_leq]: unsupported type passed");
+  }
+}
+
+auto expr_lt(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<int>(left.value())
+      && std::holds_alternative<int>(right.value())) {
+    return slcp::Expr(int_lt(left, right));
+  } else if (std::holds_alternative<double>(left.value())
+      && std::holds_alternative<double>(right.value())) {
+    return slcp::Expr(double_lt(left, right));
+  } else if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_lt(left, right));
+  } else {
+    throw std::runtime_error("[expression_lt]: unsupported type passed");
+  }
+}
+
+auto expr_sin(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_sin(expr));
+  } else {
+    throw std::runtime_error("[expression_sin]: unsupported type passed");
+  }
+}
+
+auto expr_cos(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_cos(expr));
+  } else {
+    throw std::runtime_error("[expression_cos]: unsupported type passed");
+  }
+}
+
+auto expr_tan(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_tan(expr));
+  } else {
+    throw std::runtime_error("[expression_tan]: unsupported type passed");
+  }
+}
+
+auto expr_arcsin(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_arcsin(expr));
+  } else {
+    throw std::runtime_error("[expression_arcsin]: unsupported type passed");
+  }
+}
+
+auto expr_arccos(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_arccos(expr));
+  } else {
+    throw std::runtime_error("[expression_arccos]: unsupported type passed");
+  }
+}
+
+auto expr_arctan(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_arctan(expr));
+  } else {
+    throw std::runtime_error("[expression_arctan]: unsupported type passed");
+  }
+}
+
+auto expr_log(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_log(expr));
+  } else {
+    throw std::runtime_error("[expression_log]: unsupported type passed");
+  }
+}
+
+auto expr_ln(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<double>(expr.value())) {
+    return slcp::Expr(double_ln(expr));
+  } else {
+    throw std::runtime_error("[expression_ln]: unsupported type passed");
+  }
+}
+
+auto expr_and(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_and(left, right));
+  } else {
+    throw std::runtime_error("[expression_and]: unsupported type passed");
+  }
+}
+
+auto expr_or(slcp::Expr left, slcp::Expr right) -> slcp::Expr {
+  if (std::holds_alternative<bool>(left.value())
+      && std::holds_alternative<bool>(right.value())) {
+    return slcp::Expr(bool_or(left, right));
+  } else {
+    throw std::runtime_error("[expression_or]: unsupported type passed");
+  }
+}
+
+auto expr_not(slcp::Expr expr) -> slcp::Expr {
+  if (std::holds_alternative<bool>(expr.value())) {
+    return slcp::Expr(bool_not(expr));
+  } else {
+    throw std::runtime_error("[expression_not]: unsupported type passed");
+  }
+}
+
 // expression expression_not(expression the_expression) {
 //   expression result = {0};
 //   switch(the_expression.type) {
@@ -722,3 +592,6 @@
 // expression opaque_eval_expr(expression * value, symbol_table * st) {
 //   return evaluate_expression(*value, st).value.the_expr;
 // }
+//
+
+} // namespace SLCEvaluation

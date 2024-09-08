@@ -160,6 +160,8 @@ auto parse_axiom(const char * input, Expr& expr) -> const char * {
     return maybe_axiom;
   } else if (maybe_axiom = parse_bool(parse_ws(input), expr)) {
     return maybe_axiom;
+  // This could be in parse_precedence_1_expr but, this is the same semantics
+  // and is a little less verbose/confusing imo
   } else if (maybe_axiom = parse_shape(parse_ws(input), expr)) {
     return maybe_axiom;
   } else if (maybe_axiom = parse_string(parse_ws(input), expr)) {

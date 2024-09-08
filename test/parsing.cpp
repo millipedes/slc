@@ -651,6 +651,30 @@ TEST(parsing, assignment_test_2) {
   test_expr(expr, result);
 }
 
+TEST(parsing, assignment_test_3) {
+  const char * input = "(x = [1 < 3 == 2 > 1, -(((1 - - 2)))])";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_14_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto result_child_one = slcp::Expr(slcp::Expr::Variable{"x"});
+  auto array_one_child_one = slcp::Expr(slcp::OpType::BinLt);
+  array_one_child_one.add_children(1, 3);
+  auto array_one_child_two = slcp::Expr(slcp::OpType::BinGt);
+  array_one_child_two.add_children(2, 1);
+  auto array_one = slcp::Expr(slcp::OpType::BinEq);
+  array_one.add_children(array_one_child_one, array_one_child_two);
+  auto array_two_child_child = slcp::Expr(slcp::OpType::UnMinus);
+  array_two_child_child.add_children(2);
+  auto array_two_child = slcp::Expr(slcp::OpType::BinMinus);
+  array_two_child.add_children(1, array_two_child_child);
+  auto array_two = slcp::Expr(slcp::OpType::UnMinus);
+  array_two.add_children(array_two_child);
+  auto result_child_two = slcp::Expr(slcp::Expr::Array{slcp::Exprs{array_one, array_two}});
+  auto result = slcp::Expr(slcp::OpType::BinAssignment);
+  result.add_children(result_child_one, result_child_two);
+  test_expr(expr, result);
+}
+
 // TEST(parsing, draw_test_0) {
 //   const char * input = "draw(rectangle(thickness 1 + 2, center_x 2, center_y 1, width 1, height 2));";
 //   parsed_lline the_lline = {0};

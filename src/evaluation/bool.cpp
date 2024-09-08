@@ -1,37 +1,41 @@
-// #include "bool.h"
-// 
-// bool bool_eq(expression left, expression right) {
-//   return left.value.bool_value == right.value.bool_value;
-// }
-// 
-// bool bool_neq(expression left, expression right) {
-//   return left.value.bool_value != right.value.bool_value;
-// }
-// 
-// bool bool_geq(expression left, expression right) {
-//   return left.value.bool_value >= right.value.bool_value;
-// }
-// 
-// bool bool_gt(expression left, expression right) {
-//   return left.value.bool_value > right.value.bool_value;
-// }
-// 
-// bool bool_leq(expression left, expression right) {
-//   return left.value.bool_value <= right.value.bool_value;
-// }
-// 
-// bool bool_lt(expression left, expression right) {
-//   return left.value.bool_value < right.value.bool_value;
-// }
-// 
-// bool bool_and(expression left, expression right) {
-//   return left.value.bool_value && right.value.bool_value;
-// }
-// 
-// bool bool_or(expression left, expression right) {
-//   return left.value.bool_value || right.value.bool_value;
-// }
-// 
-// bool bool_not(expression the_expression) {
-//   return !the_expression.value.bool_value;
-// }
+#include "bool.h"
+
+namespace SLCEvaluation {
+
+auto bool_eq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) == std::get<bool>(right.value());
+}
+
+auto bool_neq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) != std::get<bool>(right.value());
+}
+
+auto bool_geq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) >= std::get<bool>(right.value());
+}
+
+auto bool_gt(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) > std::get<bool>(right.value());
+}
+
+auto bool_leq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) <= std::get<bool>(right.value());
+}
+
+auto bool_lt(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) < std::get<bool>(right.value());
+}
+
+auto bool_and(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) && std::get<bool>(right.value());
+}
+
+auto bool_or(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<bool>(left.value()) || std::get<bool>(right.value());
+}
+
+auto bool_not(slcp::Expr expr) -> bool {
+  return !std::get<bool>(expr.value());
+}
+
+} // namespace SLCEvaluation

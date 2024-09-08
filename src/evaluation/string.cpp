@@ -1,13 +1,17 @@
-// #include "string.h"
-// 
-// bool string_eq(expression left, expression right) {
-//   size_t left_len = strnlen(left.value.string_value, MAX_STR);
-//   if(left_len != strnlen(left.value.string_value, MAX_STR))
-//     return false;
-//   size_t result = !strncmp(left.value.string_value, right.value.string_value, left_len);
-//   return result;
-// }
-// 
-// bool string_neq(expression left, expression right) {
-//   return !string_eq(left, right);
-// }
+#include "string.h"
+
+namespace SLCEvaluation {
+
+auto string_addition(slcp::Expr left, slcp::Expr right) -> std::string {
+  return std::get<std::string>(left.value()) + std::get<std::string>(right.value());
+}
+
+auto string_eq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<std::string>(left.value()) == std::get<std::string>(right.value());
+}
+
+auto string_neq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<std::string>(left.value()) != std::get<std::string>(right.value());
+}
+
+} // namespace SLCEvaluation

@@ -1,16 +1,19 @@
-// #ifndef BOOL_H
-// #define BOOL_H
-// 
-// #include "../parsing/parsing.h"
-// 
-// bool bool_eq(expression left, expression right);
-// bool bool_neq(expression left, expression right);
-// bool bool_geq(expression left, expression right);
-// bool bool_gt(expression left, expression right);
-// bool bool_leq(expression left, expression right);
-// bool bool_lt(expression left, expression right);
-// bool bool_and(expression left, expression right);
-// bool bool_or(expression left, expression right);
-// bool bool_not(expression the_expression);
-// 
-// #endif
+#pragma once
+
+#include "../parsing/parsing.h"
+
+namespace slcp = SLCParsing;
+
+namespace SLCEvaluation {
+
+auto bool_eq(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_neq(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_geq(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_gt(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_leq(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_lt(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_and(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_or(slcp::Expr left, slcp::Expr right) -> bool;
+auto bool_not(slcp::Expr expr) -> bool;
+
+} // namespace SLCEvaluation

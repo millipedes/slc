@@ -1,10 +1,13 @@
-// #ifndef STRING_H
-// #define STRING_H
-// 
-// #include "../parsing/parsing.h"
-// 
-// char * string_addition(expression left, expression right);
-// bool string_eq(expression left, expression right);
-// bool string_neq(expression left, expression right);
-// 
-// #endif
+#pragma once
+
+#include "../parsing/parsing.h"
+
+namespace slcp = SLCParsing;
+
+namespace SLCEvaluation {
+
+auto string_addition(slcp::Expr left, slcp::Expr right) -> std::string;
+auto string_eq(slcp::Expr left, slcp::Expr right) -> bool;
+auto string_neq(slcp::Expr left, slcp::Expr right) -> bool;
+
+} // namespace SLCEvaluation

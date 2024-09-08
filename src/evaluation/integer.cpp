@@ -1,53 +1,57 @@
-// #include "integer.h"
-// 
-// int int_unary_minus(expression the_expression) {
-//   return -the_expression.value.int_value;
-// }
-// 
-// int int_addition(expression left, expression right) {
-//   return left.value.int_value + right.value.int_value;
-// }
-// 
-// int int_subtraction(expression left, expression right) {
-//   return left.value.int_value - right.value.int_value;
-// }
-// 
-// int int_multiplication(expression left, expression right) {
-//   return left.value.int_value * right.value.int_value;
-// }
-// 
-// int int_division(expression left, expression right) {
-//   return left.value.int_value / right.value.int_value;
-// }
-// 
-// int int_modulus(expression left, expression right) {
-//   return left.value.int_value % right.value.int_value;
-// }
-// 
-// int int_pow(expression left, expression right) {
-//   return pow(left.value.int_value, right.value.int_value);
-// }
-// 
-// bool int_eq(expression left, expression right) {
-//   return left.value.int_value == right.value.int_value;
-// }
-// 
-// bool int_neq(expression left, expression right) {
-//   return left.value.int_value != right.value.int_value;
-// }
-// 
-// bool int_geq(expression left, expression right) {
-//   return left.value.int_value >= right.value.int_value;
-// }
-// 
-// bool int_gt(expression left, expression right) {
-//   return left.value.int_value > right.value.int_value;
-// }
-// 
-// bool int_leq(expression left, expression right) {
-//   return left.value.int_value <= right.value.int_value;
-// }
-// 
-// bool int_lt(expression left, expression right) {
-//   return left.value.int_value < right.value.int_value;
-// }
+#include "integer.h"
+
+namespace SLCEvaluation {
+
+auto int_unary_minus(slcp::Expr expr) -> int {
+  return -std::get<int>(expr.value());
+}
+
+auto int_addition(slcp::Expr left, slcp::Expr right) -> int {
+  return std::get<int>(left.value()) + std::get<int>(right.value());
+}
+
+auto int_subtraction(slcp::Expr left, slcp::Expr right) -> int {
+  return std::get<int>(left.value()) - std::get<int>(right.value());
+}
+
+auto int_multiplication(slcp::Expr left, slcp::Expr right) -> int {
+  return std::get<int>(left.value()) * std::get<int>(right.value());
+}
+
+auto int_division(slcp::Expr left, slcp::Expr right) -> int {
+  return std::get<int>(left.value()) / std::get<int>(right.value());
+}
+
+auto int_modulus(slcp::Expr left, slcp::Expr right) -> int {
+  return std::get<int>(left.value()) % std::get<int>(right.value());
+}
+
+auto int_pow(slcp::Expr left, slcp::Expr right) -> int {
+  return pow(std::get<int>(left.value()), std::get<int>(right.value()));
+}
+
+auto int_eq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) == std::get<int>(right.value());
+}
+
+auto int_neq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) != std::get<int>(right.value());
+}
+
+auto int_geq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) >= std::get<int>(right.value());
+}
+
+auto int_gt(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) > std::get<int>(right.value());
+}
+
+auto int_leq(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) <= std::get<int>(right.value());
+}
+
+auto int_lt(slcp::Expr left, slcp::Expr right) -> bool {
+  return std::get<int>(left.value()) < std::get<int>(right.value());
+}
+
+} // namespace SLCEvaluation

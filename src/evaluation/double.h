@@ -1,28 +1,32 @@
-// #ifndef DOUBLE_H
-// #define DOUBLE_H
-// 
-// #include <math.h>
-// #include "../parsing/parsing.h"
-// 
-// double double_unary_minus(expression the_expression);
-// double double_addition(expression left, expression right);
-// double double_subtraction(expression left, expression right);
-// double double_multiplication(expression left, expression right);
-// double double_division(expression left, expression right);
-// double double_pow(expression left, expression right);
-// bool double_eq(expression left, expression right);
-// bool double_neq(expression left, expression right);
-// bool double_geq(expression left, expression right);
-// bool double_gt(expression left, expression right);
-// bool double_leq(expression left, expression right);
-// bool double_lt(expression left, expression right);
-// double double_sin(expression the_expression);
-// double double_cos(expression the_expression);
-// double double_tan(expression the_expression);
-// double double_arcsin(expression the_expression);
-// double double_arccos(expression the_expression);
-// double double_arctan(expression the_expression);
-// double double_log(expression the_expression);
-// double double_ln(expression the_expression);
-// 
-// #endif
+#pragma once
+
+#include <cmath>
+
+#include "../parsing/parsing.h"
+
+namespace slcp = SLCParsing;
+
+namespace SLCEvaluation {
+
+auto double_unary_minus(slcp::Expr expr) -> double;
+auto double_addition(slcp::Expr left, slcp::Expr right) -> double;
+auto double_subtraction(slcp::Expr left, slcp::Expr right) -> double;
+auto double_multiplication(slcp::Expr left, slcp::Expr right) -> double;
+auto double_division(slcp::Expr left, slcp::Expr right) -> double;
+auto double_pow(slcp::Expr left, slcp::Expr right) -> double;
+auto double_eq(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_neq(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_geq(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_gt(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_leq(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_lt(slcp::Expr left, slcp::Expr right) -> bool;
+auto double_sin(slcp::Expr expr) -> double;
+auto double_cos(slcp::Expr expr) -> double;
+auto double_tan(slcp::Expr expr) -> double;
+auto double_arcsin(slcp::Expr expr) -> double;
+auto double_arccos(slcp::Expr expr) -> double;
+auto double_arctan(slcp::Expr expr) -> double;
+auto double_log(slcp::Expr expr) -> double;
+auto double_ln(slcp::Expr expr) -> double;
+
+} // namespace SLCEvaluation

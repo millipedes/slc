@@ -32,7 +32,7 @@ add_executable(slc ${SRC_FILES} src/main/main.cpp)
 
 find_package(PNG REQUIRED)
 
-target_link_libraries(slc PNG::PNG m)
+target_link_libraries(slc PNG::PNG)
 
 option(BUILD_TESTS "Build Test Suite" ON)
 
@@ -45,5 +45,5 @@ if(BUILD_TESTS)
     ${TEST_DIR}/drawing_test.cpp
   )
   add_executable(tests ${TEST_SRC_FILES} test/main.cpp)
-  target_link_libraries(tests ${SRC_FILES} gtest gtest_main pthread PNG::PNG m)
+  target_link_libraries(tests ${SRC_FILES} gtest gtest_main pthread PNG::PNG)
 endif()

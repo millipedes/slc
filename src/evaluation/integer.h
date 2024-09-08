@@ -1,21 +1,25 @@
-// #ifndef INTEGER_H
-// #define INTEGER_H
-// 
-// #include <math.h>
-// #include "../parsing/parsing.h"
-// 
-// int int_unary_minus(expression the_expression);
-// int int_addition(expression left, expression right);
-// int int_subtraction(expression left, expression right);
-// int int_multiplication(expression left, expression right);
-// int int_division(expression left, expression right);
-// int int_modulus(expression left, expression right);
-// int int_pow(expression left, expression right);
-// bool int_eq(expression left, expression right);
-// bool int_neq(expression left, expression right);
-// bool int_geq(expression left, expression right);
-// bool int_gt(expression left, expression right);
-// bool int_leq(expression left, expression right);
-// bool int_lt(expression left, expression right);
-// 
-// #endif
+#pragma once
+
+#include <cmath>
+
+#include "../parsing/parsing.h"
+
+namespace slcp = SLCParsing;
+
+namespace SLCEvaluation {
+
+auto int_unary_minus(slcp::Expr expr) -> int;
+auto int_addition(slcp::Expr left, slcp::Expr right) -> int;
+auto int_subtraction(slcp::Expr left, slcp::Expr right) -> int;
+auto int_multiplication(slcp::Expr left, slcp::Expr right) -> int;
+auto int_division(slcp::Expr left, slcp::Expr right) -> int;
+auto int_modulus(slcp::Expr left, slcp::Expr right) -> int;
+auto int_pow(slcp::Expr left, slcp::Expr right) -> int;
+auto int_eq(slcp::Expr left, slcp::Expr right) -> bool;
+auto int_neq(slcp::Expr left, slcp::Expr right) -> bool;
+auto int_geq(slcp::Expr left, slcp::Expr right) -> bool;
+auto int_gt(slcp::Expr left, slcp::Expr right) -> bool;
+auto int_leq(slcp::Expr left, slcp::Expr right) -> bool;
+auto int_lt(slcp::Expr left, slcp::Expr right) -> bool;
+
+} // namespace SLCEvaluation
