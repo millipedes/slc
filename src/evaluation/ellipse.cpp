@@ -1,92 +1,67 @@
-// /**
-//  * @file   ellipse.c
-//  * @brief  This file contains the functions related to drawing an ellipse.
-//  * @author Matthew C. Lindeman
-//  * @date   July 02, 2023
-//  * @bug    None known
-//  * @todo   Nothing
-//  */
-// #include "ellipse.h"
-// 
-// ellipse evaluate_ellipse(parsed_shape the_shape, symbol_table * st) {
-//   double center_x = DEFAULT_ELLIPSE_CENTER_X;
-//   double center_y = DEFAULT_ELLIPSE_CENTER_Y;
-// 
-//   uint8_t pixel_r = DEFAULT_ELLIPSE_PIXEL_R;
-//   uint8_t pixel_g = DEFAULT_ELLIPSE_PIXEL_G;
-//   uint8_t pixel_b = DEFAULT_ELLIPSE_PIXEL_B;
-//   uint8_t pixel_a = DEFAULT_ELLIPSE_PIXEL_A;
-// 
-//   size_t major_axis = DEFAULT_ELLIPSE_MAJOR_AXIS;
-//   size_t minor_axis = DEFAULT_ELLIPSE_MINOR_AXIS;
-// 
-//   int thickness = DEFAULT_ELLIPSE_THICKNESS;
-// 
-//   expression tmp_name = {0};
-//   expression tmp_value = {0};
-// 
-//   for(uint32_t i = 0; i < the_shape.qty_values; i++) {
-//     tmp_name = the_shape.values[i];
-//     i++;
-//     tmp_value = opaque_eval_expr(&the_shape.values[i], st);
-//     validate_type(tmp_name, VAR, "[EVALUATE_ELLIPSE]: name was not specified before value\n");
-// 
-//     if(!strncmp(tmp_name.value.string_value, "center_x", sizeof("center_x") - 1)) {
-//       if(tmp_value.type == DOUBLE) {
-//         center_x = tmp_value.value.double_value;
-//       } else if(tmp_value.type == INT) {
-//         center_x = (double)tmp_value.value.int_value;
-//       } else {
-//         fprintf(stderr, "[EVALUATE_ELLIPSE]: center_x requires a double or an int\n");
-//         exit(1);
-//       }
-//     } else if(!strncmp(tmp_name.value.string_value, "center_y", sizeof("center_y") - 1)) {
-//       if(tmp_value.type == DOUBLE) {
-//         center_y = tmp_value.value.double_value;
-//       } else if(tmp_value.type == INT) {
-//         center_y = (double)tmp_value.value.int_value;
-//       } else {
-//         fprintf(stderr, "[EVALUATE_ELLIPSE]: center_y requires a double or an int\n");
-//         exit(1);
-//       }
-//     } else if(!strncmp(tmp_name.value.string_value, "pixel_r", sizeof("pixel_r") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_r requires an int\n");
-//       pixel_r = (uint8_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "pixel_g", sizeof("pixel_g") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_g requires an int\n");
-//       pixel_g = (uint8_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "pixel_b", sizeof("pixel_b") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_b requires an int\n");
-//       pixel_b = (uint8_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "pixel_a", sizeof("pixel_a") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: pixel_a requires an int\n");
-//       pixel_a = (uint8_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "major_axis", sizeof("major_axis") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: major_axis requires a int\n");
-//       major_axis = (size_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "minor_axis", sizeof("minor_axis") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: minor_axis requires a int\n");
-//       minor_axis = (size_t)tmp_value.value.int_value;
-//     } else if(!strncmp(tmp_name.value.string_value, "thickness", sizeof("thickness") - 1)) {
-//       validate_type(tmp_value, INT, "[EVALUATE_ELLIPSE]: thickness requires a int\n");
-//       thickness = tmp_value.value.int_value;
-//     } else {
-//       fprintf(stderr, "[EVALUATE_ELLIPSE]: unrecognized directive `%s`\n",
-//           tmp_name.value.string_value);
-//       exit(1);
-//     }
-// 
-//     tmp_name = (expression){0};
-//     tmp_value = (expression){0};
-//   }
-//   return (ellipse){
-//     (coord_2d){center_x, center_y},
-//     (pixel){pixel_r, pixel_g, pixel_b, pixel_a},
-//     major_axis,
-//     minor_axis,
-//     thickness};
-// }
-// 
+#include "ellipse.h"
+
+namespace SLCEvaluation {
+
+auto Ellipse::operator==(const Ellipse& other) const -> bool {
+  return center == other.center
+    && color == other.color
+    && major_axis == other.major_axis
+    && minor_axis == other.minor_axis
+    && thickness == other.thickness;
+}
+
+auto evaluate_ellipse(slcp::Expr expr, SymbolTableStack& sts) -> Ellipse {
+  double center_x = default_ellipse_center_x;
+  double center_y = default_ellipse_center_y;
+
+  uint8_t pixel_r = default_ellipse_pixel_r;
+  uint8_t pixel_g = default_ellipse_pixel_g;
+  uint8_t pixel_b = default_ellipse_pixel_b;
+  uint8_t pixel_a = default_ellipse_pixel_a;
+
+  size_t major_axis = default_ellipse_major_axis;
+  size_t minor_axis = default_ellipse_minor_axis;
+
+  int thickness = default_ellipse_thickness;
+
+  auto local_canvas_sts = std::stack<SymbolTable>();
+  local_canvas_sts.push(SymbolTable());
+  if (expr.child().size() > 0) {
+    read_in_values(expr.child()[0], local_canvas_sts);
+  }
+
+  if (extract_value<int, double>(local_canvas_sts, "center_x")) {
+    center_x = *extract_value<int, double>(local_canvas_sts, "center_x");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "center_y")) {
+    center_y = *extract_value<int, double>(local_canvas_sts, "center_y");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_r")) {
+    pixel_r = *extract_value<int, double>(local_canvas_sts, "pixel_r");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_g")) {
+    pixel_g = *extract_value<int, double>(local_canvas_sts, "pixel_g");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_b")) {
+    pixel_b = *extract_value<int, double>(local_canvas_sts, "pixel_b");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_a")) {
+    pixel_a = *extract_value<int, double>(local_canvas_sts, "pixel_a");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "major_axis")) {
+    major_axis = *extract_value<int, double>(local_canvas_sts, "major_axis");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "minor_axis")) {
+    minor_axis = *extract_value<int, double>(local_canvas_sts, "minor_axis");
+  }
+  if (extract_value<int, double>(local_canvas_sts, "thickness")) {
+    thickness = *extract_value<int, double>(local_canvas_sts, "thickness");
+  }
+
+  return Ellipse((Coord2D){center_x, center_y},
+      (Pixel){pixel_r, pixel_g, pixel_b, pixel_a}, major_axis, minor_axis, thickness);
+}
+
 // /**
 //  * This function draws an ellipse.
 //  * @param  the_canvas - The canvas which the ellipse will be drawn to.
@@ -198,3 +173,5 @@
 // 
 //   return ellipse_value <= 1.0 + the_ellipse.thickness;
 // }
+
+} // namespace SLCEvaluation

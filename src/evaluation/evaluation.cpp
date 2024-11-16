@@ -369,9 +369,6 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
   }
 }
 
-auto evaluate_canvas(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
-}
-
 // auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
 //   slc_value result = {0};
 //   result.type = SHAPE;

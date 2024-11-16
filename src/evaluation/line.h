@@ -28,6 +28,7 @@ struct Line {
   int thickness;
 
   auto operator==(const Line& other) const -> bool;
+  auto debug() -> void;
 
   Line(const Coord2D& to, const Coord2D& from,
       const Pixel& color, const int& thickness)

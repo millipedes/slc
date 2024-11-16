@@ -1,6 +1,7 @@
 #include "test_helper.h"
 
 #include "evaluation/canvas.h"
+#include "evaluation/ellipse.h"
 #include "evaluation/line.h"
 
 namespace slcp = SLCParsing;
@@ -268,62 +269,60 @@ TEST(evaluation, evaluate_shape_test_1) {
   auto remainder = slcp::parse_precedence_15_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
   auto line_result = slce::evaluate_line(expr, sts);
-  auto line = slce::Line((slce::Coord2D){0.0, 0.0}, (slce::Coord2D){100.0, 100.0}, (slce::Pixel){1, 35, 66, 254}, 3);
+  auto line = slce::Line(slce::Coord2D(0.0, 0.0), slce::Coord2D(100.0, 100.0), slce::Pixel(1, 35, 66, 254), 3);
   ASSERT_EQ(line, line_result);
 }
 
-// TEST(evaluation, evaluate_shape_test_1) {
-//   symbol_table st = {0};
-//   const char * input = "line(thickness 1 + 2, pixel_r 1, to_x 2.0, from_x 2.0, to_y 2.0, from_y 2.0 pixel_b 66, pixel_g 35)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   slc_value value_result = evaluate_shape(the_shape, &st);
-//   shape result = value_result.value.the_shape;
-//   validate_line((line){(coord_2d){2.0, 2.0},
-//       (coord_2d){2.0, 2.0}, (pixel){1, 35, 66}, 3}, result.value.the_line);
-//   free_parsed_shape(the_shape);
-// }
-// 
-// TEST(evaluation, evaluate_shape_test_2) {
-//   symbol_table st = {0};
-//   const char * input = "ellipse(thickness 1 + 2, pixel_r 1, center_x 2.0, minor_axis 2, center_y 2.0, pixel_b 66, major_axis 3, pixel_g 35)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   slc_value value_result = evaluate_shape(the_shape, &st);
-//   shape result = value_result.value.the_shape;
-//   validate_ellipse((ellipse){(coord_2d){2.0, 2.0},
-//       (pixel){1, 35, 66}, 3, 2, 3}, result.value.the_ellipse);
-//   free_parsed_shape(the_shape);
-// }
-// 
-// TEST(evaluation, evaluate_shape_test_3) {
-//   symbol_table st = {0};
-//   const char * input = "ellipse()";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   slc_value value_result = evaluate_shape(the_shape, &st);
-//   shape result = value_result.value.the_shape;
-//   validate_ellipse((ellipse){(coord_2d){0.0, 0.0},
-//       (pixel){DEFAULT_ELLIPSE_PIXEL_R, DEFAULT_ELLIPSE_PIXEL_G,
-//               DEFAULT_ELLIPSE_PIXEL_B, DEFAULT_ELLIPSE_PIXEL_A},
-//       DEFAULT_ELLIPSE_MAJOR_AXIS, DEFAULT_ELLIPSE_MINOR_AXIS, DEFAULT_ELLIPSE_THICKNESS},
-//       result.value.the_ellipse);
-//   free_parsed_shape(the_shape);
-// }
+TEST(evaluation, evaluate_shape_test_2) {
+  auto sts = std::stack<slce::SymbolTable>();
+  const char * input = "line(thickness = 1 + 2, pixel_r = 1, to_x = 2.0, "
+    "from_x = 2.0, to_y = 2.0, from_y = 2.0, pixel_b = 66, pixel_g = 35)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto line_result = slce::evaluate_line(expr, sts);
+  auto line = slce::Line(slce::Coord2D(2.0, 2.0),
+      slce::Coord2D(2.0, 2.0), slce::Pixel(1, 35, 66, 255), 3);
+  ASSERT_EQ(line, line_result);
+}
+
+TEST(evaluation, evaluate_shape_test_3) {
+  auto sts = std::stack<slce::SymbolTable>();
+  const char * input = "ellipse(thickness = 1 + 2, pixel_r = 1, center_x = 2.0, "
+    "minor_axis = 2, center_y = 2.0, pixel_b = 66, major_axis = 3, pixel_g = 35)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto ellipse_result = slce::evaluate_ellipse(expr, sts);
+  auto ellipse = slce::Ellipse(slce::Coord2D(2.0, 2.0), slce::Pixel(1, 35, 66, 255), 3, 2, 3);
+  ASSERT_EQ(ellipse, ellipse_result);
+}
 
 TEST(evaluation, evaluate_shape_test_4) {
+  auto sts = std::stack<slce::SymbolTable>();
+  const char * input = "ellipse()";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto ellipse_result = slce::evaluate_ellipse(expr, sts);
+  auto ellipse = slce::Ellipse(
+      slce::Coord2D(slce::default_ellipse_center_x, slce::default_ellipse_center_y),
+      slce::Pixel(slce::default_ellipse_pixel_r, slce::default_ellipse_pixel_g,
+        slce::default_ellipse_pixel_b, slce::default_ellipse_pixel_a),
+      slce::default_ellipse_major_axis, slce::default_ellipse_minor_axis, slce::default_ellipse_thickness);
+  ASSERT_EQ(ellipse, ellipse_result);
+}
+
+TEST(evaluation, evaluate_shape_test_5) {
   auto sts = std::stack<slce::SymbolTable>();
   sts.push(slce::SymbolTable());
   const char * input = "canvas(pixel_r = 1, pixel_b = 66 - 66 + 66, pixel_g = 35, pixel_a = 255, width = 1100, height = 1200)";
   slcp::Expr expr;
   auto remainder = slcp::parse_precedence_15_expr(input, expr);
   ASSERT_EQ(remainder[0], '\0');
-  auto not_pertinent = slce::evaluate_expression(expr, sts);
-  // Canvas result = init_canvas(1200, 1100, 1, 35, 66, 255);
-  // validate_canvas(truth, result.value.the_canvas);
+  auto canvas_result = slce::evaluate_canvas(expr, sts);
+  auto canvas = slce::Canvas(1100, 1200, 1, 35, 66, 255);
+  ASSERT_EQ(canvas, canvas_result);
 }
 
 // TEST(evaluation, array_test_0) {

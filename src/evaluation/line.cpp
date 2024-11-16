@@ -9,6 +9,16 @@ auto Line::operator==(const Line& other) const -> bool {
     && thickness == other.thickness;
 }
 
+auto Line::debug() -> void {
+  std::cout << "To: " << std::endl;
+  to.debug();
+  std::cout << "From: " << std::endl;
+  from.debug();
+  std::cout << "Color: " << std::endl;
+  color.debug();
+  std::cout << "Thickness: " << thickness << std::endl;
+}
+
 auto evaluate_line(slcp::Expr& expr, SymbolTableStack& sts) -> Line {
   double to_x = default_line_to_x;
   double to_y = default_line_to_y;
@@ -27,77 +37,32 @@ auto evaluate_line(slcp::Expr& expr, SymbolTableStack& sts) -> Line {
   local_canvas_sts.push(SymbolTable());
   read_in_values(expr.child()[0], local_canvas_sts);
 
-  auto pixel_r_it = local_canvas_sts.top().find("pixel_r");
-  if (pixel_r_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_r"].value())) {
-      pixel_r = std::get<int>(local_canvas_sts.top()["pixel_r"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_r"].value())) {
-      pixel_r = std::get<double>(local_canvas_sts.top()["pixel_r"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_r")) {
+    pixel_r = *extract_value<int, double>(local_canvas_sts, "pixel_r");
   }
-  auto pixel_g_it = local_canvas_sts.top().find("pixel_g");
-  if (pixel_g_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_g"].value())) {
-      pixel_g = std::get<int>(local_canvas_sts.top()["pixel_g"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_g"].value())) {
-      pixel_g = std::get<double>(local_canvas_sts.top()["pixel_g"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_g")) {
+    pixel_g = *extract_value<int, double>(local_canvas_sts, "pixel_g");
   }
-  auto pixel_b_it = local_canvas_sts.top().find("pixel_b");
-  if (pixel_b_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_b"].value())) {
-      pixel_b = std::get<int>(local_canvas_sts.top()["pixel_b"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_b"].value())) {
-      pixel_b = std::get<double>(local_canvas_sts.top()["pixel_b"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_b")) {
+    pixel_b = *extract_value<int, double>(local_canvas_sts, "pixel_b");
   }
-  auto pixel_a_it = local_canvas_sts.top().find("pixel_a");
-  if (pixel_a_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_a"].value())) {
-      pixel_a = std::get<int>(local_canvas_sts.top()["pixel_a"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_a"].value())) {
-      pixel_a = std::get<double>(local_canvas_sts.top()["pixel_a"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_a")) {
+    pixel_a = *extract_value<int, double>(local_canvas_sts, "pixel_a");
   }
-  auto to_x_it = local_canvas_sts.top().find("to_x");
-  if (to_x_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["to_x"].value())) {
-      to_x = std::get<int>(local_canvas_sts.top()["to_x"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["to_x"].value())) {
-      to_x = std::get<double>(local_canvas_sts.top()["to_x"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "to_x")) {
+    to_x = *extract_value<int, double>(local_canvas_sts, "to_x");
   }
-  auto to_y_it = local_canvas_sts.top().find("to_y");
-  if (to_y_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["to_y"].value())) {
-      to_y = std::get<int>(local_canvas_sts.top()["to_y"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["to_y"].value())) {
-      to_y = std::get<double>(local_canvas_sts.top()["to_y"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "to_y")) {
+    to_y = *extract_value<int, double>(local_canvas_sts, "to_y");
   }
-  auto from_x_it = local_canvas_sts.top().find("from_x");
-  if (from_x_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["from_x"].value())) {
-      from_x = std::get<int>(local_canvas_sts.top()["from_x"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["from_x"].value())) {
-      from_x = std::get<double>(local_canvas_sts.top()["from_x"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "from_x")) {
+    from_x = *extract_value<int, double>(local_canvas_sts, "from_x");
   }
-  auto from_y_it = local_canvas_sts.top().find("from_y");
-  if (from_y_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["from_y"].value())) {
-      from_y = std::get<int>(local_canvas_sts.top()["from_y"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["from_y"].value())) {
-      from_y = std::get<double>(local_canvas_sts.top()["from_y"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "from_y")) {
+    from_y = *extract_value<int, double>(local_canvas_sts, "from_y");
   }
-  auto thickness_it = local_canvas_sts.top().find("thickness");
-  if (thickness_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["thickness"].value())) {
-      thickness = std::get<int>(local_canvas_sts.top()["thickness"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["thickness"].value())) {
-      thickness = std::get<double>(local_canvas_sts.top()["thickness"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "thickness")) {
+    thickness = *extract_value<int, double>(local_canvas_sts, "thickness");
   }
 
   return Line((Coord2D){to_x, to_y}, (Coord2D){from_x, from_y},

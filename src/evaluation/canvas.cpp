@@ -9,6 +9,10 @@ auto Pixel::operator==(const Pixel& other) const -> bool {
     && a == other.a;
 }
 
+auto Pixel::debug() -> void {
+  std::cout << "(r: " << r << ", g: " << g << ", b: " << b << ", a: " << a << ")" << std::endl;
+}
+
 auto Canvas::operator==(const Canvas& other) const -> bool {
   return values == other.values;
 }
@@ -26,54 +30,25 @@ auto evaluate_canvas(slcp::Expr& expr, SymbolTableStack& sts) -> Canvas {
   local_canvas_sts.push(SymbolTable());
   read_in_values(expr.child()[0], local_canvas_sts);
 
-  auto pixel_r_it = local_canvas_sts.top().find("pixel_r");
-  if (pixel_r_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_r"].value())) {
-      pixel_r = std::get<int>(local_canvas_sts.top()["pixel_r"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_r"].value())) {
-      pixel_r = std::get<double>(local_canvas_sts.top()["pixel_r"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_r")) {
+    pixel_r = *extract_value<int, double>(local_canvas_sts, "pixel_r");
   }
-  auto pixel_g_it = local_canvas_sts.top().find("pixel_g");
-  if (pixel_g_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_g"].value())) {
-      pixel_g = std::get<int>(local_canvas_sts.top()["pixel_g"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_g"].value())) {
-      pixel_g = std::get<double>(local_canvas_sts.top()["pixel_g"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_g")) {
+    pixel_g = *extract_value<int, double>(local_canvas_sts, "pixel_g");
   }
-  auto pixel_b_it = local_canvas_sts.top().find("pixel_b");
-  if (pixel_b_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_b"].value())) {
-      pixel_b = std::get<int>(local_canvas_sts.top()["pixel_b"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_b"].value())) {
-      pixel_b = std::get<double>(local_canvas_sts.top()["pixel_b"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_b")) {
+    pixel_b = *extract_value<int, double>(local_canvas_sts, "pixel_b");
   }
-  auto pixel_a_it = local_canvas_sts.top().find("pixel_a");
-  if (pixel_a_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["pixel_a"].value())) {
-      pixel_a = std::get<int>(local_canvas_sts.top()["pixel_a"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["pixel_a"].value())) {
-      pixel_a = std::get<double>(local_canvas_sts.top()["pixel_a"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "pixel_a")) {
+    pixel_a = *extract_value<int, double>(local_canvas_sts, "pixel_a");
   }
-  auto height_it = local_canvas_sts.top().find("height");
-  if (height_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["height"].value())) {
-      height = std::get<int>(local_canvas_sts.top()["height"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["height"].value())) {
-      height = std::get<double>(local_canvas_sts.top()["height"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "height")) {
+    height = *extract_value<int, double>(local_canvas_sts, "height");
   }
-  auto width_it = local_canvas_sts.top().find("width");
-  if (width_it != local_canvas_sts.top().end()) {
-    if (std::holds_alternative<int>(local_canvas_sts.top()["width"].value())) {
-      width = std::get<int>(local_canvas_sts.top()["width"].value());
-    } else if (std::holds_alternative<double>(local_canvas_sts.top()["width"].value())) {
-      width = std::get<double>(local_canvas_sts.top()["width"].value());
-    }
+  if (extract_value<int, double>(local_canvas_sts, "width")) {
+    width = *extract_value<int, double>(local_canvas_sts, "width");
   }
+
   return Canvas(width, height, pixel_r, pixel_g, pixel_b, pixel_a);
 }
 

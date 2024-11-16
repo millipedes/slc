@@ -23,6 +23,9 @@ struct Pixel {
   uint8_t b;
   uint8_t a;
   auto operator==(const Pixel& other) const -> bool;
+  auto debug() -> void;
+  Pixel(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
+    : r(r), g(g), b(b), a(a) {}
 };
 
 struct Canvas {
@@ -30,8 +33,8 @@ struct Canvas {
 
   auto operator==(const Canvas& other) const -> bool;
 
-  Canvas(const uint32_t& width, const uint32_t& height,
-      const uint8_t& r, const uint8_t& g, const uint8_t& b, const uint8_t& a)
+  Canvas(const uint32_t width, const uint32_t height,
+      const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
     : values(height, std::vector<Pixel>(width, Pixel{r, g, b, a})) {}
 };
 

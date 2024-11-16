@@ -122,7 +122,8 @@ auto parse_shape(const char * input, Expr& expr) -> const char * {
   } else return NULL;
   Expr child;
   const char * maybe_empty;
-  if (maybe_empty = parse_word(parse_ws(shape_name), "()")) {
+  if ((maybe_empty = parse_word(parse_ws(shape_name), "("))
+      && (maybe_empty = parse_word(parse_ws(maybe_empty), ")"))) {
     return maybe_empty;
   }
   const char * remainder;

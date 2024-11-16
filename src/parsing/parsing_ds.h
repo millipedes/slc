@@ -88,7 +88,12 @@ struct Expr {
     auto value() -> ExprVariant { return value_; }
 
     auto set_child(std::unique_ptr<Exprs> child) -> void { child_ = std::move(child); }
-    auto child() -> Exprs { return *child_; }
+    // TODO: fix this
+    auto child() -> Exprs {
+      if (child_)
+        return *child_;
+      return Exprs();
+    }
 
     auto add_children(Expr child) -> void {
       if (!child_) {
