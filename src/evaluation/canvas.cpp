@@ -28,7 +28,9 @@ auto evaluate_canvas(slcp::Expr& expr, SymbolTableStack& sts) -> Canvas {
 
   auto local_canvas_sts = std::stack<SymbolTable>();
   local_canvas_sts.push(SymbolTable());
-  read_in_values(expr.child()[0], local_canvas_sts);
+  if (expr.child().size() > 0) {
+    read_in_values(expr.child()[0], local_canvas_sts);
+  }
 
   if (extract_value<int, double>(local_canvas_sts, "pixel_r")) {
     pixel_r = *extract_value<int, double>(local_canvas_sts, "pixel_r");

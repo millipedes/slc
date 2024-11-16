@@ -2,6 +2,16 @@
 
 namespace SLCEvaluation {
 
+auto Ellipse::debug() -> void {
+  std::cout << "Center: " << std::endl;
+  center.debug();
+  std::cout << "Color: " << std::endl;
+  color.debug();
+  std::cout << "Major Axis: " << major_axis << std::endl;
+  std::cout << "Minor Axis: " << minor_axis << std::endl;
+  std::cout << "Thickness: " << thickness << std::endl;
+}
+
 auto Ellipse::operator==(const Ellipse& other) const -> bool {
   return center == other.center
     && color == other.color
@@ -58,8 +68,8 @@ auto evaluate_ellipse(slcp::Expr expr, SymbolTableStack& sts) -> Ellipse {
     thickness = *extract_value<int, double>(local_canvas_sts, "thickness");
   }
 
-  return Ellipse((Coord2D){center_x, center_y},
-      (Pixel){pixel_r, pixel_g, pixel_b, pixel_a}, major_axis, minor_axis, thickness);
+  return Ellipse(Coord2D(center_x, center_y),
+      Pixel(pixel_r, pixel_g, pixel_b, pixel_a), major_axis, minor_axis, thickness);
 }
 
 // /**

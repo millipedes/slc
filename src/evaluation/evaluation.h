@@ -2,7 +2,10 @@
 
 #include "bool.h"
 #include "double.h"
-// #include "evaluation_drawing.h"
+#include "canvas.h"
+#include "rectangle.h"
+#include "ellipse.h"
+#include "line.h"
 #include "integer.h"
 #include "string.h"
 #include "symbol_table.h"
@@ -36,6 +39,7 @@ auto expr_ln(slcp::Expr expr) -> slcp::Expr;
 auto expr_and(slcp::Expr left, slcp::Expr right) -> slcp::Expr;
 auto expr_or(slcp::Expr left, slcp::Expr right) -> slcp::Expr;
 auto expr_not(slcp::Expr expr) -> slcp::Expr;
+auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr;
 
 // slc_value evaluate_array(parsed_array the_array, symbol_table * st);
 // 

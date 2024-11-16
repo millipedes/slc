@@ -3,6 +3,7 @@
 #include "evaluation/canvas.h"
 #include "evaluation/ellipse.h"
 #include "evaluation/line.h"
+#include "evaluation/rectangle.h"
 
 namespace slcp = SLCParsing;
 namespace slce = SLCEvaluation;
@@ -323,6 +324,18 @@ TEST(evaluation, evaluate_shape_test_5) {
   auto canvas_result = slce::evaluate_canvas(expr, sts);
   auto canvas = slce::Canvas(1100, 1200, 1, 35, 66, 255);
   ASSERT_EQ(canvas, canvas_result);
+}
+
+TEST(evaluation, evaluate_shape_test_6) {
+  auto sts = std::stack<slce::SymbolTable>();
+  sts.push(slce::SymbolTable());
+  const char * input = "rectangle(pixel_r = 1, pixel_b = 66 - 66 + 66, pixel_g = 35, pixel_a = 255, width = 1100, height = 1200)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto rectangle_result = slce::evaluate_rectangle(expr, sts);
+  auto rectangle = slce::Rectangle(slce::Coord2D(0.0, 0.0), slce::Pixel(1, 35, 66, 255), 1200, 1100, 10);
+  ASSERT_EQ(rectangle, rectangle_result);
 }
 
 // TEST(evaluation, array_test_0) {

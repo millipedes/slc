@@ -95,6 +95,7 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
       case slcp::OpType::Ellipse:
       case slcp::OpType::Canvas:
         return expr;
+        // return expr_shape(expr, sts);
     }
   } else {
     throw std::runtime_error("[evaluate_expression]: something went very wrong");
@@ -370,25 +371,18 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
 }
 
 // auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
-//   slc_value result = {0};
-//   result.type = SHAPE;
-//   switch(the_shape.type) {
-//     case ELLIPSE:
-//       result.value.the_shape.type = ELLIPSE;
-//       result.value.the_shape.value.the_ellipse = evaluate_ellipse(the_shape, st);
-//       break;
-//     case LINE:
-//       result.value.the_shape.type = LINE;
-//       result.value.the_shape.value.the_line = evaluate_line(the_shape, st);
-//       break;
-//     case RECTANGLE:
-//       result.value.the_shape.type = RECTANGLE;
-//       result.value.the_shape.value.the_rectangle = evaluate_rectangle(the_shape, st);
-//       break;
-//     case CANVAS:
-//       result.value.the_shape.type = CANVAS;
-//       result.value.the_shape.value.the_canvas = evaluate_canvas(the_shape, st);
-//       break;
+//   auto type = std::get<slcp::OpType>(expr.value());
+//   switch(type) {
+//     case slcp::OpType::Ellipse:
+//       return slcp::Expr(evaluate_ellipse(expr, sts));
+//     case slcp::OpType::Line:
+//       return slcp::Expr(evaluate_line(expr, sts));
+//     case slcp::OpType::Rectangle:
+//       return slcp::Expr(evaluate_rectangle(expr, sts));
+//     case slcp::OpType::Canvas:
+//       return slcp::Expr(evaluate_canvas(expr, sts));
+//     default:
+//       throw std::runtime_error("[expr_shape]: unsupported type passed");
 //   }
 //   return result;
 // }

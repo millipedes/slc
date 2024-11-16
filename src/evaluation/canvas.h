@@ -35,7 +35,7 @@ struct Canvas {
 
   Canvas(const uint32_t width, const uint32_t height,
       const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
-    : values(height, std::vector<Pixel>(width, Pixel{r, g, b, a})) {}
+    : values(height, std::vector<Pixel>(width, Pixel(r, g, b, a))) {}
 };
 
 auto evaluate_canvas(slcp::Expr& expr, SymbolTableStack& sts) -> Canvas;

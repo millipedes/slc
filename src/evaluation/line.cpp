@@ -35,7 +35,9 @@ auto evaluate_line(slcp::Expr& expr, SymbolTableStack& sts) -> Line {
 
   auto local_canvas_sts = std::stack<SymbolTable>();
   local_canvas_sts.push(SymbolTable());
-  read_in_values(expr.child()[0], local_canvas_sts);
+  if (expr.child().size() > 0) {
+    read_in_values(expr.child()[0], local_canvas_sts);
+  }
 
   if (extract_value<int, double>(local_canvas_sts, "pixel_r")) {
     pixel_r = *extract_value<int, double>(local_canvas_sts, "pixel_r");
@@ -65,8 +67,8 @@ auto evaluate_line(slcp::Expr& expr, SymbolTableStack& sts) -> Line {
     thickness = *extract_value<int, double>(local_canvas_sts, "thickness");
   }
 
-  return Line((Coord2D){to_x, to_y}, (Coord2D){from_x, from_y},
-      (Pixel){pixel_r, pixel_g, pixel_b, pixel_a}, thickness);
+  return Line(Coord2D(to_x, to_y), Coord2D(from_x, from_y),
+      Pixel(pixel_r, pixel_g, pixel_b, pixel_a), thickness);
 }
 
 // /**

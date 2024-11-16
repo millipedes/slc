@@ -27,6 +27,8 @@ struct Ellipse {
   int thickness;
 
   auto operator==(const Ellipse& other) const -> bool;
+  auto debug() -> void;
+
   Ellipse(const Coord2D& center, const Pixel& color, const size_t& major_axis, const size_t& minor_axis, const int& thickness) : center(center), color(color), major_axis(major_axis), minor_axis(minor_axis), thickness(thickness) {}
 };
 
