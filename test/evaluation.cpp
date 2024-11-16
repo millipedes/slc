@@ -1,5 +1,8 @@
 #include "test_helper.h"
 
+#include "evaluation/canvas.h"
+#include "evaluation/line.h"
+
 namespace slcp = SLCParsing;
 namespace slce = SLCEvaluation;
 
@@ -154,92 +157,121 @@ TEST(evaluation, evaluate_expression_test_18) {
 
 TEST(evaluation, evaluate_expression_test_19) {
   slcp::Expr expr;
-  test_double_expr(expr, "sin(3.1415926 / 6.0)", 0.5);
+  const char * input = "16 + 19 - 7 * 4 ** 9 + 1834976";
+  auto sts = std::stack<slce::SymbolTable>();
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto result = slce::evaluate_expression(expr, sts);
+  test_expr(result, slcp::Expr(3));
 }
 
 TEST(evaluation, evaluate_expression_test_20) {
   slcp::Expr expr;
-  test_double_expr(expr, "cos(3.1415926 / 3.0)", 0.5);
+  test_double_expr(expr, "sin(3.1415926 / 6.0)", 0.5);
 }
 
 TEST(evaluation, evaluate_expression_test_21) {
   slcp::Expr expr;
-  test_double_expr(expr, "tan(3.1415926 / 4.0)", 1.0);
+  test_double_expr(expr, "cos(3.1415926 / 3.0)", 0.5);
 }
 
 TEST(evaluation, evaluate_expression_test_22) {
   slcp::Expr expr;
-  test_double_expr(expr, "arcsin(0.5)", M_PI / 6.0);
+  test_double_expr(expr, "tan(3.1415926 / 4.0)", 1.0);
 }
 
 TEST(evaluation, evaluate_expression_test_23) {
   slcp::Expr expr;
-  test_double_expr(expr, "arccos(0.5)", M_PI / 3.0);
+  test_double_expr(expr, "arcsin(0.5)", M_PI / 6.0);
 }
 
 TEST(evaluation, evaluate_expression_test_24) {
   slcp::Expr expr;
-  test_double_expr(expr, "arctan(1.0)", M_PI / 4.0);
+  test_double_expr(expr, "arccos(0.5)", M_PI / 3.0);
 }
 
 TEST(evaluation, evaluate_expression_test_25) {
   slcp::Expr expr;
-  test_double_expr(expr, "log(2.0)", 1.0);
+  test_double_expr(expr, "arctan(1.0)", M_PI / 4.0);
 }
 
 TEST(evaluation, evaluate_expression_test_26) {
   slcp::Expr expr;
-  test_double_expr(expr, "ln(0.5)", -0.6931);
+  test_double_expr(expr, "log(2.0)", 1.0);
 }
 
 TEST(evaluation, evaluate_expression_test_27) {
   slcp::Expr expr;
-  test_result_from_string(expr, "-ln(0.5) + 1.0 * 2.0 < 3.0 && 1 == 1", true);
+  test_double_expr(expr, "ln(0.5)", -0.6931);
 }
 
 TEST(evaluation, evaluate_expression_test_28) {
   slcp::Expr expr;
-  test_result_from_string(expr, "-ln(0.5) + 1.0 * 2.0 < 2.0 && 1 == 1", false);
+  test_result_from_string(expr, "-ln(0.5) + 1.0 * 2.0 < 3.0 && 1 == 1", true);
 }
 
 TEST(evaluation, evaluate_expression_test_29) {
   slcp::Expr expr;
-  test_result_from_string(expr, "1 <= 2 && 1 == 2 || 2 == 3", false);
+  test_result_from_string(expr, "-ln(0.5) + 1.0 * 2.0 < 2.0 && 1 == 1", false);
 }
 
 TEST(evaluation, evaluate_expression_test_30) {
   slcp::Expr expr;
-  test_result_from_string(expr, "1 <= 2 && 1 == 1 || 2 == 3", true);
+  test_result_from_string(expr, "1 <= 2 && 1 == 2 || 2 == 3", false);
 }
 
 TEST(evaluation, evaluate_expression_test_31) {
   slcp::Expr expr;
-  test_result_from_string(expr, "1 <= 2 && 1 == 2 || 2 == 2", true);
+  test_result_from_string(expr, "1 <= 2 && 1 == 1 || 2 == 3", true);
 }
 
 TEST(evaluation, evaluate_expression_test_32) {
   slcp::Expr expr;
-  test_result_from_string(expr, "!true || 9 == 9 && !(31 - 2 < 30)", false);
+  test_result_from_string(expr, "1 <= 2 && 1 == 2 || 2 == 2", true);
 }
 
 TEST(evaluation, evaluate_expression_test_33) {
   slcp::Expr expr;
+  test_result_from_string(expr, "!true || 9 == 9 && !(31 - 2 < 30)", false);
+}
+
+TEST(evaluation, evaluate_expression_test_34) {
+  slcp::Expr expr;
   test_result_from_string(expr, "!true || 9 == 9 && (31 - 2 < 30)", true);
 }
 
-// TEST(evaluation, evaluate_shape_test_0) {
-//   symbol_table st = {0};
-//   const char * input = "rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   slc_value value_result = evaluate_shape(the_shape, &st);
-//   shape result = value_result.value.the_shape;
-//   validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
-//       (pixel){1, 35, 66}, 2, 1, 3}, result.value.the_rectangle);
-//   free_parsed_shape(the_shape);
-// }
-// 
+TEST(evaluation, evaluate_expression_test_35) {
+  slcp::Expr expr;
+  test_result_from_string(expr, "1 / 2 % 3", 0.5);
+}
+
+TEST(evaluation, evaluate_expression_test_36) {
+  slcp::Expr expr;
+  test_result_from_string(expr, "4 / -2 % 10", 8.0);
+}
+
+TEST(evaluation, evaluate_shape_test_0) {
+  auto sts = std::stack<slce::SymbolTable>();
+  const char * input = "canvas(width = 1900 + 20, height = 540 * 2, pixel_b = 3, pixel_g = 2, pixel_r = 1, pixel_a = 254)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto canvas_result = slce::evaluate_canvas(expr, sts);
+  auto canvas = slce::Canvas(1920, 1080, 1, 2, 3, 254);
+  ASSERT_EQ(canvas, canvas_result);
+}
+
+TEST(evaluation, evaluate_shape_test_1) {
+  auto sts = std::stack<slce::SymbolTable>();
+  const char * input = "line(thickness = 16 + 19 - 7 * 3 ** 4 + 535, pixel_b = 66, pixel_g = 35, pixel_r = 1, pixel_a = 254)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto line_result = slce::evaluate_line(expr, sts);
+  auto line = slce::Line((slce::Coord2D){0.0, 0.0}, (slce::Coord2D){100.0, 100.0}, (slce::Pixel){1, 35, 66, 254}, 3);
+  ASSERT_EQ(line, line_result);
+}
+
 // TEST(evaluation, evaluate_shape_test_1) {
 //   symbol_table st = {0};
 //   const char * input = "line(thickness 1 + 2, pixel_r 1, to_x 2.0, from_x 2.0, to_y 2.0, from_y 2.0 pixel_b 66, pixel_g 35)";
@@ -281,22 +313,19 @@ TEST(evaluation, evaluate_expression_test_33) {
 //       result.value.the_ellipse);
 //   free_parsed_shape(the_shape);
 // }
-// 
-// TEST(evaluation, evaluate_shape_test_4) {
-//   symbol_table st = {0};
-//   const char * input = "canvas(pixel_r 1, pixel_b 66 - 66 + 66, pixel_g 35, pixel_a 255, width 1100, height 1200)";
-//   parsed_shape the_shape = {0};
-//   const char * remainder = parse_shape(input, &the_shape);
-//   ASSERT_EQ(remainder[0], '\0');
-//   slc_value value_result = evaluate_shape(the_shape, &st);
-//   shape result = value_result.value.the_shape;
-//   canvas truth = init_canvas(1200, 1100, 1, 35, 66, 255);
-//   validate_canvas(truth, result.value.the_canvas);
-//   free_canvas(truth);
-//   free_parsed_shape(the_shape);
-//   free_slc_value(value_result);
-// }
-// 
+
+TEST(evaluation, evaluate_shape_test_4) {
+  auto sts = std::stack<slce::SymbolTable>();
+  sts.push(slce::SymbolTable());
+  const char * input = "canvas(pixel_r = 1, pixel_b = 66 - 66 + 66, pixel_g = 35, pixel_a = 255, width = 1100, height = 1200)";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  ASSERT_EQ(remainder[0], '\0');
+  auto not_pertinent = slce::evaluate_expression(expr, sts);
+  // Canvas result = init_canvas(1200, 1100, 1, 35, 66, 255);
+  // validate_canvas(truth, result.value.the_canvas);
+}
+
 // TEST(evaluation, array_test_0) {
 //   symbol_table st = {0};
 //   const char * input = "[1 < 3 == 2 > 1, -(((1 - - 2)))]";
@@ -346,27 +375,17 @@ TEST(evaluation, evaluate_expression_test_33) {
 //   free_parsed_array(the_parsed_array);
 //   free_slc_value(the_value);
 // }
-// 
-// TEST(evaluation, symbol_table_test_0) {
-//   symbol_table st = {0};
-//   const char * input = "some_value = rectangle(thickness 1 + 2, center_x 2.0, pixel_b 66, center_y 1.0, width 1, pixel_g 35, height 2, pixel_r 1);";
-//   parsed_lline the_lline = {0};
-//   const char * remainder = parse_assignment(input, &the_lline);
-//   evaluate_lline(the_lline, &st);
-//   expression symbol = {0};
-//   symbol.type = VAR;
-//   symbol.value.string_value = (char *)calloc(sizeof("some_value"), sizeof(char));
-//   strncpy(symbol.value.string_value, "some_value", sizeof("some_value"));
-//   slc_value the_value = find_symbol(st, symbol);
-//   ASSERT_EQ(the_value.type, SHAPE);
-//   ASSERT_EQ(the_value.value.the_shape.type, RECTANGLE);
-//   validate_rectangle((rectangle){(coord_2d){2.0, 1.0},
-//       (pixel){1, 35, 66}, 2, 1, 3}, the_value.value.the_shape.value.the_rectangle);
-//   free_expression(symbol);
-//   free_parsed_lline(the_lline);
-//   free_symbol_table(st);
-// }
-// 
+
+TEST(evaluation, symbol_table_test_0) {
+  auto sts = std::stack<slce::SymbolTable>();
+  sts.push(slce::SymbolTable());
+  const char * input = "some_value = 2.0 * 15.0";
+  slcp::Expr expr;
+  auto remainder = slcp::parse_precedence_15_expr(input, expr);
+  auto tmp = slce::evaluate_expression(expr, sts);
+  test_expr(sts.top()["some_value"], slcp::Expr(30.0));
+}
+
 // TEST(evaluation, symbol_table_test_1) {
 //   symbol_table st = {0};
 //   st = add_slc_value_to_table(st, "x", slc_value{expression{{.int_value = 5}, NULL, 0, INT}, EXPR});

@@ -23,7 +23,7 @@ auto parse_variable_name(const char * input, Expr& expr) -> const char * {
   uint32_t inc = 0;
   while (isalpha(*(input + inc)) || *(input + inc) == '_') inc++;
   if (inc > 0) {
-    expr.set_value(Expr::Variable{std::string(input, inc)});
+    expr.set_value(Variable{std::string(input, inc)});
     return input + inc;
   } else return NULL;
 }
@@ -164,7 +164,11 @@ auto make_binary_tree(const char * input, Expr& expr, Exprs& child,
     Expr parent = Expr(type);
     child[0] = expr;
     child.push_back(Expr());
+    auto before_last = input;
     input = parser(parse_ws(input), child[1]);
+    if (before_last == input) {
+      child.pop_back();
+    }
     if (!input) return NULL;
     parent.set_child(std::make_unique<Exprs>(child));
     expr = parent;
@@ -211,22 +215,17 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
   } else {
     factor = parse_axiom(parse_ws(input), expr);
   }
-  const char * maybe_factor;
-  if (maybe_factor = parse_word(parse_ws(factor), "**")) {
-    return make_binary_tree(parse_ws(maybe_factor), expr, child,
-        OpType::BinPow, parse_precedence_3_expr);
-  }
   const char * maybe_accessors;
   if (maybe_accessors = parse_word(parse_ws(factor), "[")) {
     Expr parent = expr;
     Expr accessor_parent = Expr(OpType::ArrayAccessor);
-    maybe_accessors = parse_precedence_4_expr(parse_ws(maybe_accessors), child[0]);
+    maybe_accessors = parse_precedence_12_expr(parse_ws(maybe_accessors), child[0]);
     maybe_accessors = parse_word(parse_ws(maybe_accessors), "]");
     factor = maybe_accessors;
     uint32_t i = 1;
     while (maybe_accessors = parse_word(parse_ws(factor), "[")) {
       child.push_back(Expr());
-      maybe_accessors = parse_precedence_4_expr(parse_ws(maybe_accessors), child[i]);
+      maybe_accessors = parse_precedence_12_expr(parse_ws(maybe_accessors), child[i]);
       maybe_accessors = parse_word(parse_ws(maybe_accessors), "]");
       factor = maybe_accessors;
       i++;
@@ -238,39 +237,58 @@ auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char * {
   return factor;
 }
 
+auto parse_precedence_2_expr(const char * input, Expr& expr) -> const char * {
+  const char * expression = parse_precedence_1_expr(parse_ws(input), expr);
+  const char * maybe_boolean_expr;
+  if (expression) {
+    while (true) {
+      Exprs child;
+      child.push_back(Expr());
+      if (maybe_boolean_expr = parse_word(parse_ws(expression), "**")) {
+        expression = make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
+            OpType::BinPow, parse_precedence_2_expr);
+      } else return expression;
+    }
+  } else return NULL;
+}
+
 auto parse_precedence_3_expr(const char * input, Expr& expr) -> const char * {
-  const char * factor = parse_precedence_1_expr(parse_ws(input), expr);
+  const char * factor = parse_precedence_2_expr(parse_ws(input), expr);
   const char * maybe_term;
-  Exprs child;
-  child.push_back(Expr());
   if (factor) {
-    if (!(maybe_term = parse_word(parse_ws(factor), "**"))
-        && (maybe_term = parse_word(parse_ws(factor), "*"))) {
-      return make_binary_tree(parse_ws(maybe_term), expr, child,
-          OpType::BinMult, parse_precedence_3_expr);
-    } else if (maybe_term = parse_word(parse_ws(factor), "/")) {
-      return make_binary_tree(parse_ws(maybe_term), expr, child,
-          OpType::BinDivide, parse_precedence_3_expr);
-    } else if (maybe_term = parse_word(parse_ws(factor), "%")) {
-      return make_binary_tree(parse_ws(maybe_term), expr, child,
-          OpType::BinMod, parse_precedence_3_expr);
-    } else return factor;
+    while (true) {
+      Exprs child;
+      child.push_back(Expr());
+      if (!(maybe_term = parse_word(parse_ws(factor), "**"))
+          && (maybe_term = parse_word(parse_ws(factor), "*"))) {
+        factor = make_binary_tree(parse_ws(maybe_term), expr, child,
+            OpType::BinMult, parse_precedence_2_expr);
+      } else if (maybe_term = parse_word(parse_ws(factor), "/")) {
+        factor = make_binary_tree(parse_ws(maybe_term), expr, child,
+            OpType::BinDivide, parse_precedence_2_expr);
+      } else if (maybe_term = parse_word(parse_ws(factor), "%")) {
+        factor = make_binary_tree(parse_ws(maybe_term), expr, child,
+            OpType::BinMod, parse_precedence_2_expr);
+      } else return factor;
+    }
   } else return NULL;
 }
 
 auto parse_precedence_4_expr(const char * input, Expr& expr) -> const char * {
   const char * term = parse_precedence_3_expr(parse_ws(input), expr);
   const char * maybe_expression;
-  Exprs child;
-  child.push_back(Expr());
   if (term) {
-    if (maybe_expression = parse_word(parse_ws(term), "+")) {
-      return make_binary_tree(parse_ws(maybe_expression), expr, child,
-          OpType::BinPlus, parse_precedence_4_expr);
-    } else if (maybe_expression = parse_word(parse_ws(term), "-")) {
-      return make_binary_tree(parse_ws(maybe_expression), expr, child,
-          OpType::BinMinus, parse_precedence_4_expr);
-    } else return term;
+    while (true) {
+      Exprs child;
+      child.push_back(Expr());
+      if (maybe_expression = parse_word(parse_ws(term), "+")) {
+        term = make_binary_tree(parse_ws(maybe_expression), expr, child,
+            OpType::BinPlus, parse_precedence_3_expr);
+      } else if (maybe_expression = parse_word(parse_ws(term), "-")) {
+        term = make_binary_tree(parse_ws(maybe_expression), expr, child,
+            OpType::BinMinus, parse_precedence_3_expr);
+      } else return term;
+    }
   } else return NULL;
 }
 
@@ -282,16 +300,16 @@ auto parse_precedence_6_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), ">=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinGeq, parse_precedence_6_expr);
+          OpType::BinGeq, parse_precedence_4_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), ">")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinGt, parse_precedence_6_expr);
+          OpType::BinGt, parse_precedence_4_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "<=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinLeq, parse_precedence_6_expr);
+          OpType::BinLeq, parse_precedence_4_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "<")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinLt, parse_precedence_6_expr);
+          OpType::BinLt, parse_precedence_4_expr);
     } else return expression;
 
   } else return NULL;
@@ -305,10 +323,10 @@ auto parse_precedence_7_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "==")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinEq, parse_precedence_7_expr);
+          OpType::BinEq, parse_precedence_6_expr);
     } else if (maybe_boolean_expr = parse_word(parse_ws(expression), "!=")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinNeq, parse_precedence_7_expr);
+          OpType::BinNeq, parse_precedence_6_expr);
     } else return expression;
   } else return NULL;
 }
@@ -321,7 +339,7 @@ auto parse_precedence_11_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "&&")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinBoolAnd, parse_precedence_11_expr);
+          OpType::BinBoolAnd, parse_precedence_7_expr);
     } else return expression;
   } else return NULL;
 }
@@ -334,7 +352,7 @@ auto parse_precedence_12_expr(const char * input, Expr& expr) -> const char * {
   if (expression) {
     if (maybe_boolean_expr = parse_word(parse_ws(expression), "||")) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinBoolOr, parse_precedence_12_expr);
+          OpType::BinBoolOr, parse_precedence_11_expr);
     } else return expression;
   } else return NULL;
 }
@@ -348,7 +366,7 @@ auto parse_precedence_14_expr(const char * input, Expr& expr) -> const char * {
     if (!(maybe_boolean_expr = parse_word(parse_ws(expression), "=="))
         && (maybe_boolean_expr = parse_word(parse_ws(expression), "="))) {
       return make_binary_tree(parse_ws(maybe_boolean_expr), expr, child,
-          OpType::BinAssignment, parse_precedence_14_expr);
+          OpType::BinAssignment, parse_precedence_12_expr);
     } else return expression;
   } else return NULL;
 }

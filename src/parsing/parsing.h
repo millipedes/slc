@@ -22,6 +22,7 @@ auto parse_shape(const char * input, Expr& expr) -> const char *;
 auto parse_array(const char * input, Expr& expr) -> const char *;
 
 auto parse_precedence_1_expr(const char * input, Expr& expr) -> const char *;
+auto parse_precedence_2_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_3_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_4_expr(const char * input, Expr& expr) -> const char *;
 auto parse_precedence_6_expr(const char * input, Expr& expr) -> const char *;

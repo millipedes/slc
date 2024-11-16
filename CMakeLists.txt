@@ -16,6 +16,7 @@ set(SRC_FILES
   ${SRC_DIR}/evaluation/integer.cpp
   ${SRC_DIR}/evaluation/line.cpp
   ${SRC_DIR}/evaluation/rectangle.cpp
+  ${SRC_DIR}/evaluation/shape_helpers.cpp
   ${SRC_DIR}/evaluation/string.cpp
   ${SRC_DIR}/evaluation/symbol_table.cpp
   ${SRC_DIR}/io/default_output_file.cpp

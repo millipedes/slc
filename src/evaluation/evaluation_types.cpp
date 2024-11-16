@@ -1,31 +1,5 @@
-// #include "evaluation_types.h"
-// 
-// shape deep_copy_shape(shape original) {
-//   shape copy = {0};
-//   copy.type = original.type;
-//   switch(original.type) {
-//     case RECTANGLE:
-//       copy.value.the_rectangle = original.value.the_rectangle;
-//       break;
-//     case ELLIPSE:
-//       copy.value.the_ellipse = original.value.the_ellipse;
-//       break;
-//     case LINE:
-//       copy.value.the_line = original.value.the_line;
-//       break;
-//     case CANVAS:
-//       copy.value.the_canvas = deep_copy_canvas(original.value.the_canvas);
-//       break;
-//   }
-//   return copy;
-// }
-// 
-// void free_shape(shape the_shape) {
-//   if(the_shape.type == CANVAS) {
-//     free_canvas(the_shape.value.the_canvas);
-//   }
-// }
-// 
+#include "evaluation_types.h"
+
 // array deep_copy_array(array original) {
 //   array copy = {0};
 //   copy.qty_values = original.qty_values;

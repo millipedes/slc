@@ -44,9 +44,9 @@ enum class OpType {
   Canvas,
 };
 
+struct Variable { std::string value; };
 struct Expr {
   using Exprs = std::vector<Expr>;
-  struct Variable { std::string value; };
   using ExprVariant = std::variant<int,         // Integer
                                    double,      // Double
                                    std::string, // String

@@ -8,13 +8,13 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
       || std::holds_alternative<std::string>(expr.value())
       || std::holds_alternative<bool>(expr.value())) {
     return slcp::Expr(expr);
-  } else if (std::holds_alternative<slcp::Expr::Variable>(expr.value())) {
-    auto it = sts.top().find(std::get<slcp::Expr::Variable>(expr.value()).value);
+  } else if (std::holds_alternative<slcp::Variable>(expr.value())) {
+    auto it = sts.top().find(std::get<slcp::Variable>(expr.value()).value);
     if (it != sts.top().end()) {
-      return sts.top()[std::get<slcp::Expr::Variable>(expr.value()).value];
+      return sts.top()[std::get<slcp::Variable>(expr.value()).value];
     } else {
       throw std::runtime_error("[evaluate_expression]: variable "
-          + std::get<slcp::Expr::Variable>(expr.value()).value + " not defined");
+          + std::get<slcp::Variable>(expr.value()).value + " not defined");
     }
   } else if (std::holds_alternative<slcp::OpType>(expr.value())) {
     auto type = std::get<slcp::OpType>(expr.value());
@@ -83,12 +83,18 @@ auto evaluate_expression(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
             evaluate_expression(expr.child()[1], sts));
       case slcp::OpType::BoolNot:
         return expr_not(evaluate_expression(expr.child()[0], sts));
-      // case slcp::OpType::BinAssignment:
+      case slcp::OpType::BinAssignment:
+        sts.top()[std::get<slcp::Variable>(expr.child()[0].value()).value]
+          = evaluate_expression(expr.child()[1], sts);
+        return slcp::Expr();
       // case slcp::OpType::BinComma:
-      // case slcp::OpType::Rectangle:
-      // case slcp::OpType::Line:
-      // case slcp::OpType::Ellipse:
-      // case slcp::OpType::Canvas:
+      // For shapes, we evaluate at draw time (different from array because we
+      // assign values local to the shape)
+      case slcp::OpType::Rectangle:
+      case slcp::OpType::Line:
+      case slcp::OpType::Ellipse:
+      case slcp::OpType::Canvas:
+        return expr;
     }
   } else {
     throw std::runtime_error("[evaluate_expression]: something went very wrong");
@@ -361,6 +367,9 @@ auto expr_not(slcp::Expr expr) -> slcp::Expr {
   } else {
     throw std::runtime_error("[expression_not]: unsupported type passed");
   }
+}
+
+auto evaluate_canvas(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
 }
 
 // auto expr_shape(slcp::Expr expr, SymbolTableStack& sts) -> slcp::Expr {
